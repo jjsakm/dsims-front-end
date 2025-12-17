@@ -1,5 +1,7 @@
 const URL = {
-  // 공지사항
+  // 메인
+  MAIN: "/",
+  // 대시보드
   DASHBOARD: "/dashboard",
   // 공지사항
   NOTICE_LIST: "/notice/list",

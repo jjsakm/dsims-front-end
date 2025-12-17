@@ -6,7 +6,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import type { DocDestruction } from "@/types/docDestruction";
-import useNotifications from "@/hooks/useNotifications/useNotifications";
+import useNotifications from "@/hooks/useNotifications";
 
 type ButtonProps = {
   selectedRows: DocDestruction[];

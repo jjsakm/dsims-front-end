@@ -62,3 +62,12 @@ export interface NoticeFormState {
   values: Partial<Omit<Notice, "id">>;
   errors: Partial<Record<keyof NoticeFormState["values"], string>>;
 }
+
+interface NoticeSearchValues {
+  searchCnd: string;
+  searchWrd: string;
+}
+
+export interface NoticeSearchState {
+  values: Partial<Omit<NoticeSearchValues, "id">>;
+}

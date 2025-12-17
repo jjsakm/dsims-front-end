@@ -1,5 +1,4 @@
 import * as React from "react";
-import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
@@ -8,21 +7,20 @@ import PageContainer from "@/components/PageContainer";
 import AgGridContainer from "@/components/AgGridContainer/AgGridContainer";
 import { FormGroup, Grid, TextField } from "@mui/material";
 import MuiSelect from "@/components/Elements/MuiSelect";
-import type { SelectChangeEvent } from "node_modules/@mui/material";
 import type { ColDef } from "ag-grid-community";
 import { listDefs } from "./col-def";
 import type { DigitalDoc, DigitalDocSearchState } from "@/types/digitalDoc";
 import { getDigitalDocList } from "@/services/digitalDocService";
-import type { FormFieldValue } from "@/types/common";
+import { useSearchStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
+import PageStatus from "@/components/PageStatus";
 
 export default function DigitalDocListPage() {
   const navigate = useNavigate();
 
-  const [searchValues, setSearchValues] = React.useState<
-    Partial<DigitalDocSearchState["values"]>
-  >({});
+  const [columnDefs] = React.useState<ColDef<any>[]>(listDefs);
 
-  const [columnDefs] = React.useState<ColDef[]>(listDefs);
+  const { values, handleTextFieldChange, handleSelectFieldChange } =
+    useSearchStateHandlers<DigitalDocSearchState["values"]>();
 
   const [rowData, setRowsData] = React.useState<{
     rows: DigitalDoc[];
@@ -34,35 +32,6 @@ export default function DigitalDocListPage() {
 
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
-
-  const handleFormFieldChange = React.useCallback(
-    (name: keyof DigitalDocSearchState["values"], value: FormFieldValue) => {
-      const newSearchValues = { ...searchValues, [name]: value };
-
-      setSearchValues(newSearchValues);
-    },
-    [searchValues]
-  );
-
-  const handleSelectFieldChange = React.useCallback(
-    (event: SelectChangeEvent) => {
-      handleFormFieldChange(
-        event.target.name as keyof DigitalDocSearchState["values"],
-        event.target.value
-      );
-    },
-    [handleFormFieldChange]
-  );
-
-  const handleTextFieldChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      handleFormFieldChange(
-        event.target.name as keyof DigitalDocSearchState["values"],
-        event.target.value
-      );
-    },
-    [handleFormFieldChange]
-  );
 
   const loadData = React.useCallback(async () => {
     setError(null);
@@ -88,12 +57,16 @@ export default function DigitalDocListPage() {
 
   const handleSearch = () => {
     // TODO: 검색 로직은 이후 구현
-    console.log(searchValues);
+    console.log(values);
   };
 
   const handleRowClick = (row: DigitalDoc) => {
     navigate(`/digitalDoc/${row.id}`);
   };
+
+  if (isLoading || error) {
+    return <PageStatus isLoading={isLoading} error={error} />;
+  }
 
   const breadcrumbs = "문서고 관리 > 전자문서 관리";
   const pageTitle = "전자문서 관리";
@@ -117,7 +90,7 @@ export default function DigitalDocListPage() {
                   { value: "00", label: "전체" },
                   { value: "01", label: "피해구제" },
                 ]}
-                value={searchValues.largeCategory ?? "00"}
+                value={values.largeCategory ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
@@ -131,7 +104,7 @@ export default function DigitalDocListPage() {
                   { value: "02", label: "신청자 제출서류" },
                   { value: "03", label: "직원보완자료" },
                 ]}
-                value={searchValues.midCategory ?? "00"}
+                value={values.midCategory ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
@@ -146,7 +119,7 @@ export default function DigitalDocListPage() {
                   { value: "03", label: "이전문서" },
                   { value: "04", label: "의무기록" },
                 ]}
-                value={searchValues.smallCategory ?? "00"}
+                value={values.smallCategory ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
@@ -157,7 +130,7 @@ export default function DigitalDocListPage() {
                 name="docNum"
                 placeholder="문서번호"
                 label="문서번호"
-                value={searchValues.docNum ?? ""}
+                value={values.docNum ?? ""}
                 onChange={handleTextFieldChange}
               />
             </Grid>
@@ -167,7 +140,7 @@ export default function DigitalDocListPage() {
                 name="docTitle"
                 placeholder="문서제목"
                 label="문서제목"
-                value={searchValues.docTitle ?? ""}
+                value={values.docTitle ?? ""}
                 onChange={handleTextFieldChange}
               />
             </Grid>
@@ -179,18 +152,12 @@ export default function DigitalDocListPage() {
       </FormGroup>
 
       <Box sx={{ flex: 1, width: "100%" }}>
-        {error ? (
-          <Box sx={{ flexGrow: 1 }}>
-            <Alert severity="error">{error.message}</Alert>
-          </Box>
-        ) : (
-          <AgGridContainer
-            isLoading={isLoading}
-            colDefs={columnDefs}
-            rowData={rowData.rows}
-            onRowClick={handleRowClick}
-          />
-        )}
+        <AgGridContainer
+          isLoading={isLoading}
+          colDefs={columnDefs}
+          rowData={rowData.rows}
+          onRowClick={handleRowClick}
+        />
       </Box>
     </PageContainer>
   );

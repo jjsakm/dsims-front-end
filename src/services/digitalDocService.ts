@@ -64,7 +64,7 @@ type ValidationResult = {
   issues: { message: string; path: (keyof DigitalDoc)[] }[];
 };
 
-export function validate(data: Partial<DigitalDoc>): ValidationResult {
+export function digitalDocFormValidator(data: Partial<DigitalDoc>): ValidationResult {
   let issues: ValidationResult["issues"] = [];
 
   if (!data.docNo) {

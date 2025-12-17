@@ -1,8 +1,6 @@
 import * as React from "react";
-import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
@@ -18,13 +16,13 @@ import { useNavigate, useParams } from "react-router";
 import PageContainer from "@/components/PageContainer";
 import type { DigitalDoc } from "@/types/digitalDoc";
 import { getDigitalDocData } from "@/services/digitalDocService";
-import { useDialogs } from "@/hooks/useDialogs/useDialogs/useDialogs";
-import useNotifications from "@/hooks/useNotifications/useNotifications";
+import { useDialogs } from "@/hooks/useDialogs/useDialogs";
+import useNotifications from "@/hooks/useNotifications";
 import DigitalDocHistoryButton from "@/components/Buttons/DigitalDocHistoryButton";
 import DigitalDocDownButton from "@/components/Buttons/DigitalDocDownButton";
 import DigitalDocViewerButton from "@/components/Buttons/DigitalDocViewerButton";
 import URL from "@/constants/url";
-import { TableHead } from "@mui/material";
+import PageStatus from "@/components/PageStatus";
 
 export default function DigitalDocDetailPage() {
   const { docId } = useParams();
@@ -121,41 +119,14 @@ export default function DigitalDocDetailPage() {
     navigate(URL.DIGITAL_DOC_LIST);
   }, [navigate]);
 
-  if (isLoading) {
-    return (
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-          m: 1,
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-  if (error) {
-    return (
-      <Box sx={{ flexGrow: 1 }}>
-        <Alert severity="error">{error.message}</Alert>
-      </Box>
-    );
+  if (isLoading || error) {
+    return <PageStatus isLoading={isLoading} error={error} />;
   }
 
-  const pageTitle = `문서분류 관리`;
+  const pageTitle = `전자문서 상세`;
 
   return (
-    <PageContainer
-      title={pageTitle}
-      breadcrumbs={[
-        { title: "문서고 관리", path: "/digitalDoc/list" },
-        { title: pageTitle },
-      ]}
-    >
+    <PageContainer title={pageTitle}>
       <Stack
         direction="row"
         spacing={2}
@@ -180,49 +151,49 @@ export default function DigitalDocDetailPage() {
           <TableBody>
             {/* 문서분류 */}
             <TableRow>
-              <TableHead>문서분류</TableHead>
+              <TableCell>문서분류</TableCell>
               <TableCell colSpan={3}>{viewData?.docCategory ?? ""}</TableCell>
             </TableRow>
 
             {/* 문서번호 / 기본권한 */}
             <TableRow>
-              <TableHead>문서번호</TableHead>
+              <TableCell>문서번호</TableCell>
               <TableCell>{viewData?.docNo ?? ""}</TableCell>
-              <TableHead>기본권한</TableHead>
+              <TableCell>기본권한</TableCell>
               <TableCell>피해구제팀 / 전체</TableCell>
             </TableRow>
 
             {/* 문서제목 */}
             <TableRow>
-              <TableHead>문서제목</TableHead>
+              <TableCell>문서제목</TableCell>
               <TableCell colSpan={3}>{viewData?.docTitle ?? ""}</TableCell>
             </TableRow>
 
             {/* 수집일자 / 종료일자 */}
             <TableRow>
-              <TableHead>수집일자</TableHead>
+              <TableCell>수집일자</TableCell>
               <TableCell>{viewData?.collectDateLabel ?? ""}</TableCell>
-              <TableHead>종료일자</TableHead>
+              <TableCell>종료일자</TableCell>
               <TableCell>{viewData?.endDate ?? ""}</TableCell>
             </TableRow>
 
             {/* 개인정보 / 반환여부 */}
             <TableRow>
-              <TableHead>개인정보</TableHead>
+              <TableCell>개인정보</TableCell>
               <TableCell>{viewData?.hasPersonalInfo ?? ""}</TableCell>
-              <TableHead>반환여부</TableHead>
+              <TableCell>반환여부</TableCell>
               <TableCell>미반환</TableCell>
             </TableRow>
 
             {/* 비고 */}
             <TableRow>
-              <TableHead>비고</TableHead>
+              <TableCell>비고</TableCell>
               <TableCell colSpan={3}>{viewData?.remark ?? ""}</TableCell>
             </TableRow>
 
             {/* 첨부파일 */}
             <TableRow>
-              <TableHead>첨부파일</TableHead>
+              <TableCell>첨부파일</TableCell>
               <TableCell colSpan={3}>
                 <Stack
                   direction="row"
@@ -338,7 +309,7 @@ export default function DigitalDocDetailPage() {
           >
             <TableBody>
               <TableRow>
-                <TableHead>문서분류</TableHead>
+                <TableCell>문서분류</TableCell>
                 <TableCell>
                   <Stack
                     direction="row"
@@ -365,7 +336,7 @@ export default function DigitalDocDetailPage() {
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableHead>반환여부</TableHead>
+                <TableCell>반환여부</TableCell>
                 <TableCell>
                   <FormControl component="fieldset">
                     <RadioGroup
@@ -389,6 +360,9 @@ export default function DigitalDocDetailPage() {
               </TableRow>
             </TableBody>
           </Table>
+          <Button variant="contained" size="small" color="primary">
+            수정
+          </Button>
         </Box>
       </Stack>
     </PageContainer>

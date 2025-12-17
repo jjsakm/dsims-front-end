@@ -1,19 +1,16 @@
 import * as React from "react";
 import {
-  Alert,
   Stack,
   Box,
   Button,
-  CircularProgress,
   Table,
   TableBody,
   TableCell,
   TableRow,
-  TableHead,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
-import { useDialogs } from "@/hooks/useDialogs/useDialogs/useDialogs";
-import useNotifications from "@/hooks/useNotifications/useNotifications";
+import { useDialogs } from "@/hooks/useDialogs/useDialogs";
+import useNotifications from "@/hooks/useNotifications";
 import PageContainer from "@/components/PageContainer";
 import {
   deleteDocClassificationData,
@@ -21,6 +18,7 @@ import {
 } from "@/services/docClassificationService";
 import type { DocClassification } from "@/types/docClassification";
 import DocClassificationHistoryButton from "@/components/Buttons/DocClassificationHistoryButton";
+import PageStatus from "@/components/PageStatus";
 
 export default function DocClassificationDetailPage() {
   const { docClassificationId } = useParams();
@@ -100,30 +98,8 @@ export default function DocClassificationDetailPage() {
     navigate("/docClassification/list");
   }, [navigate]);
 
-  if (isLoading) {
-    return (
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-          m: 1,
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box sx={{ flexGrow: 1 }}>
-        <Alert severity="error">{error.message}</Alert>
-      </Box>
-    );
+  if (isLoading || error) {
+    return <PageStatus isLoading={isLoading} error={error} />;
   }
 
   const pageTitle = `문서분류 관리`;
@@ -168,17 +144,17 @@ export default function DocClassificationDetailPage() {
               <TableBody>
                 {/* 상단 기본 정보 영역 */}
                 <TableRow>
-                  <TableHead>문서분류</TableHead>
+                  <TableCell>문서분류</TableCell>
                   <TableCell colSpan={3}>
                     {`${detailData?.largeCategory} > ${detailData?.midCategory} > ${detailData?.smallCategory}`}
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableHead>개인정보 포함</TableHead>
+                  <TableCell>개인정보 포함</TableCell>
                   <TableCell>
                     {detailData?.fileName ? "포함" : "미포함"}
                   </TableCell>
-                  <TableHead>사용여부</TableHead>
+                  <TableCell>사용여부</TableCell>
                   <TableCell>
                     {detailData?.useYn === "Y"
                       ? "사용"
@@ -188,9 +164,9 @@ export default function DocClassificationDetailPage() {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableHead>등록일자</TableHead>
+                  <TableCell>등록일자</TableCell>
                   <TableCell>{detailData?.regDate ?? "-"}</TableCell>
-                  <TableHead>등록자</TableHead>
+                  <TableCell>등록자</TableCell>
                   <TableCell>{detailData?.registrant ?? "-"}</TableCell>
                 </TableRow>
               </TableBody>
@@ -204,93 +180,93 @@ export default function DocClassificationDetailPage() {
             >
               <TableBody>
                 <TableRow>
-                  <TableHead>부서명</TableHead>
+                  <TableCell>부서명</TableCell>
                   <TableCell>{detailData?.departmentName ?? ""}</TableCell>
-                  <TableHead>파일명</TableHead>
+                  <TableCell>파일명</TableCell>
                   <TableCell>{detailData?.fileName ?? ""}</TableCell>
                 </TableRow>
 
                 <TableRow>
-                  <TableHead>보유목적</TableHead>
                   <TableCell>보유목적</TableCell>
-                  <TableHead>사용부서(내부, 외부)</TableHead>
+                  <TableCell>보유목적</TableCell>
+                  <TableCell>사용부서(내부, 외부)</TableCell>
                   <TableCell>내부</TableCell>
                 </TableRow>
 
                 <TableRow>
-                  <TableHead>개인정보 처리방법</TableHead>
                   <TableCell>개인정보 처리방법</TableCell>
-                  <TableHead>보유기간</TableHead>
+                  <TableCell>개인정보 처리방법</TableCell>
+                  <TableCell>보유기간</TableCell>
                   <TableCell>5년</TableCell>
                 </TableRow>
 
                 <TableRow>
-                  <TableHead>정보주체의 개인정보항목</TableHead>
                   <TableCell>정보주체의 개인정보항목</TableCell>
-                  <TableHead>법정대리인의 개인정보항목</TableHead>
+                  <TableCell>정보주체의 개인정보항목</TableCell>
+                  <TableCell>법정대리인의 개인정보항목</TableCell>
                   <TableCell>법정대리인의 개인정보항목</TableCell>
                 </TableRow>
 
                 <TableRow>
-                  <TableHead>주민등록번호 수집여부</TableHead>
+                  <TableCell>주민등록번호 수집여부</TableCell>
                   <TableCell>수집</TableCell>
-                  <TableHead>주민등록번호 수집 법령근거</TableHead>
+                  <TableCell>주민등록번호 수집 법령근거</TableCell>
                   <TableCell>주민등록번호 수집 법령근거</TableCell>
                 </TableRow>
 
                 <TableRow>
-                  <TableHead>정보주체 동의여부</TableHead>
+                  <TableCell>정보주체 동의여부</TableCell>
                   <TableCell>동의</TableCell>
-                  <TableHead>정보주체 동의 없이 수집 법령근거</TableHead>
+                  <TableCell>정보주체 동의 없이 수집 법령근거</TableCell>
                   <TableCell>정보주체 동의 없이 수집 법령근거</TableCell>
                 </TableRow>
 
                 <TableRow>
-                  <TableHead>민감 정보 보유여부</TableHead>
+                  <TableCell>민감 정보 보유여부</TableCell>
                   <TableCell>보유</TableCell>
-                  <TableHead>민감 정보 별도동의 여부</TableHead>
+                  <TableCell>민감 정보 별도동의 여부</TableCell>
                   <TableCell>동의</TableCell>
                 </TableRow>
 
                 <TableRow>
-                  <TableHead>고유식별정보 보유여부</TableHead>
+                  <TableCell>고유식별정보 보유여부</TableCell>
                   <TableCell>보유</TableCell>
-                  <TableHead>고유식별정보 별도동의 여부</TableHead>
+                  <TableCell>고유식별정보 별도동의 여부</TableCell>
                   <TableCell>동의</TableCell>
                 </TableRow>
 
                 <TableRow>
-                  <TableHead>개인정보영향평가 대상여부</TableHead>
+                  <TableCell>개인정보영향평가 대상여부</TableCell>
                   <TableCell>대상</TableCell>
-                  <TableHead>취급담당자</TableHead>
+                  <TableCell>취급담당자</TableCell>
                   <TableCell>취급담당자</TableCell>
                 </TableRow>
 
                 <TableRow>
-                  <TableHead>제3자 제공받는 자</TableHead>
                   <TableCell>제3자 제공받는 자</TableCell>
-                  <TableHead>제3자 제공 근거</TableHead>
+                  <TableCell>제3자 제공받는 자</TableCell>
+                  <TableCell>제3자 제공 근거</TableCell>
                   <TableCell>제3자 제공 근거</TableCell>
                 </TableRow>
 
                 <TableRow>
-                  <TableHead>제3자 제공 항목</TableHead>
                   <TableCell>제3자 제공 항목</TableCell>
-                  <TableHead>개인정보처리 위탁 업체명</TableHead>
+                  <TableCell>제3자 제공 항목</TableCell>
+                  <TableCell>개인정보처리 위탁 업체명</TableCell>
                   <TableCell>개인정보처리 위탁 업체명</TableCell>
                 </TableRow>
 
                 <TableRow>
-                  <TableHead>개인정보위탁 계약서 여부</TableHead>
+                  <TableCell>개인정보위탁 계약서 여부</TableCell>
                   <TableCell>있음</TableCell>
-                  <TableHead>개인정보위탁사실 게재여부</TableHead>
+                  <TableCell>개인정보위탁사실 게재여부</TableCell>
                   <TableCell>게재</TableCell>
                 </TableRow>
 
                 <TableRow>
-                  <TableHead>목적 외 이용·제공 여부</TableHead>
+                  <TableCell>목적 외 이용·제공 여부</TableCell>
                   <TableCell>있음</TableCell>
-                  <TableHead>목적 외 이용·제공 근거</TableHead>
+                  <TableCell>목적 외 이용·제공 근거</TableCell>
                   <TableCell>목적 외 이용·제공 근거</TableCell>
                 </TableRow>
               </TableBody>

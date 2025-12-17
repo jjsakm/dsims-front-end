@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useNavigate, useParams } from "react-router";
-import useNotifications from "@/hooks/useNotifications/useNotifications";
+import useNotifications from "@/hooks/useNotifications";
 import {
   getDocClassificationData,
   updateDocClassificationData,
@@ -13,9 +13,9 @@ import type {
   DocClassification,
   DocClassificationFormState,
 } from "@/types/docClassification";
-import { Alert, Box, CircularProgress } from "@mui/material";
-import type { FormFieldValue } from "@/types/common";
 import URL from "@/constants/url";
+import { useFormStateHandlers } from "@/hooks/InputStateHandlers/useFormStateHandlers";
+import PageStatus from "@/components/PageStatus";
 
 const INITIAL_FORM_VALUES: Partial<DocClassificationFormState["values"]> = {
   useYn: "N",
@@ -29,14 +29,12 @@ export default function DocClassificationFormPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
 
-  const [formState, setFormState] = React.useState<DocClassificationFormState>(
-    () => ({
-      values: INITIAL_FORM_VALUES,
-      errors: {},
-    })
-  );
+  const { formState, setFormValues, setFormErrors, handleFormFieldChange } =
+    useFormStateHandlers<DocClassificationFormState["values"]>(
+      INITIAL_FORM_VALUES, // 초기값
+      docClassificationvalidator // 이 폼에서 쓸 validator
+    );
   const formValues = formState.values;
-  const formErrors = formState.errors;
 
   const loadData = React.useCallback(async () => {
     setError(null);
@@ -47,12 +45,12 @@ export default function DocClassificationFormPage() {
         Number(docClassificationId)
       );
 
-      setFormState((prev) => ({ ...prev, values: viewData }));
+      setFormValues(viewData);
     } catch (viewDataError) {
       setError(viewDataError as Error);
     }
     setIsLoading(false);
-  }, [docClassificationId]);
+  }, [docClassificationId, setFormValues]);
 
   React.useEffect(() => {
     if (!docClassificationId) {
@@ -62,49 +60,6 @@ export default function DocClassificationFormPage() {
 
     loadData();
   }, [docClassificationId, loadData]);
-
-  const setFormValues = React.useCallback(
-    (newFormValues: Partial<DocClassificationFormState["values"]>) => {
-      setFormState((previousState) => ({
-        ...previousState,
-        values: newFormValues,
-      }));
-    },
-    []
-  );
-
-  const setFormErrors = React.useCallback(
-    (newFormErrors: Partial<DocClassificationFormState["errors"]>) => {
-      setFormState((previousState) => ({
-        ...previousState,
-        errors: newFormErrors,
-      }));
-    },
-    []
-  );
-
-  const handleFormFieldChange = React.useCallback(
-    (
-      name: keyof DocClassificationFormState["values"],
-      value: FormFieldValue
-    ) => {
-      const validateField = async (
-        values: Partial<DocClassificationFormState["values"]>
-      ) => {
-        const { issues } = docClassificationvalidator(values);
-        setFormErrors({
-          ...formErrors,
-          [name]: issues?.find((issue) => issue.path?.[0] === name)?.message,
-        });
-      };
-
-      const newFormValues = { ...formValues, [name]: value };
-
-      setFormValues(newFormValues);
-      validateField(newFormValues);
-    },
-    [formValues, formErrors, setFormErrors, setFormValues]
-  );
 
   const createData = React.useCallback(
     async (formValues: Partial<DocClassificationFormState["values"]>) => {
@@ -142,7 +97,7 @@ export default function DocClassificationFormPage() {
           docClassificationId,
           formValues as Partial<Omit<DocClassification, "id">>
         );
-        setFormState((prev) => ({ ...prev, values: updatedData }));
+        setFormValues(updatedData);
 
         notifications.show("수정 완료.", {
           severity: "success",
@@ -159,7 +114,7 @@ export default function DocClassificationFormPage() {
         throw editError;
       }
     },
-    [notifications]
+    [notifications, setFormValues]
   );
 
   const handleSubmit = React.useCallback(async () => {
@@ -182,30 +137,8 @@ export default function DocClassificationFormPage() {
     }
   }, [formValues, setFormErrors, docClassificationId, createData, updatedData]);
 
-  if (isLoading) {
-    return (
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-          m: 1,
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box sx={{ flexGrow: 1 }}>
-        <Alert severity="error">{error.message}</Alert>
-      </Box>
-    );
+  if (isLoading || error) {
+    return <PageStatus isLoading={isLoading} error={error} />;
   }
 
   const pageTitle = docClassificationId ? "수정" : "등록";

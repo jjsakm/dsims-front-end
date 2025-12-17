@@ -11,14 +11,12 @@ import {
   Typography,
 } from "@mui/material";
 import MuiSelect from "@/components/Elements/MuiSelect";
-import type { SelectChangeEvent } from "node_modules/@mui/material";
 import type { ColDef } from "ag-grid-community";
 import { listDefs } from "./col-def";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 
-import type { FormFieldValue } from "@/types/common";
 import { getDocDestructionList } from "@/services/docDestructionService";
 import DocDestructionManagementPrintButton from "@/components/Buttons/DocDestructionManagementPrintButton";
 import type {
@@ -26,15 +24,13 @@ import type {
   DocDestructionSearchState,
 } from "@/types/docDestruction";
 import { useNavigate } from "react-router";
+import { useSearchStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
+import PageStatus from "@/components/PageStatus";
 
 export default function DocDestructionListPage() {
   const navigate = useNavigate();
 
-  const [searchValues, setSearchValues] = React.useState<
-    Partial<DocDestructionSearchState["values"]>
-  >({});
-
-  const [columnDefs] = React.useState<ColDef[]>(listDefs);
+  const [columnDefs] = React.useState<ColDef<any>[]>(listDefs);
 
   const [rowData, setRowsData] = React.useState<{
     rows: DocDestruction[];
@@ -48,39 +44,8 @@ export default function DocDestructionListPage() {
   const [error, setError] = React.useState<Error | null>(null);
   const [printOn, setPrintOn] = React.useState(false);
 
-  const handleSearchFieldChange = React.useCallback(
-    (
-      name: keyof DocDestructionSearchState["values"],
-      value: FormFieldValue
-    ) => {
-      const newSearchValues = { ...searchValues, [name]: value };
-
-      setSearchValues(newSearchValues);
-    },
-    [searchValues]
-  );
-
-  const handleDateFieldChange = React.useCallback(
-    (fieldName: keyof DocDestructionSearchState["values"]) =>
-      (value: Dayjs | null) => {
-        if (value?.isValid()) {
-          handleSearchFieldChange(fieldName, value.toISOString() ?? null);
-        } else if (rowData[fieldName]) {
-          handleSearchFieldChange(fieldName, null);
-        }
-      },
-    [rowData, handleSearchFieldChange]
-  );
-
-  const handleSelectFieldChange = React.useCallback(
-    (event: SelectChangeEvent) => {
-      handleSearchFieldChange(
-        event.target.name as keyof DocDestructionSearchState["values"],
-        event.target.value
-      );
-    },
-    [handleSearchFieldChange]
-  );
+  const { values, handleSelectFieldChange, handleDateFieldChange } =
+    useSearchStateHandlers<DocDestructionSearchState["values"]>();
 
   const loadData = React.useCallback(async () => {
     setError(null);
@@ -114,15 +79,19 @@ export default function DocDestructionListPage() {
   const handleSearch = () => {
     // TODO: 검색 로직은 이후 AgGrid 연동 시 구현
     console.log({
-      firstCategory: searchValues.largeCategory,
-      secondCategory: searchValues.midCategory,
-      thirdCategory: searchValues.smallCategory,
+      firstCategory: values.largeCategory,
+      secondCategory: values.midCategory,
+      thirdCategory: values.smallCategory,
     });
   };
 
   const handleRowClick = (row: DocDestruction) => {
     navigate(`/docDestruction/${row.id}`);
   };
+
+  if (isLoading || error) {
+    return <PageStatus isLoading={isLoading} error={error} />;
+  }
 
   const breadcrumbs = "파기문서 관리 > 파기 문서 목록";
   const pageTitle = "파기 문서 목록";
@@ -146,7 +115,7 @@ export default function DocDestructionListPage() {
                   { value: "00", label: "전체" },
                   { value: "01", label: "피해구제" },
                 ]}
-                value={searchValues.largeCategory ?? "00"}
+                value={values.largeCategory ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
@@ -160,7 +129,7 @@ export default function DocDestructionListPage() {
                   { value: "02", label: "신청자 제출서류" },
                   { value: "03", label: "직원보완자료" },
                 ]}
-                value={searchValues.midCategory ?? "00"}
+                value={values.midCategory ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
@@ -175,7 +144,7 @@ export default function DocDestructionListPage() {
                   { value: "03", label: "이전문서" },
                   { value: "04", label: "의무기록" },
                 ]}
-                value={searchValues.smallCategory ?? "00"}
+                value={values.smallCategory ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
@@ -185,8 +154,8 @@ export default function DocDestructionListPage() {
                 <Stack direction="row" spacing={2}>
                   <DatePicker
                     value={
-                      searchValues.destructionStartDate
-                        ? dayjs(searchValues.destructionStartDate)
+                      values.destructionStartDate
+                        ? dayjs(values.destructionStartDate)
                         : null
                     }
                     onChange={handleDateFieldChange("destructionStartDate")}
@@ -196,8 +165,8 @@ export default function DocDestructionListPage() {
                   <Typography>-</Typography>
                   <DatePicker
                     value={
-                      searchValues.destructionEndDate
-                        ? dayjs(searchValues.destructionEndDate)
+                      values.destructionEndDate
+                        ? dayjs(values.destructionEndDate)
                         : null
                     }
                     onChange={handleDateFieldChange("destructionEndDate")}
@@ -221,19 +190,13 @@ export default function DocDestructionListPage() {
       </Stack>
 
       <Box sx={{ flex: 1, width: "100%" }}>
-        {error ? (
-          <Box sx={{ flexGrow: 1 }}>
-            <Alert severity="error">{error.message}</Alert>
-          </Box>
-        ) : (
-          <AgGridContainer
-            isLoading={isLoading}
-            colDefs={columnDefs}
-            rowData={rowData.rows}
-            printOn={printOn}
-            onRowClick={handleRowClick}
-          />
-        )}
+        <AgGridContainer
+          isLoading={isLoading}
+          colDefs={columnDefs}
+          rowData={rowData.rows}
+          printOn={printOn}
+          onRowClick={handleRowClick}
+        />
       </Box>
     </PageContainer>
   );

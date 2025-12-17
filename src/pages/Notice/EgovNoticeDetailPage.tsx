@@ -1,64 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { NOTICE_BBS_ID } from "@/config";
 import { useNavigate, useParams } from "react-router";
-import { deleteNoticeItem, getNoticeItem } from "@/services/noticeService";
-import useNotifications from "@/hooks/useNotifications/useNotifications";
 // import EgovAttachFile from "@/components/EgovAttachFile";
 import {
-  Alert,
-  Box,
   Button,
-  CircularProgress,
   Stack,
   Table,
   TableBody,
-  TableHead,
   TableCell,
   TableRow,
 } from "@mui/material";
-import NET_CODE from "@/constants/netCode";
-import type { NoticeListItem } from "@/types/notice";
 import URL from "@/constants/url";
 import PageContainer from "@/components/PageContainer";
-import { useDialogs } from "@/hooks/useDialogs/useDialogs/useDialogs";
+import { useDialogs } from "@/hooks/useDialogs/useDialogs";
+import { useNoticeFormQueries } from "./useNoticeFormQueries";
+import PageStatus from "@/components/PageStatus";
 
 export default function EgovNoticeDetailPage() {
   const { nttId } = useParams();
   const dialogs = useDialogs();
-  const notifications = useNotifications();
   const navigate = useNavigate();
 
   const bbsId = NOTICE_BBS_ID;
+  const hasId = nttId != null && !Number.isNaN(Number(nttId));
 
-  const [detailData, setDetailData] = useState<NoticeListItem | null>(null);
-  // const [boardAttachFiles, setBoardAttachFiles] = useState();
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState<Error | null>(null);
-
-  const loadData = async () => {
-    setError(null);
-    setIsLoading(true);
-
-    try {
-      const resp = await getNoticeItem({
-        bbsId,
-        nttId: nttId?.toString() || "",
-      });
-      setDetailData(resp);
-      // setBoardAttachFiles(resp.result.resultFiles);
-    } catch (viewDataError) {
-      setError(viewDataError as Error);
-    }
-    setIsLoading(false);
-  };
-
-  useEffect(function () {
-    const hasId = nttId != null && !Number.isNaN(Number(nttId));
-    if (hasId) {
-      loadData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { detailData, isLoading, error, deleteNotice, isSubmitting } =
+    useNoticeFormQueries({
+      bbsId,
+      nttId: nttId?.toString(),
+      hasId,
+    });
 
   const onClickDeleteBoardArticle = async () => {
     const confirmed = await dialogs.confirm(`공지사항을 삭제 할까요?`, {
@@ -68,23 +39,10 @@ export default function EgovNoticeDetailPage() {
       cancelText: "취소",
     });
 
-    if (confirmed) {
-      const resp = await deleteNoticeItem({
-        bbsId: bbsId,
-        nttId,
-      });
-      if (resp === NET_CODE.RCV_SUCCESS) {
-        notifications.show("삭제되었습니다.", {
-          severity: "success",
-          autoHideDuration: 3000,
-        });
-      } else {
-        notifications.show("삭제가 실패하였습니다.", {
-          severity: "error",
-          autoHideDuration: 3000,
-        });
-      }
+    if (!confirmed) {
+      return;
     }
+    await deleteNotice();
   };
 
   const handleMove = React.useCallback(
@@ -94,30 +52,8 @@ export default function EgovNoticeDetailPage() {
     [navigate]
   );
 
-  if (isLoading) {
-    return (
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-          m: 1,
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box sx={{ flexGrow: 1 }}>
-        <Alert severity="error">{error.message}</Alert>
-      </Box>
-    );
+  if (isLoading || error) {
+    return <PageStatus isLoading={isLoading} error={error} />;
   }
 
   const pageTitle = `공지사항`;
@@ -125,10 +61,6 @@ export default function EgovNoticeDetailPage() {
   return (
     <PageContainer
       title={pageTitle}
-      breadcrumbs={[
-        { title: "알림마당", path: "/notice/list" },
-        { title: pageTitle },
-      ]}
     >
       {pageTitle}
       {/* <!-- 게시판 상세보기 --> */}
@@ -136,25 +68,25 @@ export default function EgovNoticeDetailPage() {
         <TableBody>
           {/* 제목 */}
           <TableRow>
-            <TableHead>제목</TableHead>
+            <TableCell>제목</TableCell>
             <TableCell colSpan={5}>{detailData?.nttSj}</TableCell>
           </TableRow>
 
           {/* 작성자 / 작성일 / 조회수 */}
           <TableRow>
-            <TableHead>작성자</TableHead>
+            <TableCell>작성자</TableCell>
             <TableCell>{detailData?.frstRegisterNm}</TableCell>
 
-            <TableHead>작성일</TableHead>
+            <TableCell>작성일</TableCell>
             <TableCell>{detailData?.frstRegisterPnttm}</TableCell>
 
-            <TableHead>조회수</TableHead>
+            <TableCell>조회수</TableCell>
             <TableCell>{detailData?.inqireCo}</TableCell>
           </TableRow>
 
           {/* 내용 */}
           <TableRow>
-            <TableHead>내용</TableHead>
+            <TableCell>내용</TableCell>
             <TableCell colSpan={5}>
               <div
                 style={{
@@ -170,9 +102,9 @@ export default function EgovNoticeDetailPage() {
           {/* 첨부파일 (필요 시 주석 해제하여 사용) */}
           {/*
             <TableRow>
-              <TableHead>
+              <TableCell>
                 첨부파일
-              </TableHead>
+              </TableCell>
               <TableCell colSpan={5}>
                 <EgovAttachFile boardFiles={boardAttachFiles} />
               </TableCell>
@@ -188,7 +120,9 @@ export default function EgovNoticeDetailPage() {
           <Button onClick={() => handleMove(`/notice/${nttId}/modify`)}>
             수정
           </Button>
-          <Button onClick={onClickDeleteBoardArticle}>삭제</Button>
+          <Button onClick={onClickDeleteBoardArticle} disabled={isSubmitting}>
+            삭제
+          </Button>
         </Stack>
       </Stack>
     </PageContainer>

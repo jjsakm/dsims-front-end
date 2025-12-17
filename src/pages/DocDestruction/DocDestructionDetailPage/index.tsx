@@ -8,7 +8,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableRow,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
@@ -17,6 +16,7 @@ import { getDocDestructionData } from "@/services/docDestructionService";
 import type { DocDestruction } from "@/types/docDestruction";
 import DocDestructionHistoryButton from "@/components/Buttons/DocDestructionHistoryButton";
 import URL from "@/constants/url";
+import PageStatus from "@/components/PageStatus";
 
 export default function DocDestructionViewPage() {
   const { docId } = useParams();
@@ -48,29 +48,8 @@ export default function DocDestructionViewPage() {
     navigate(URL.DOC_DESTRUCTION_LIST);
   }, [navigate]);
 
-  if (isLoading) {
-    return (
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-          m: 1,
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-  if (error) {
-    return (
-      <Box sx={{ flexGrow: 1 }}>
-        <Alert severity="error">{error.message}</Alert>
-      </Box>
-    );
+  if (isLoading || error) {
+    return <PageStatus isLoading={isLoading} error={error} />;
   }
 
   const pageTitle = `문서분류 관리`;
@@ -88,63 +67,63 @@ export default function DocDestructionViewPage() {
           <TableBody>
             {/* 문서분류 */}
             <TableRow>
-              <TableHead>문서분류</TableHead>
+              <TableCell>문서분류</TableCell>
               <TableCell colSpan={3}>{viewData?.docCategory ?? "-"}</TableCell>
             </TableRow>
 
             {/* 문서번호 / 파기일자 */}
             <TableRow>
-              <TableHead>문서번호</TableHead>
+              <TableCell>문서번호</TableCell>
               <TableCell>{viewData?.docNo ?? "-"}</TableCell>
-              <TableHead>파기일자</TableHead>
+              <TableCell>파기일자</TableCell>
               <TableCell>{viewData?.docCategory ?? "-"}</TableCell>
             </TableRow>
 
             {/* 문서제목 */}
             <TableRow>
-              <TableHead>문서제목</TableHead>
+              <TableCell>문서제목</TableCell>
               <TableCell colSpan={3}>{viewData?.docTitle ?? "-"}</TableCell>
             </TableRow>
 
             {/* 수집일자 / 종료일자 */}
             <TableRow>
-              <TableHead>수집일자</TableHead>
+              <TableCell>수집일자</TableCell>
               <TableCell>{viewData?.collectDateLabel ?? "-"}</TableCell>
-              <TableHead>종료일자</TableHead>
+              <TableCell>종료일자</TableCell>
               <TableCell>{viewData?.endDate ?? "-"}</TableCell>
             </TableRow>
 
             {/* 신청자 / 부서장 */}
             <TableRow>
-              <TableHead>신청자</TableHead>
+              <TableCell>신청자</TableCell>
               <TableCell>{viewData?.docCategory ?? "-"}</TableCell>
-              <TableHead>부서장</TableHead>
+              <TableCell>부서장</TableCell>
               <TableCell>{viewData?.docCategory ?? "-"}</TableCell>
             </TableRow>
 
             {/* 개인정보 / 개인정보처리 담당자 */}
             <TableRow>
-              <TableHead>개인정보</TableHead>
+              <TableCell>개인정보</TableCell>
               <TableCell>{viewData?.hasPersonalInfo ?? "-"}</TableCell>
-              <TableHead>개인정보처리 담당자</TableHead>
+              <TableCell>개인정보처리 담당자</TableCell>
               <TableCell>{viewData?.docCategory ?? "-"}</TableCell>
             </TableRow>
 
             {/* 자료의 종류 */}
             <TableRow>
-              <TableHead>자료의 종류</TableHead>
+              <TableCell>자료의 종류</TableCell>
               <TableCell colSpan={3}>{viewData?.docCategory ?? "-"}</TableCell>
             </TableRow>
 
             {/* 비고 */}
             <TableRow>
-              <TableHead>비고</TableHead>
+              <TableCell>비고</TableCell>
               <TableCell colSpan={3}>{viewData?.docCategory ?? "-"}</TableCell>
             </TableRow>
 
             {/* 파기사유 */}
             <TableRow>
-              <TableHead>파기사유</TableHead>
+              <TableCell>파기사유</TableCell>
               <TableCell colSpan={3}>{viewData?.docCategory ?? "-"}</TableCell>
             </TableRow>
           </TableBody>

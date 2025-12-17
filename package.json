@@ -1,7 +1,7 @@
 {
   "name": "kids-docu",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -21,6 +21,7 @@
     "@mui/x-date-pickers": "^8.19.0",
     "@mui/x-tree-view": "^8.22.0",
     "@react-spring/web": "^10.0.3",
+    "@tanstack/react-query": "^5.90.12",
     "ag-grid-community": "^34.3.1",
     "ag-grid-react": "^34.3.1",
     "axios": "^1.13.2",
@@ -28,7 +29,8 @@
     "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
     "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0",
     "react-router": "^7.9.6",
-    "react-router-dom": "^6.30.2"
+    "react-router-dom": "^6.30.2",
+    "recoil": "^0.7.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

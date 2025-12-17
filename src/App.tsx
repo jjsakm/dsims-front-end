@@ -11,6 +11,12 @@ import {
   formInputCustomizations,
 } from "./theme/customizations";
 
+import "@/css/base.css";
+import "@/css/layout.css";
+import "@/css/component.css";
+import "@/css/page.css";
+import "@/css/response.css";
+
 const themeComponents = {
   ...dataGridCustomizations,
   ...datePickersCustomizations,

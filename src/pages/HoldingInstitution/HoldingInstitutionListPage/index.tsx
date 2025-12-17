@@ -13,29 +13,24 @@ import {
 } from "@mui/material";
 import MuiSelect from "@/components/Elements/MuiSelect";
 import MuiCheckbox from "@/components/Elements/MuiCheckbox";
-import type { SelectChangeEvent } from "node_modules/@mui/material";
 import type { ColDef } from "ag-grid-community";
 import { listDefs } from "./col-def";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import type { Dayjs } from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { getHoldingInstitutionList } from "@/services/holdingInstitutionService";
-import { useDialogs } from "@/hooks/useDialogs/useDialogs/useDialogs";
+import { useDialogs } from "@/hooks/useDialogs/useDialogs";
 import type {
   HoldingInstitution,
-  HoldingInstitutionFormState,
+  HoldingInstitutionSearchState,
 } from "@/types/holdingInstitution";
-import type { FormFieldValue } from "@/types/common";
+import { useSearchStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
+import PageStatus from "@/components/PageStatus";
 
 export default function DocDestructionDetailPage() {
   const dialogs = useDialogs();
 
-  const [searchValues, setSearchValues] = React.useState<
-    Partial<HoldingInstitutionFormState["values"]>
-  >({});
-
-  const [columnDefs] = React.useState<ColDef[]>(listDefs);
+  const [columnDefs] = React.useState<ColDef<any>[]>(listDefs);
 
   const [rowData, setRowsData] = React.useState<{
     rows: HoldingInstitution[];
@@ -52,59 +47,13 @@ export default function DocDestructionDetailPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
 
-  const handleFormFieldChange = React.useCallback(
-    (
-      name: keyof HoldingInstitutionFormState["values"],
-      value: FormFieldValue
-    ) => {
-      const newSearchValues = { ...searchValues, [name]: value };
-
-      setSearchValues(newSearchValues);
-    },
-    [searchValues]
-  );
-
-  const handleDateFieldChange = React.useCallback(
-    (fieldName: keyof HoldingInstitutionFormState["values"]) =>
-      (value: Dayjs | null) => {
-        if (value?.isValid()) {
-          handleFormFieldChange(fieldName, value.toISOString() ?? null);
-        } else if (rowData[fieldName]) {
-          handleFormFieldChange(fieldName, null);
-        }
-      },
-    [rowData, handleFormFieldChange]
-  );
-
-  const handleSelectFieldChange = React.useCallback(
-    (event: SelectChangeEvent) => {
-      handleFormFieldChange(
-        event.target.name as keyof HoldingInstitutionFormState["values"],
-        event.target.value
-      );
-    },
-    [handleFormFieldChange]
-  );
-
-  const handleTextFieldChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      handleFormFieldChange(
-        event.target.name as keyof HoldingInstitutionFormState["values"],
-        event.target.value
-      );
-    },
-    [handleFormFieldChange]
-  );
-
-  const handleCheckboxFieldChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-      handleFormFieldChange(
-        event.target.name as keyof HoldingInstitutionFormState["values"],
-        checked
-      );
-    },
-    [handleFormFieldChange]
-  );
+  const {
+    values,
+    handleTextFieldChange,
+    handleSelectFieldChange,
+    handleCheckboxFieldChange,
+    handleDateFieldChange,
+  } = useSearchStateHandlers<HoldingInstitutionSearchState["values"]>();
 
   const handleSelectionChange = React.useCallback(
     (rows: HoldingInstitution[]) => {
@@ -177,8 +126,12 @@ export default function DocDestructionDetailPage() {
 
   const handleSearch = () => {
     // TODO: 검색 로직은 이후 AgGrid 연동 시 구현
-    console.log(searchValues);
+    console.log(values);
   };
+
+  if (isLoading || error) {
+    return <PageStatus isLoading={isLoading} error={error} />;
+  }
 
   const breadcrumbs = "보유기관 관리";
   const pageTitle = "보유기관 관리";
@@ -199,8 +152,8 @@ export default function DocDestructionDetailPage() {
                 <Stack direction="row" spacing={2}>
                   <DatePicker
                     value={
-                      searchValues.collectionStartDate
-                        ? dayjs(searchValues.collectionStartDate)
+                      values.collectionStartDate
+                        ? dayjs(values.collectionStartDate)
                         : null
                     }
                     onChange={handleDateFieldChange("collectionStartDate")}
@@ -210,8 +163,8 @@ export default function DocDestructionDetailPage() {
                   <Typography>-</Typography>
                   <DatePicker
                     value={
-                      searchValues.collectionStartDate
-                        ? dayjs(searchValues.collectionStartDate)
+                      values.collectionStartDate
+                        ? dayjs(values.collectionStartDate)
                         : null
                     }
                     onChange={handleDateFieldChange("collectionStartDate")}
@@ -225,8 +178,8 @@ export default function DocDestructionDetailPage() {
                 <Stack direction="row" spacing={2}>
                   <DatePicker
                     value={
-                      searchValues.closeStartDate
-                        ? dayjs(searchValues.closeStartDate)
+                      values.closeStartDate
+                        ? dayjs(values.closeStartDate)
                         : null
                     }
                     onChange={handleDateFieldChange("closeStartDate")}
@@ -236,8 +189,8 @@ export default function DocDestructionDetailPage() {
                   <Typography>-</Typography>
                   <DatePicker
                     value={
-                      searchValues.closeStartDate
-                        ? dayjs(searchValues.closeStartDate)
+                      values.closeStartDate
+                        ? dayjs(values.closeStartDate)
                         : null
                     }
                     onChange={handleDateFieldChange("closeStartDate")}
@@ -255,7 +208,7 @@ export default function DocDestructionDetailPage() {
                   { value: "00", label: "전체" },
                   { value: "01", label: "피해구제" },
                 ]}
-                value={searchValues.largeCategory ?? "00"}
+                value={values.largeCategory ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
@@ -269,7 +222,7 @@ export default function DocDestructionDetailPage() {
                   { value: "02", label: "신청자 제출서류" },
                   { value: "03", label: "직원보완자료" },
                 ]}
-                value={searchValues.midCategory ?? "00"}
+                value={values.midCategory ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
@@ -284,7 +237,7 @@ export default function DocDestructionDetailPage() {
                   { value: "03", label: "이전문서" },
                   { value: "04", label: "의무기록" },
                 ]}
-                value={searchValues.smallCategory ?? "00"}
+                value={values.smallCategory ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
@@ -299,7 +252,7 @@ export default function DocDestructionDetailPage() {
                   { value: "03", label: "이전문서" },
                   { value: "04", label: "의무기록" },
                 ]}
-                value={searchValues.retentionPeriod ?? "00"}
+                value={values.retentionPeriod ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
@@ -310,7 +263,7 @@ export default function DocDestructionDetailPage() {
                 name="docNumber"
                 placeholder="문서번호"
                 label="문서번호"
-                value={searchValues.docNumber ?? ""}
+                value={values.docNumber ?? ""}
                 onChange={handleTextFieldChange}
               />
             </Grid>
@@ -320,7 +273,7 @@ export default function DocDestructionDetailPage() {
                 name="docTitle"
                 placeholder="문서제목"
                 label="문서제목"
-                value={searchValues.docTitle ?? ""}
+                value={values.docTitle ?? ""}
                 onChange={handleTextFieldChange}
               />
             </Grid>
@@ -328,7 +281,7 @@ export default function DocDestructionDetailPage() {
               <MuiCheckbox
                 id="agreeYn"
                 label="정보주체 동의여부"
-                checked={searchValues.agreeYn ?? false}
+                checked={values.agreeYn ?? false}
                 onChange={handleCheckboxFieldChange}
               />
             </Grid>
@@ -347,19 +300,13 @@ export default function DocDestructionDetailPage() {
         </Button>
       </Stack>
       <Box sx={{ flex: 1, width: "100%" }}>
-        {error ? (
-          <Box sx={{ flexGrow: 1 }}>
-            <Alert severity="error">{error.message}</Alert>
-          </Box>
-        ) : (
-          <AgGridContainer
-            isLoading={isLoading}
-            enableRowSelection={true}
-            colDefs={columnDefs}
-            rowData={rowData.rows}
-            onSelectionChange={handleSelectionChange}
-          />
-        )}
+        <AgGridContainer
+          isLoading={isLoading}
+          enableRowSelection={true}
+          colDefs={columnDefs}
+          rowData={rowData.rows}
+          onSelectionChange={handleSelectionChange}
+        />
       </Box>
     </PageContainer>
   );

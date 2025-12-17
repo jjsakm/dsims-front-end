@@ -1,18 +1,18 @@
 import * as React from "react";
 import { useNavigate, useParams } from "react-router";
-import useNotifications from "@/hooks/useNotifications/useNotifications";
+import useNotifications from "@/hooks/useNotifications";
 import DocClassificationForm from "./DigitalDocForm";
 import PageContainer from "@/components/PageContainer";
-import { Alert, Box, CircularProgress } from "@mui/material";
 import type { DigitalDoc, DigitalDocFormState } from "@/types/digitalDoc";
 import {
   createDigitalDocData,
+  digitalDocFormValidator,
   getDigitalDocData,
   updateDigitalDocData,
-  validate as validateForm,
 } from "@/services/digitalDocService";
-import type { FormFieldValue } from "@/types/common";
 import URL from "@/constants/url";
+import { useFormStateHandlers } from "@/hooks/InputStateHandlers/useFormStateHandlers";
+import PageStatus from "@/components/PageStatus";
 
 const INITIAL_FORM_VALUES: Partial<DigitalDocFormState["values"]> = {
   // useYn: "N",
@@ -26,12 +26,12 @@ export default function DigitalDocFormPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
 
-  const [formState, setFormState] = React.useState<DigitalDocFormState>(() => ({
-    values: INITIAL_FORM_VALUES,
-    errors: {},
-  }));
+  const { formState, setFormValues, setFormErrors, handleFormFieldChange } =
+    useFormStateHandlers<DigitalDocFormState["values"]>(
+      INITIAL_FORM_VALUES, // 초기값
+      digitalDocFormValidator // 이 폼에서 쓸 validator
+    );
   const formValues = formState.values;
-  const formErrors = formState.errors;
 
   const loadData = React.useCallback(async () => {
     setError(null);
@@ -40,12 +40,12 @@ export default function DigitalDocFormPage() {
     try {
       const viewData = await getDigitalDocData(Number(docId));
 
-      setFormState((prev) => ({ ...prev, values: viewData }));
+      setFormValues(viewData);
     } catch (viewDataError) {
       setError(viewDataError as Error);
     }
     setIsLoading(false);
-  }, [docId]);
+  }, [docId, setFormValues]);
 
   React.useEffect(() => {
     if (!docId) {
@@ -56,46 +56,6 @@ export default function DigitalDocFormPage() {
     loadData();
   }, [docId, loadData]);
 
-  const setFormValues = React.useCallback(
-    (newFormValues: Partial<DigitalDocFormState["values"]>) => {
-      setFormState((previousState) => ({
-        ...previousState,
-        values: newFormValues,
-      }));
-    },
-    []
-  );
-
-  const setFormErrors = React.useCallback(
-    (newFormErrors: Partial<DigitalDocFormState["errors"]>) => {
-      setFormState((previousState) => ({
-        ...previousState,
-        errors: newFormErrors,
-      }));
-    },
-    []
-  );
-
-  const handleFormFieldChange = React.useCallback(
-    (name: keyof DigitalDocFormState["values"], value: FormFieldValue) => {
-      const validateField = async (
-        values: Partial<DigitalDocFormState["values"]>
-      ) => {
-        const { issues } = validateForm(values);
-        setFormErrors({
-          ...formErrors,
-          [name]: issues?.find((issue) => issue.path?.[0] === name)?.message,
-        });
-      };
-
-      const newFormValues = { ...formValues, [name]: value };
-
-      setFormValues(newFormValues);
-      validateField(newFormValues);
-    },
-    [formValues, formErrors, setFormErrors, setFormValues]
-  );
-
   const createData = React.useCallback(
     async (formValues: Partial<DigitalDocFormState["values"]>) => {
       try {
@@ -104,7 +64,6 @@ export default function DigitalDocFormPage() {
           severity: "success",
           autoHideDuration: 3000,
         });
-
         navigate(URL.DOC_CLASSIFICATION_LIST);
       } catch (createError) {
         notifications.show(
@@ -117,7 +76,7 @@ export default function DigitalDocFormPage() {
         throw createError;
       }
     },
-    [notifications, navigate]
+    [navigate, notifications]
   );
 
   const updatedData = React.useCallback(
@@ -130,15 +89,14 @@ export default function DigitalDocFormPage() {
           docId,
           formValues as Partial<Omit<DigitalDoc, "id">>
         );
-        setFormState((prev) => ({ ...prev, values: updatedData }));
-
-        notifications.show("수정 완료.", {
+        setFormValues(updatedData);
+        notifications.show("생성 완료.", {
           severity: "success",
           autoHideDuration: 3000,
         });
       } catch (editError) {
         notifications.show(
-          `데이터 수정 실패. 사유: ${(editError as Error).message}`,
+          `데이터 생성 실패. 사유: ${(editError as Error).message}`,
           {
             severity: "error",
             autoHideDuration: 3000,
@@ -147,11 +105,11 @@ export default function DigitalDocFormPage() {
         throw editError;
       }
     },
-    [notifications]
+    [notifications, setFormValues]
   );
 
   const handleSubmit = React.useCallback(async () => {
-    const { issues } = validateForm(formValues);
+    const { issues } = digitalDocFormValidator(formValues);
     if (issues && issues.length > 0) {
       setFormErrors(
         Object.fromEntries(
@@ -170,32 +128,9 @@ export default function DigitalDocFormPage() {
     }
   }, [formValues, setFormErrors, docId, createData, updatedData]);
 
-  if (isLoading) {
-    return (
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-          m: 1,
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+  if (isLoading || error) {
+    return <PageStatus isLoading={isLoading} error={error} />;
   }
-
-  if (error) {
-    return (
-      <Box sx={{ flexGrow: 1 }}>
-        <Alert severity="error">{error.message}</Alert>
-      </Box>
-    );
-  }
-
   const pageTitle = docId ? "수정" : "등록";
 
   return (

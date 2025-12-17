@@ -12,15 +12,14 @@ import {
   TableCell,
   TableBody,
   TableRow,
-  TableHead,
   Stack,
 } from "@mui/material";
-import { type SelectChangeEvent } from "@mui/material/Select";
 import { useNavigate } from "react-router";
 import MuiSelect from "@/components/Elements/MuiSelect";
 import type { DigitalDocFormState } from "@/types/digitalDoc";
 import type { FormFieldValue } from "@/types/common";
 import URL from "@/constants/url";
+import { useInputStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
 
 export type DigitalDocProps = {
   formState: DigitalDocFormState;
@@ -40,6 +39,12 @@ export default function DigitalDocForm(props: DigitalDocProps) {
   const formErrors = formState.errors;
 
   const navigate = useNavigate();
+
+  const {
+    handleTextFieldChange,
+    handleSelectFieldChange,
+    handleRadioFieldChange,
+  } = useInputStateHandlers<DigitalDocFormState["values"]>(onFieldChange);
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -78,54 +83,12 @@ export default function DigitalDocForm(props: DigitalDocProps) {
     [formValues, onSubmit]
   );
 
-  const handleTextFieldChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      onFieldChange(
-        event.target.name as keyof DigitalDocFormState["values"],
-        event.target.value
-      );
-    },
-    [onFieldChange]
-  );
-
-  const handleSelectFieldChange = React.useCallback(
-    (event: SelectChangeEvent) => {
-      onFieldChange(
-        event.target.name as keyof DigitalDocFormState["values"],
-        event.target.value
-      );
-    },
-    [onFieldChange]
-  );
-
-  const handleRadioFieldChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      onFieldChange(
-        event.target.name as keyof DigitalDocFormState["values"],
-        event.target.value
-      );
-    },
-    [onFieldChange]
-  );
-
   const handleBack = React.useCallback(() => {
     navigate(URL.DOC_CLASSIFICATION_LIST);
   }, [navigate]);
 
-  React.useEffect(() => {
-    if (formValues) {
-      console.log(22, formValues);
-    }
-  }, [formValues]);
-
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit}
-      noValidate
-      autoComplete="off"
-      sx={{ width: "100%" }}
-    >
+    <Box component="form" onSubmit={handleSubmit} noValidate autoComplete="off">
       <FormGroup>
         <Table
           size="small"
@@ -135,13 +98,13 @@ export default function DigitalDocForm(props: DigitalDocProps) {
           <TableBody>
             {/* 문서분류 */}
             <TableRow>
-              <TableHead>문서분류</TableHead>
+              <TableCell>문서분류</TableCell>
               <TableCell colSpan={3}>
                 <Stack direction="row" spacing={1}>
                   <MuiSelect
                     id="largeCategory"
                     placeholder="대분류"
-                    items={[{ value: "01", label: "피해구제" }]}
+                    items={[ {value: "01", label: "피해구제" }]}
                     value={formValues.largeCategory ?? ""}
                     error={formErrors.largeCategory}
                     onChange={handleSelectFieldChange}
@@ -175,7 +138,7 @@ export default function DigitalDocForm(props: DigitalDocProps) {
 
             {/* 문서번호 */}
             <TableRow>
-              <TableHead>문서번호</TableHead>
+              <TableCell>문서번호</TableCell>
               <TableCell colSpan={3}>
                 <TextField
                   fullWidth
@@ -193,7 +156,7 @@ export default function DigitalDocForm(props: DigitalDocProps) {
 
             {/* 문서제목 */}
             <TableRow>
-              <TableHead>문서제목</TableHead>
+              <TableCell>문서제목</TableCell>
               <TableCell colSpan={3}>
                 <TextField
                   fullWidth
@@ -211,7 +174,7 @@ export default function DigitalDocForm(props: DigitalDocProps) {
 
             {/* 수집일자 / 보존연한 */}
             <TableRow>
-              <TableHead>수집일자</TableHead>
+              <TableCell>수집일자</TableCell>
               <TableCell>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <TextField
@@ -228,7 +191,7 @@ export default function DigitalDocForm(props: DigitalDocProps) {
                   />
                 </Stack>
               </TableCell>
-              <TableHead>보존연한</TableHead>
+              <TableCell>보존연한</TableCell>
               <TableCell>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <MuiSelect
@@ -260,7 +223,7 @@ export default function DigitalDocForm(props: DigitalDocProps) {
 
             {/* 종료일자 */}
             <TableRow>
-              <TableHead>종료일자</TableHead>
+              <TableCell>종료일자</TableCell>
               <TableCell colSpan={3}>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <TextField
@@ -285,7 +248,7 @@ export default function DigitalDocForm(props: DigitalDocProps) {
 
             {/* 비고 */}
             <TableRow>
-              <TableHead>비고</TableHead>
+              <TableCell>비고</TableCell>
               <TableCell colSpan={3}>
                 <TextField
                   fullWidth
@@ -305,7 +268,7 @@ export default function DigitalDocForm(props: DigitalDocProps) {
 
             {/* 파일업로드 */}
             <TableRow>
-              <TableHead>파일업로드</TableHead>
+              <TableCell>파일업로드</TableCell>
               <TableCell colSpan={3}>
                 <Stack direction="row" spacing={2} alignItems="center">
                   <RadioGroup

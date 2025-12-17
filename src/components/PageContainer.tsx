@@ -42,47 +42,18 @@ export interface Breadcrumb {
 }
 export interface PageContainerProps extends ContainerProps {
   children?: React.ReactNode;
-  title?: string;
   breadcrumbs?: Breadcrumb[];
   actions?: React.ReactNode;
 }
 
 export default function PageContainer(props: PageContainerProps) {
-  const { children, breadcrumbs, title, actions = null } = props;
+  const { children, actions = null } = props;
 
   return (
     <Container sx={{ my: 2 }}>
       <Stack spacing={2}>
         <Stack>
-          <PageHeaderBreadcrumbs
-            aria-label="breadcrumb"
-            separator={<NavigateNextRoundedIcon fontSize="small" />}
-          >
-            {breadcrumbs
-              ? breadcrumbs.map((breadcrumb, index) => {
-                  return breadcrumb.path ? (
-                    <MuiLink
-                      key={index}
-                      component={Link}
-                      underline="hover"
-                      color="inherit"
-                      to={breadcrumb.path}
-                    >
-                      {breadcrumb.title}
-                    </MuiLink>
-                  ) : (
-                    <Typography
-                      key={index}
-                      sx={{ color: "text.primary", fontWeight: 600 }}
-                    >
-                      {breadcrumb.title}
-                    </Typography>
-                  );
-                })
-              : null}
-          </PageHeaderBreadcrumbs>
           <PageContentHeader>
-            {title ? <Typography variant="h4">{title}</Typography> : null}
             <PageHeaderToolbar>{actions}</PageHeaderToolbar>
           </PageContentHeader>
         </Stack>

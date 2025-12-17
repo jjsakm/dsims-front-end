@@ -1,200 +1,314 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router";
-import { NOTICE_BBS_ID } from "@/config";
-import PageContainer from "@/components/PageContainer";
-import EgovPaging from "@/components/EgovPaging";
-import type { NoticeListItem } from "@/types/notice";
-import {
-  Box,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  Stack,
-  TextField,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-} from "@mui/material";
-import { getNoticeList } from "@/services/noticeService";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useLocation } from "react-router";
+
+import * as EgovNet from "@/api/egovFetch";
 import URL from "@/constants/url";
+import { NOTICE_BBS_ID } from "@/config";
 
-export default function EgovNoticeListPage() {
-  const navigate = useNavigate();
-  const cndRef = useRef<HTMLSelectElement>(null);
-  const wrdRef = useRef<HTMLInputElement>(null);
+import EgovPaging from "@/components/EgovPaging";
 
-  const bbsId = NOTICE_BBS_ID;
+import { itemIdxByPage } from "@/utils/calc";
+import { getSessionItem } from "@/utils/storage";
 
-  const [searchCondition, setSearchCondition] = useState({
-    bbsId: bbsId,
-    pageIndex: 1,
-    searchCnd: "",
-    searchWrd: "",
-  });
-  const [paginationInfo, setPaginationInfo] = useState({});
+type SearchCondition = {
+  bbsId: string;
+  pageIndex: number;
+  searchCnd: string;
+  searchWrd: string;
+};
 
-  const [listTag, setListTag] = useState<NoticeListItem[]>([]);
+type NoticeListItem = {
+  nttId: string | number;
+  bbsId: string;
+  replyLc?: string | number;
+  nttSj?: string;
+  frstRegisterNm?: string;
+  frstRegisterPnttm?: string;
+  inqireCo?: string | number;
+};
 
-  const handleRowClick = (nttId: number) => {
-    navigate(`/notice/${nttId}`);
-  };
+type PaginationInfo = {
+  currentPageNo?: number;
+  pageSize?: number;
+  totalRecordCount?: number;
+  [key: string]: any;
+};
 
-  // 검색 핸들러
-  const handleSearch = (cndRef, wrdRef, retrieveList) => {
-    const newSearchCondition = {
-      ...searchCondition,
-      searchCnd: cndRef.current.value,
-      searchWrd: wrdRef.current.value,
+type BoardMaster = {
+  bbsUseFlag?: string;
+  [key: string]: any;
+};
+
+type UserInfo = {
+  [key: string]: any;
+};
+
+function EgovNoticeList(props: any) {
+  const location = useLocation();
+
+  // 관리자 권한 체크(세션)
+  const sessionUser = getSessionItem("loginUser");
+  const sessionUserSe = sessionUser?.userSe;
+
+  const bbsId: string = location.state?.bbsId || NOTICE_BBS_ID;
+
+  const initialSearchCondition: SearchCondition =
+    location.state?.searchCondition ||
+    ({
+      bbsId,
+      pageIndex: 1,
+      searchCnd: "0",
+      searchWrd: "",
+    } satisfies SearchCondition);
+
+  const [searchCondition, setSearchCondition] = useState<SearchCondition>(
+    initialSearchCondition
+  );
+
+  // 화면 입력값(검색 폼)
+  const [searchCnd, setSearchCnd] = useState<string>(
+    initialSearchCondition.searchCnd
+  );
+  const [searchWrd, setSearchWrd] = useState<string>(
+    initialSearchCondition.searchWrd
+  );
+
+  const [masterBoard, setMasterBoard] = useState<BoardMaster>({});
+  const [user, setUser] = useState<UserInfo>({});
+  const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({});
+
+  const [rows, setRows] = useState<NoticeListItem[]>([]);
+  const [resultCnt, setResultCnt] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<any>(null);
+
+  const canCreate = useMemo(() => {
+    return (
+      !!user &&
+      sessionUserSe === "ADM" &&
+      masterBoard?.bbsUseFlag === "Y"
+    );
+  }, [user, sessionUserSe, masterBoard]);
+
+  const fetchList = useCallback(async (condition: SearchCondition) => {
+    const retrieveListURL = "/board" + EgovNet.getQueryString(condition);
+    const requestOptions = {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json",
+      },
     };
 
-    // updateURL(newSearchCondition);
-    retrieveList(newSearchCondition);
-    setSearchCondition(newSearchCondition);
-  };
+    setIsLoading(true);
+    setError(null);
 
-  const handleMoveToCreate = () => {
-    navigate(URL.NOTICE_CREATE);
-  };
+    try {
+      const resp: any = await new Promise((resolve, reject) => {
+        EgovNet.requestFetch(
+          retrieveListURL,
+          requestOptions,
+          (r: any) => resolve(r),
+          (e: any) => reject(e)
+        );
+      });
 
-  // 페이지 이동 핸들러
-  const handlePageMove = (pageIndex, cndRef, wrdRef, retrieveList) => {
-    const newSearchCondition = {
-      ...searchCondition,
-      pageIndex,
-      searchCnd: cndRef.current.value,
-      searchWrd: wrdRef.current.value,
-    };
+      const result = resp?.result;
 
-    // updateURL(newSearchCondition);
-    retrieveList(newSearchCondition);
-    setSearchCondition(newSearchCondition);
-  };
+      setMasterBoard(result?.brdMstrVO ?? {});
+      setPaginationInfo(result?.paginationInfo ?? {});
+      setUser(result?.user ?? {});
 
-  const retrieveList = useCallback(async (searchCondition) => {
-    const res = await getNoticeList(searchCondition);
-    setListTag(res.items);
-    setPaginationInfo(res.paginationInfo);
+      const cnt = Number.parseInt(result?.resultCnt ?? "0", 10);
+      setResultCnt(Number.isNaN(cnt) ? 0 : cnt);
+
+      setRows(Array.isArray(result?.resultList) ? result.resultList : []);
+    } catch (e) {
+      // 기존 코드에서도 콘솔만 찍고 UI 처리는 없었으므로,
+      // 에러 상태만 보관해 두고 목록은 비웁니다.
+      setError(e);
+      setRows([]);
+      setResultCnt(0);
+      // eslint-disable-next-line no-console
+      console.log("err response : ", e);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    retrieveList(searchCondition);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    fetchList(searchCondition);
+  }, [fetchList, searchCondition]);
 
-  const breadcrumbs = "공지사항";
-  const pageTitle = "공지사항";
+  const handleSearch = () => {
+    setSearchCondition((prev) => ({
+      ...prev,
+      bbsId,
+      pageIndex: 1,
+      searchCnd,
+      searchWrd,
+    }));
+  };
+
+  const handleMovePage = (passedPage: number) => {
+    setSearchCondition((prev) => ({
+      ...prev,
+      bbsId,
+      pageIndex: passedPage,
+      searchCnd,
+      searchWrd,
+    }));
+  };
+
+  const renderedRows = useMemo(() => {
+    if (isLoading && rows.length === 0) {
+      return (
+        <p className="no_data" key="loading">
+          불러오는 중입니다...
+        </p>
+      );
+    }
+
+    if (!isLoading && rows.length === 0) {
+      return (
+        <p className="no_data" key="empty">
+          검색된 결과가 없습니다.
+        </p>
+      );
+    }
+
+    const currentPageNo = Number(paginationInfo?.currentPageNo ?? 1);
+    const pageSize = Number(paginationInfo?.pageSize ?? 10);
+
+    return rows.map((item, index) => {
+      const listIdx = itemIdxByPage(resultCnt, currentPageNo, pageSize, index);
+      const isReply = Number(item.replyLc ?? 0) > 0;
+
+      return (
+        <Link
+          to={{ pathname: URL.NOTICE_DETAIL }}
+          state={{
+            nttId: item.nttId,
+            bbsId: item.bbsId,
+            searchCondition,
+          }}
+          key={String(listIdx)}
+          className="list_item"
+        >
+          <div>{listIdx}</div>
+          <div className={isReply ? "al reply" : "al"}>{item.nttSj}</div>
+          <div>{item.frstRegisterNm}</div>
+          <div>{item.frstRegisterPnttm}</div>
+          <div>{item.inqireCo}</div>
+        </Link>
+      );
+    });
+  }, [isLoading, rows, paginationInfo, resultCnt, searchCondition]);
 
   return (
-    <PageContainer title={pageTitle} breadcrumbs={[{ title: breadcrumbs }]}>
-      {/* <!-- 검색조건 --> */}
-      <Stack direction="row" justifyContent="space-between" mb={2}>
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 2,
-            alignItems: "center",
-          }}
-        >
-          <FormControl size="small" sx={{ minWidth: 140 }}>
-            <InputLabel id="notice-search-condition-label">조건</InputLabel>
-            <Select
-              labelId="notice-search-condition-label"
-              id="sel1"
-              defaultValue={searchCondition.searchCnd ?? "0"}
-              native
-              inputRef={cndRef}
-              onChange={(e) => {
-                if (cndRef.current) {
-                  cndRef.current.value = (e.target as HTMLSelectElement).value;
-                }
-              }}
-            >
-              <option value="0">제목</option>
-              <option value="1">내용</option>
-              <option value="2">작성자</option>
-            </Select>
-          </FormControl>
+    <div className="container">
+      <div className="c_wrap">
+        {/* <!-- Location --> */}
+        <div className="location">
+          <ul>
+            <li>
+              <Link to={URL.MAIN} className="home">
+                Home
+              </Link>
+            </li>
+            <li>공지사항</li>
+          </ul>
+        </div>
+        {/* <!--// Location --> */}
 
-          <TextField
-            size="small"
-            placeholder="검색어를 입력하세요"
-            defaultValue={searchCondition.searchWrd ?? ""}
-            inputRef={wrdRef}
-            onChange={(e) => {
-              if (wrdRef.current) {
-                wrdRef.current.value = e.target.value;
-              }
-            }}
-            sx={{ flexGrow: 1, maxWidth: 400 }}
-          />
+        <div className="layout">
+          <div className="contents NOTICE_LIST" id="contents">
+            {/* <!-- 본문 --> */}
 
-          <Button
-            variant="contained"
-            onClick={() => {
-              handleSearch(cndRef, wrdRef, retrieveList);
-            }}
-            sx={{ whiteSpace: "nowrap" }}
-          >
-            조회
-          </Button>
-        </Box>
-        <Button variant="contained" onClick={handleMoveToCreate}>
-          등록
-        </Button>
-      </Stack>
-      {/* <!--// 검색조건 --> */}
+            <div className="top_tit">
+              <h1 className="tit_1">알림마당</h1>
+            </div>
 
-      {/* <!-- 게시판목록 --> */}
-      <div className="board_list BRD002">
-        <Table size="small" sx={{ width: "100%" }} aria-label="공지사항 목록">
-          <TableHead>
-            <TableRow>
-              <TableCell align="center">번호</TableCell>
-              <TableCell align="center">제목</TableCell>
-              <TableCell align="center">작성자</TableCell>
-              <TableCell align="center">작성일</TableCell>
-              <TableCell align="center">조회수</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {listTag.length > 0 ? (
-              listTag.map((item) => (
-                <TableRow
-                  key={item.nttId}
-                  hover
-                  onClick={() => handleRowClick(item.nttId)}
-                  sx={{ cursor: "pointer" }}
-                >
-                  <TableCell align="center">{item.nttId}</TableCell>
-                  {/* 제목은 왼쪽 정렬 */}
-                  <TableCell align="left">{item.nttSj}</TableCell>
-                  <TableCell align="center">{item.frstRegisterNm}</TableCell>
-                  <TableCell align="center">{item.frstRegisterPnttm}</TableCell>
-                  <TableCell align="center">{item.inqireCo}</TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell className="no_data" colSpan={5} align="center">
-                  검색된 결과가 없습니다.
-                </TableCell>
-              </TableRow>
+            <h2 className="tit_2">공지사항</h2>
+
+            {/* <!-- 검색조건 --> */}
+            <div className="condition">
+              <ul>
+                <li className="third_1 L">
+                  <label className="f_select" htmlFor="sel1">
+                    <select
+                      id="sel1"
+                      title="조건"
+                      value={searchCnd}
+                      onChange={(e) => setSearchCnd(e.target.value)}
+                    >
+                      <option value="0">제목</option>
+                      <option value="1">내용</option>
+                      <option value="2">작성자</option>
+                    </select>
+                  </label>
+                </li>
+                <li className="third_2 R">
+                  <span className="f_search w_500">
+                    <input
+                      type="text"
+                      defaultValue={undefined}
+                      value={searchWrd}
+                      onChange={(e) => setSearchWrd(e.target.value)}
+                    />
+                    <button type="button" onClick={handleSearch}>
+                      조회
+                    </button>
+                  </span>
+                </li>
+
+                {/* user.id 대신 권한그룹 세션값 사용 */}
+                {canCreate && (
+                  <li>
+                    <Link
+                      to={URL.NOTICE_CREATE}
+                      state={{ bbsId }}
+                      className="btn btn_blue_h46 pd35"
+                    >
+                      등록
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            </div>
+            {/* <!--// 검색조건 --> */}
+
+            {/* 에러는 UX에 맞게 다듬을 수 있도록 최소 표시만 추가 */}
+            {error && (
+              <p className="no_data" role="alert">
+                목록을 불러오지 못했습니다.
+              </p>
             )}
-          </TableBody>
-        </Table>
 
-        <EgovPaging
-          pagination={paginationInfo}
-          moveToPage={(passedPage) => {
-            handlePageMove(passedPage, cndRef, wrdRef, retrieveList);
-          }}
-        />
+            {/* <!-- 게시판목록 --> */}
+            <div className="board_list BRD002">
+              <div className="head">
+                <span>번호</span>
+                <span>제목</span>
+                <span>작성자</span>
+                <span>작성일</span>
+                <span>조회수</span>
+              </div>
+              <div className="result">{renderedRows}</div>
+            </div>
+            {/* <!--// 게시판목록 --> */}
+
+            <div className="board_bot">
+              {/* <!-- Paging --> */}
+              <EgovPaging pagination={paginationInfo} moveToPage={handleMovePage} />
+              {/* <!--/ Paging --> */}
+            </div>
+
+            {/* <!--// 본문 --> */}
+          </div>
+        </div>
       </div>
-      {/* <!--// 게시판목록 --> */}
-    </PageContainer>
+    </div>
   );
 }
+
+export default EgovNoticeList;

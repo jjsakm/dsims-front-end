@@ -21,7 +21,7 @@ import EgovNoticeFormPage from "./pages/Notice/EgovNoticeFormPage";
 export const router = createBrowserRouter([
   {
     Component: DashboardLayout,
-    children: [ 
+    children: [
       {
         index: true,
         loader: () => redirect(URL.DASHBOARD),

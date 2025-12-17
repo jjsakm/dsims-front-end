@@ -1,4 +1,4 @@
-export interface HoldingInstitutionFormState {
+export interface HoldingInstitutionSearchState {
   values: Partial<Omit<SearchValues, "id">>;
 }
 

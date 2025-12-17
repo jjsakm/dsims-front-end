@@ -14,16 +14,15 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableRow,
 } from "@mui/material";
-import { type SelectChangeEvent } from "@mui/material/Select";
 import { useNavigate } from "react-router";
 import type { DocClassificationFormState } from "@/types/docClassification";
 import MuiSelect from "@/components/Elements/MuiSelect";
 import MuiCheckbox from "@/components/Elements/MuiCheckbox";
 import type { FormFieldValue } from "@/types/common";
 import URL from "@/constants/url";
+import { useInputStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
 
 export interface DocClassificationProps {
   isEditMode?: boolean;
@@ -45,6 +44,13 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
   const navigate = useNavigate();
 
+  const {
+    handleTextFieldChange,
+    handleSelectFieldChange,
+    handleCheckboxFieldChange,
+  } =
+    useInputStateHandlers<DocClassificationFormState["values"]>(onFieldChange);
+
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [selectedCategoryDepth, setSelectedCategoryDepth] = React.useState<
     "large" | "middle" | "small"
@@ -62,36 +68,6 @@ export default function DocClassificationForm(props: DocClassificationProps) {
       }
     },
     [formValues, onSubmit]
-  );
-
-  const handleTextFieldChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      onFieldChange(
-        event.target.name as keyof DocClassificationFormState["values"],
-        event.target.value
-      );
-    },
-    [onFieldChange]
-  );
-
-  const handleCheckboxFieldChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-      onFieldChange(
-        event.target.name as keyof DocClassificationFormState["values"],
-        checked
-      );
-    },
-    [onFieldChange]
-  );
-
-  const handleSelectFieldChange = React.useCallback(
-    (event: SelectChangeEvent) => {
-      onFieldChange(
-        event.target.name as keyof DocClassificationFormState["values"],
-        event.target.value
-      );
-    },
-    [onFieldChange]
   );
 
   const handleBack = React.useCallback(() => {
@@ -143,7 +119,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
             {/* 대분류 */}
             <TableRow>
-              <TableHead>대분류</TableHead>
+              <TableCell>대분류</TableCell>
               <TableCell>
                 <Stack direction="row" spacing={2}>
                   <MuiSelect
@@ -169,7 +145,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
             {/* 중분류 */}
             <TableRow>
-              <TableHead>중분류</TableHead>
+              <TableCell>중분류</TableCell>
               <TableCell>
                 <Stack direction="row" spacing={2}>
                   <MuiSelect
@@ -199,7 +175,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
             {/* 소분류 */}
             <TableRow>
-              <TableHead>소분류</TableHead>
+              <TableCell>소분류</TableCell>
               <TableCell>
                 <TextField
                   value={formValues.smallCategoryMeta ?? ""}
@@ -227,11 +203,11 @@ export default function DocClassificationForm(props: DocClassificationProps) {
             <TableBody>
               {/* 부서명 / 파일명 */}
               <TableRow>
-                <TableHead>부서명</TableHead>
+                <TableCell>부서명</TableCell>
                 <TableCell>
                   <TextField fullWidth size="small" placeholder="부서명" />
                 </TableCell>
-                <TableHead>파일명</TableHead>
+                <TableCell>파일명</TableCell>
                 <TableCell>
                   <TextField fullWidth size="small" placeholder="파일명" />
                 </TableCell>
@@ -239,11 +215,11 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
               {/* 보유목적 / 사용부서(내부, 외부) */}
               <TableRow>
-                <TableHead>보유목적</TableHead>
+                <TableCell>보유목적</TableCell>
                 <TableCell>
                   <TextField fullWidth size="small" placeholder="보유목적" />
                 </TableCell>
-                <TableHead>사용부서(내부, 외부)</TableHead>
+                <TableCell>사용부서(내부, 외부)</TableCell>
                 <TableCell>
                   <RadioGroup row>
                     <FormControlLabel
@@ -262,7 +238,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
               {/* 개인정보 처리방법 / 보유기간 */}
               <TableRow>
-                <TableHead>개인정보 처리방법</TableHead>
+                <TableCell>개인정보 처리방법</TableCell>
                 <TableCell>
                   <TextField
                     fullWidth
@@ -270,7 +246,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
                     placeholder="개인정보 처리방법"
                   />
                 </TableCell>
-                <TableHead>보유기간</TableHead>
+                <TableCell>보유기간</TableCell>
                 <TableCell>
                   <Stack direction="row" spacing={1} alignItems="center">
                     <TextField
@@ -296,7 +272,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
               {/* 정보주체의 개인정보항목 / 법정대리인의 개인정보항목 */}
               <TableRow>
-                <TableHead>정보주체의 개인정보항목</TableHead>
+                <TableCell>정보주체의 개인정보항목</TableCell>
                 <TableCell>
                   <TextField
                     fullWidth
@@ -304,7 +280,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
                     placeholder="정보주체의 개인정보항목"
                   />
                 </TableCell>
-                <TableHead>법정대리인의 개인정보항목</TableHead>
+                <TableCell>법정대리인의 개인정보항목</TableCell>
                 <TableCell>
                   <TextField
                     fullWidth
@@ -316,7 +292,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
               {/* 주민등록번호 수집여부 / 주민등록번호 수집 법령근거 */}
               <TableRow>
-                <TableHead>주민등록번호 수집여부</TableHead>
+                <TableCell>주민등록번호 수집여부</TableCell>
                 <TableCell>
                   <RadioGroup row>
                     <FormControlLabel
@@ -331,7 +307,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
                     />
                   </RadioGroup>
                 </TableCell>
-                <TableHead>주민등록번호 수집 법령근거</TableHead>
+                <TableCell>주민등록번호 수집 법령근거</TableCell>
                 <TableCell>
                   <TextField
                     fullWidth
@@ -343,14 +319,14 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
               {/* 정보주체 동의여부 / 정보주체 동의 없이 수집 법령근거 */}
               <TableRow>
-                <TableHead>정보주체 동의여부</TableHead>
+                <TableCell>정보주체 동의여부</TableCell>
                 <TableCell>
                   <FormControlLabel
                     control={<Checkbox size="small" />}
                     label="동의"
                   />
                 </TableCell>
-                <TableHead>정보주체 동의 없이 수집 법령근거</TableHead>
+                <TableCell>정보주체 동의 없이 수집 법령근거</TableCell>
                 <TableCell>
                   <TextField
                     fullWidth
@@ -362,7 +338,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
               {/* 민감 정보 보유여부 / 민감 정보 별도동의 여부 */}
               <TableRow>
-                <TableHead>민감 정보 보유여부</TableHead>
+                <TableCell>민감 정보 보유여부</TableCell>
                 <TableCell>
                   <RadioGroup row>
                     <FormControlLabel
@@ -377,7 +353,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
                     />
                   </RadioGroup>
                 </TableCell>
-                <TableHead>민감 정보 별도동의 여부</TableHead>
+                <TableCell>민감 정보 별도동의 여부</TableCell>
                 <TableCell>
                   <RadioGroup row>
                     <FormControlLabel
@@ -396,7 +372,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
               {/* 고유식별정보 보유여부 / 고유식별정보 별도동의 여부 */}
               <TableRow>
-                <TableHead>고유식별정보 보유여부</TableHead>
+                <TableCell>고유식별정보 보유여부</TableCell>
                 <TableCell>
                   <RadioGroup row>
                     <FormControlLabel
@@ -411,7 +387,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
                     />
                   </RadioGroup>
                 </TableCell>
-                <TableHead>고유식별정보 별도동의 여부</TableHead>
+                <TableCell>고유식별정보 별도동의 여부</TableCell>
                 <TableCell>
                   <RadioGroup row>
                     <FormControlLabel
@@ -430,7 +406,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
               {/* 개인정보영향평가 대상여부 / 취급담당자 */}
               <TableRow>
-                <TableHead>개인정보영향평가 대상여부</TableHead>
+                <TableCell>개인정보영향평가 대상여부</TableCell>
                 <TableCell>
                   <RadioGroup row>
                     <FormControlLabel
@@ -445,7 +421,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
                     />
                   </RadioGroup>
                 </TableCell>
-                <TableHead>취급담당자</TableHead>
+                <TableCell>취급담당자</TableCell>
                 <TableCell>
                   <TextField fullWidth size="small" placeholder="취급담당자" />
                 </TableCell>
@@ -453,7 +429,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
               {/* 제3자 제공받는 자 / 제3자 제공 근거 */}
               <TableRow>
-                <TableHead>제3자 제공받는 자</TableHead>
+                <TableCell>제3자 제공받는 자</TableCell>
                 <TableCell>
                   <TextField
                     fullWidth
@@ -461,7 +437,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
                     placeholder="제3자 제공받는 자"
                   />
                 </TableCell>
-                <TableHead>제3자 제공 근거</TableHead>
+                <TableCell>제3자 제공 근거</TableCell>
                 <TableCell>
                   <TextField
                     fullWidth
@@ -473,7 +449,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
               {/* 제3자 제공 항목 / 개인정보처리 위탁 업체명 */}
               <TableRow>
-                <TableHead>제3자 제공 항목</TableHead>
+                <TableCell>제3자 제공 항목</TableCell>
                 <TableCell>
                   <TextField
                     fullWidth
@@ -481,7 +457,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
                     placeholder="제3자 제공 항목"
                   />
                 </TableCell>
-                <TableHead>개인정보처리 위탁 업체명</TableHead>
+                <TableCell>개인정보처리 위탁 업체명</TableCell>
                 <TableCell>
                   <TextField
                     fullWidth
@@ -493,7 +469,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
               {/* 개인정보위탁계약서 여부 / 개인정보위탁사실 게재여부 */}
               <TableRow>
-                <TableHead>개인정보위탁계약서 여부</TableHead>
+                <TableCell>개인정보위탁계약서 여부</TableCell>
                 <TableCell>
                   <RadioGroup row>
                     <FormControlLabel
@@ -508,7 +484,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
                     />
                   </RadioGroup>
                 </TableCell>
-                <TableHead>개인정보위탁사실 게재여부</TableHead>
+                <TableCell>개인정보위탁사실 게재여부</TableCell>
                 <TableCell>
                   <RadioGroup row>
                     <FormControlLabel
@@ -527,7 +503,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
 
               {/* 목적 외 이용.제공 여부 / 목적 외 이용.제공 근거 */}
               <TableRow>
-                <TableHead>목적 외 이용.제공 여부</TableHead>
+                <TableCell>목적 외 이용.제공 여부</TableCell>
                 <TableCell>
                   <RadioGroup row>
                     <FormControlLabel
@@ -542,7 +518,7 @@ export default function DocClassificationForm(props: DocClassificationProps) {
                     />
                   </RadioGroup>
                 </TableCell>
-                <TableHead>목적 외 이용.제공 근거</TableHead>
+                <TableCell>목적 외 이용.제공 근거</TableCell>
                 <TableCell>
                   <TextField
                     fullWidth
