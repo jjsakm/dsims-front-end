@@ -30,7 +30,7 @@ export default function DocDestructionReqListPage() {
     Partial<DocDestructionSearchState["values"]>
   >({});
 
-  const [columnDefs] = React.useState<ColDef<any>[]>(listDefs);
+  const [columnDefs] = React.useState<ColDef[]>(listDefs);
 
   const [rowData, setRowsData] = React.useState<{
     rows: DocDestruction[];

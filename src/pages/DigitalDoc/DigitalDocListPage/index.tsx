@@ -22,7 +22,7 @@ export default function DigitalDocListPage() {
     Partial<DigitalDocSearchState["values"]>
   >({});
 
-  const [columnDefs] = React.useState<ColDef<any>[]>(listDefs);
+  const [columnDefs] = React.useState<ColDef[]>(listDefs);
 
   const [rowData, setRowsData] = React.useState<{
     rows: DigitalDoc[];

@@ -10,11 +10,26 @@ export type PaginationInfo = {
   recordCountPerPage: number;
 };
 
+import axios from "axios";
+// import axios from "axios";
+
+// // GET
+// const res = await axios.get("/api/users", { params: { page: 1 } });
+
+// // POST
+// const res2 = await axios.post("/api/users", { name: "kim", age: 20 });
+
+// // PUT / DELETE
+// await axios.put(`/api/users/${id}`, { name: "lee" });
+// await axios.delete(`/api/users/${id}`);
+
 export async function getNoticeList(searchCondition): Promise<{
   items: NoticeListItem[];
   itemCount: number;
   paginationInfo: PaginationInfo;
 }> {
+  const res = await axios.get("/api/dbtest");
+  console.log(res);
   const retrieveURL = "/board" + EgovNet.getQueryString(searchCondition);
   const requestOptions = {
     method: "GET",
@@ -74,7 +89,9 @@ export async function getNoticeItem(searchCondition: {
   });
 }
 
-export async function createNoticeItem(formData: FormData): Promise<NoticeListItem> {
+export async function createNoticeItem(
+  formData: FormData
+): Promise<NoticeListItem> {
   const retrieveDetailURL = "/board";
   const requestOptions = {
     method: "POST",

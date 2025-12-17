@@ -35,7 +35,7 @@ export default function DocDestructionDetailPage() {
     Partial<HoldingInstitutionFormState["values"]>
   >({});
 
-  const [columnDefs] = React.useState<ColDef<any>[]>(listDefs);
+  const [columnDefs] = React.useState<ColDef[]>(listDefs);
 
   const [rowData, setRowsData] = React.useState<{
     rows: HoldingInstitution[];

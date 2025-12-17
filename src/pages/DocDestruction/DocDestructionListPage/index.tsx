@@ -34,7 +34,7 @@ export default function DocDestructionListPage() {
     Partial<DocDestructionSearchState["values"]>
   >({});
 
-  const [columnDefs] = React.useState<ColDef<any>[]>(listDefs);
+  const [columnDefs] = React.useState<ColDef[]>(listDefs);
 
   const [rowData, setRowsData] = React.useState<{
     rows: DocDestruction[];
@@ -119,10 +119,10 @@ export default function DocDestructionListPage() {
       thirdCategory: searchValues.smallCategory,
     });
   };
-  
-    const handleRowClick = (row: DocDestruction) => {
-      navigate(`/docDestruction/${row.id}`);
-    };
+
+  const handleRowClick = (row: DocDestruction) => {
+    navigate(`/docDestruction/${row.id}`);
+  };
 
   const breadcrumbs = "파기문서 관리 > 파기 문서 목록";
   const pageTitle = "파기 문서 목록";

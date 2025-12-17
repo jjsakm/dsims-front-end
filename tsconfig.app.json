@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "incremental": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "ES2022",
     "useDefineForClassFields": true,
@@ -25,9 +26,9 @@
     "noImplicitAny": false, // 개발 편의를 위해 any 허용
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    // "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true
+    // "noUncheckedSideEffectImports": true
   },
   "include": ["src"]
 }

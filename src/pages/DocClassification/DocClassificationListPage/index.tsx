@@ -31,7 +31,7 @@ export default function DocClassificationListPage() {
     Partial<DocClassificationSearchState["values"]>
   >({});
 
-  const [columnDefs] = React.useState<ColDef<any>[]>(listDefs);
+  const [columnDefs] = React.useState<ColDef[]>(listDefs);
 
   const [rowData, setRowsData] = React.useState<{
     rows: DocClassification[];
@@ -127,7 +127,7 @@ export default function DocClassificationListPage() {
   const handleRowClick = (row: DocClassification) => {
     navigate(`/docClassification/${row.id}`);
   };
-  
+
   const breadcrumbs = "문서고 관리 > 문서분류 관리";
   const pageTitle = "문서분류 관리";
 
