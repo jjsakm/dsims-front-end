@@ -45,6 +45,11 @@ export default function MuiSelect(props: MuiSelectProps) {
             ? placeholder ?? ""
             : items?.find((i) => i.value === selected)?.label ?? ""
         }
+        sx={{
+          '& .MuiSelect-select': {
+            display: 'block !important',
+          }
+        }}
       >
         {/* placeholder 용 빈 값 아이템 */}
         <MenuItem value="">
@@ -53,11 +58,7 @@ export default function MuiSelect(props: MuiSelectProps) {
 
         {items?.map((item) => (
           <MenuItem key={item.value} value={item.value}>
-            <Typography noWrap sx={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              display: 'block',
-            }}>
+            <Typography noWrap>
               {item.label}
             </Typography>
           </MenuItem>
