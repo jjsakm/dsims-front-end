@@ -1,5 +1,12 @@
-import {FormControl, FormHelperText, InputLabel, MenuItem, Select, type SelectProps,} from "@mui/material";
-import type {Ref} from "react";
+import {
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  Select,
+  type SelectProps,
+} from "@mui/material";
+import type { Ref } from "react";
 import Typography from "@mui/material/Typography";
 
 type MuiSelectProps = {
@@ -40,27 +47,20 @@ export default function MuiSelect(props: MuiSelectProps) {
         value={value ?? ""}
         onChange={onChange as SelectProps["onChange"]}
         displayEmpty
-        renderValue={(selected) =>
-          selected === ""
-            ? placeholder ?? ""
-            : items?.find((i) => i.value === selected)?.label ?? ""
-        }
         sx={{
-          '& .MuiSelect-select': {
-            display: 'block !important',
-          }
+          "& .MuiSelect-select": {
+            display: "block !important",
+          },
         }}
       >
         {/* placeholder 용 빈 값 아이템 */}
-        <MenuItem value="">
+        {/* <MenuItem value="">
           <Typography noWrap>{placeholder ?? "선택하세요"}</Typography>
-        </MenuItem>
+        </MenuItem> */}
 
         {items?.map((item) => (
           <MenuItem key={item.value} value={item.value}>
-            <Typography noWrap>
-              {item.label}
-            </Typography>
+            <Typography noWrap>{item.label}</Typography>
           </MenuItem>
         ))}
       </Select>

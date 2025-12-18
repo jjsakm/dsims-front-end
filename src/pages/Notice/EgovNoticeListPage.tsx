@@ -10,6 +10,8 @@ import EgovPaging from "@/components/EgovPaging";
 import { itemIdxByPage } from "@/utils/calc";
 import { getSessionItem } from "@/utils/storage";
 
+import axios from "axios";
+
 type SearchCondition = {
   bbsId: string;
   pageIndex: number;
@@ -44,6 +46,8 @@ type UserInfo = {
 };
 
 function EgovNoticeList(props: any) {
+  console.log(props);
+
   const location = useLocation();
 
   // 관리자 권한 체크(세션)
@@ -83,14 +87,13 @@ function EgovNoticeList(props: any) {
   const [error, setError] = useState<any>(null);
 
   const canCreate = useMemo(() => {
-    return (
-      !!user &&
-      sessionUserSe === "ADM" &&
-      masterBoard?.bbsUseFlag === "Y"
-    );
+    return !!user && sessionUserSe === "ADM" && masterBoard?.bbsUseFlag === "Y";
   }, [user, sessionUserSe, masterBoard]);
 
   const fetchList = useCallback(async (condition: SearchCondition) => {
+    const res = await axios.get("/api/dbtest");
+
+    console.log(res);
     const retrieveListURL = "/board" + EgovNet.getQueryString(condition);
     const requestOptions = {
       method: "GET",
@@ -299,7 +302,10 @@ function EgovNoticeList(props: any) {
 
             <div className="board_bot">
               {/* <!-- Paging --> */}
-              <EgovPaging pagination={paginationInfo} moveToPage={handleMovePage} />
+              <EgovPaging
+                pagination={paginationInfo}
+                moveToPage={handleMovePage}
+              />
               {/* <!--/ Paging --> */}
             </div>
 

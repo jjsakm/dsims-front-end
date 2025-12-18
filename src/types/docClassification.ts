@@ -1,14 +1,14 @@
 export interface SearchValues {
-  largeCategory: string;
-  midCategory: string;
-  smallCategory: string;
-  hasPersonalInfo: boolean;
-  useYn: "" | "Y" | "N";
+  lclsfNo: string;
+  mclsfNo: string;
+  sclsfNo: string;
+  prvcInclYn: string;
+  useYn: string;
   keyword: string;
 }
 
 export interface DocClassificationSearchState {
-  values: Partial<Omit<SearchValues, "id">>;
+  values: SearchValues;
 }
 
 export interface DocClassification {
