@@ -7,6 +7,19 @@ export interface SearchValues {
   keyword: string;
 }
 
+export interface DocClsf {
+  docClsfNo: string;
+  docClsfSeCd: string;
+  docClsfNm: string;
+  upDocClsfNo: string;
+  prvcInclYn: string;
+  useEn: string;
+  regYmd: string;
+  rgtrId: string;
+  mdfcnYmd: string;
+  mdfrId: string;
+}
+
 export interface DocClassificationSearchState {
   values: SearchValues;
 }

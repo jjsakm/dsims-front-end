@@ -1,12 +1,24 @@
 import * as React from "react";
-import {Box, Breadcrumbs, Button, FormGroup, Grid, Link, Stack, TextField, Typography} from "@mui/material";
-import {useNavigate} from "react-router";
+import {
+  Box,
+  Breadcrumbs,
+  Button,
+  FormGroup,
+  Grid,
+  Link,
+  Stack,
+  TextField,
+  Typography,
+  type SelectChangeEvent,
+} from "@mui/material";
+import { useNavigate } from "react-router";
 import AgGridContainer from "@/components/AgGridContainer/AgGridContainer";
 import MuiSelect from "@/components/Elements/MuiSelect";
 import MuiCheckbox from "@/components/Elements/MuiCheckbox";
 import type {
   DocClassification,
   DocClassificationSearchState,
+  DocClsf,
   SearchValues,
 } from "@/types/docClassification";
 import type { ColDef } from "ag-grid-community";
@@ -16,6 +28,15 @@ import URL from "@/constants/url";
 import { useSearchStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
 import PageStatus from "@/components/PageStatus";
 import SearchFilterContainer from "@/components/Layout/docClassification/SearchFilterContainer.tsx";
+import type { SelectItem } from "@/types/common";
+import { getDocClsfList, getLclsfList } from "@/services/bizCommon";
+
+const initSelectItem: SelectItem[] = [
+  {
+    label: "전체",
+    value: "",
+  },
+];
 
 export default function DocClassificationListPage() {
   const navigate = useNavigate();
@@ -30,7 +51,12 @@ export default function DocClassificationListPage() {
     rowCount: 0,
   });
 
-  const [lclsfList, setLclsfList] = React.useState<SelectItem>();
+  const [lclsfList, setLclsfList] =
+    React.useState<SelectItem[]>(initSelectItem);
+  const [mclsfList, setMclsfList] =
+    React.useState<SelectItem[]>(initSelectItem);
+  const [sclsfList, setSclsfList] =
+    React.useState<SelectItem[]>(initSelectItem);
 
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
@@ -66,9 +92,11 @@ export default function DocClassificationListPage() {
         case "lclsfNo":
           next.mclsfNo = "";
           next.sclsfNo = "";
+          getDocClsfCodeList(name, value);
           break;
         case "mclsfNo":
           next.sclsfNo = "";
+          getDocClsfCodeList(name, value);
           break;
         default:
           break;
@@ -97,28 +125,54 @@ export default function DocClassificationListPage() {
     setIsLoading(false);
   }, []);
 
+  const getLclsfCodeList = React.useCallback(async () => {
+    setError(null);
+
+    try {
+      const list = await getLclsfList();
+
+      const resultList: SelectItem[] = list.map((vo: DocClsf) => {
+        return {
+          label: vo.docClsfNm,
+          value: vo.docClsfNo,
+        };
+      });
+      setLclsfList([...initSelectItem, ...resultList]);
+    } catch (e) {
+      setError(e as Error);
+    }
+  }, []);
+
   const getDocClsfCodeList = React.useCallback(
     async (name: string, docClsfNo: string) => {
       setError(null);
-      setIsLoading(true);
 
       try {
         const list = await getDocClsfList(docClsfNo);
 
-        setLclsfList(list);
+        const resultList: SelectItem[] = list.map((vo: DocClsf) => {
+          return {
+            label: vo.docClsfNm,
+            value: vo.docClsfNo,
+          };
+        });
+
+        if (name === "lclsfNo") {
+          setMclsfList([...initSelectItem, ...resultList]);
+        } else {
+          setSclsfList([...initSelectItem, ...resultList]);
+        }
       } catch (e) {
         setError(e as Error);
       }
-
-      setIsLoading(false);
     },
     []
   );
 
   React.useEffect(() => {
     loadData();
-    getDocClsfCodeList("lclsfNo", "");
-  }, [loadData]);
+    getLclsfCodeList();
+  }, [getLclsfCodeList, loadData]);
 
   const handleSearch = () => {
     // TODO: 검색 로직은 이후 AgGrid 연동 시 구현
@@ -148,7 +202,7 @@ export default function DocClassificationListPage() {
           <Link underline="hover" color="inherit" href={URL.MAIN}>
             HOME
           </Link>
-          <Typography sx={{color: 'text.primary'}}>문서고 관리</Typography>
+          <Typography sx={{ color: "text.primary" }}>문서고 관리</Typography>
         </Breadcrumbs>
       </Box>
       {/* <!--// Location --> */}
@@ -168,10 +222,7 @@ export default function DocClassificationListPage() {
               <MuiSelect
                 id="lclsfNo"
                 label="대분류"
-                items={[
-                  {value: "00", label: "전체"},
-                  {value: "01", label: "피해구제,....ㅁ아d럼 아ㅓ라 ㅓ마ㅓㄴ아 ㅓㅏ어d라...d zmzmzm "},
-                ]}
+                items={lclsfList}
                 value={values.lclsfNo ?? ""}
                 onChange={handleSelectChange}
               />
@@ -180,12 +231,7 @@ export default function DocClassificationListPage() {
               <MuiSelect
                 id="mclsfNo"
                 label="중분류"
-                items={[
-                  { value: "", label: "전체" },
-                  { value: "01", label: "접수서류" },
-                  { value: "02", label: "신청자 제출서류" },
-                  { value: "03", label: "직원보완자료" },
-                ]}
+                items={mclsfList}
                 value={values.mclsfNo ?? ""}
                 onChange={handleSelectChange}
               />
@@ -194,13 +240,7 @@ export default function DocClassificationListPage() {
               <MuiSelect
                 id="sclsfNo"
                 label="소분류"
-                items={[
-                  { value: "", label: "전체" },
-                  { value: "01", label: "사망 신청" },
-                  { value: "02", label: "미성년자 신청" },
-                  { value: "03", label: "이전문서" },
-                  { value: "04", label: "의무기록" },
-                ]}
+                items={sclsfList}
                 value={values.sclsfNo ?? ""}
                 onChange={handleSelectFieldChange}
               />

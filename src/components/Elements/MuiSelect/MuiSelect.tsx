@@ -8,13 +8,14 @@ import {
 } from "@mui/material";
 import type { Ref } from "react";
 import Typography from "@mui/material/Typography";
+import type { SelectItem } from "@/types/common";
 
 type MuiSelectProps = {
   inputRef?: Ref<HTMLSelectElement | null>;
   id: string;
   label?: string;
   placeholder?: string;
-  items?: { value: string; label: string }[];
+  items?: SelectItem[];
   defaultValue?: string;
   value?: string;
   error?: string;
