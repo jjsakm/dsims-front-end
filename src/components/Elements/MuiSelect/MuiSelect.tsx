@@ -1,12 +1,6 @@
-import {
-  FormControl,
-  FormHelperText,
-  InputLabel,
-  MenuItem,
-  Select,
-  type SelectProps,
-} from "@mui/material";
-import type { Ref } from "react";
+import {FormControl, FormHelperText, InputLabel, MenuItem, Select, type SelectProps,} from "@mui/material";
+import type {Ref} from "react";
+import Typography from "@mui/material/Typography";
 
 type MuiSelectProps = {
   inputRef?: Ref<HTMLSelectElement | null>;
@@ -54,12 +48,18 @@ export default function MuiSelect(props: MuiSelectProps) {
       >
         {/* placeholder 용 빈 값 아이템 */}
         <MenuItem value="">
-          <em>{placeholder ?? "선택하세요"}</em>
+          <Typography noWrap>{placeholder ?? "선택하세요"}</Typography>
         </MenuItem>
 
         {items?.map((item) => (
           <MenuItem key={item.value} value={item.value}>
-            {item.label}
+            <Typography noWrap sx={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: 'block',
+            }}>
+              {item.label}
+            </Typography>
           </MenuItem>
         ))}
       </Select>
