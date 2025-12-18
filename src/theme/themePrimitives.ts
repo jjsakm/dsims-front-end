@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
-import type { Shadows } from "@mui/material/styles";
-import type { PaletteMode } from "@mui/material/styles";
-import { createTheme, alpha } from "@mui/material/styles";
+import type {PaletteMode, Shadows} from "@mui/material/styles";
+import {alpha, createTheme} from "@mui/material/styles";
 
 declare module "@mui/material/Paper" {
   interface PaperPropsVariantOverrides {
@@ -22,7 +21,8 @@ declare module "@mui/material/styles" {
     900: string;
   }
 
-  interface PaletteColor extends ColorRange {}
+  interface PaletteColor extends ColorRange {
+  }
 
   interface Palette {
     baseShadow: string;
@@ -280,7 +280,7 @@ export const colorSchemes = {
       grey: {
         ...gray,
       },
-      divider: alpha(gray[300], 0.4),
+      divider: alpha(gray[300], 1),
       background: {
         default: "hsl(0, 0%, 99%)",
         paper: "hsl(220, 35%, 97%)",
