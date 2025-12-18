@@ -3,7 +3,7 @@ import { styled } from "@mui/material/styles";
 import type { BoxProps } from "@mui/material";
 import { Box } from "@mui/material";
 
-const SearchFilterContainer = styled(Box)<BoxProps>(({ theme }) => ({
+const SearchFilter = styled(Box)<BoxProps>(({ theme }) => ({
   position: "relative",
   overflow: "hidden",
   width: "100%",
@@ -20,8 +20,8 @@ export default function SearchFilterContainer({
   const layoutRef = React.useRef<HTMLDivElement>(null);
 
   return (
-    <SearchFilterContainer ref={layoutRef} {...props}>
+    <SearchFilter ref={layoutRef} {...props}>
       {children}
-    </SearchFilterContainer>
+    </SearchFilter>
   );
 }
