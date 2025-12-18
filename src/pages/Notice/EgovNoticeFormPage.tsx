@@ -1,14 +1,14 @@
 import React from "react";
-import { NOTICE_BBS_ID } from "@/config";
-import { useParams } from "react-router";
-import { noticeFormVaildator } from "@/services/noticeService";
+import {NOTICE_BBS_ID} from "@/config";
+import {useParams} from "react-router";
+import {noticeFormVaildator} from "@/services/noticeService";
 import CODE from "@/constants/code";
-import type { NoticeFormState, NoticeListItem } from "@/types/notice";
-import PageContainer from "@/components/PageContainer";
-import { useFormStateHandlers } from "@/hooks/InputStateHandlers/useFormStateHandlers";
+import type {NoticeFormState, NoticeListItem} from "@/types/notice";
+import PageContainer from "@/components/AgGridContainer/PageContainer.tsx";
+import {useFormStateHandlers} from "@/hooks/InputStateHandlers/useFormStateHandlers";
 
 import PageStatus from "@/components/PageStatus";
-import { useNoticeFormQueries } from "@/pages/Notice/useNoticeFormQueries";
+import {useNoticeFormQueries} from "@/pages/Notice/useNoticeFormQueries";
 import {
   Box,
   Button,
@@ -19,17 +19,17 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
-import { useInputStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
+import {useInputStateHandlers} from "@/hooks/InputStateHandlers/useInputStateHandlers";
 
 export default function EgovNoticeFormPage() {
-  const { nttId } = useParams();
+  const {nttId} = useParams();
 
   const bbsId = NOTICE_BBS_ID;
   const hasId = nttId != null && !Number.isNaN(Number(nttId));
   const mode = hasId ? CODE.MODE_MODIFY : CODE.MODE_CREATE;
 
   // 폼 상태 훅
-  const { formState, setFormValues, setFormErrors, handleFormFieldChange } =
+  const {formState, setFormValues, setFormErrors, handleFormFieldChange} =
     useFormStateHandlers<NoticeFormState["values"]>(
       {}, // 초기값
       noticeFormVaildator // 이 폼에서 쓸 validator
@@ -37,7 +37,7 @@ export default function EgovNoticeFormPage() {
   const formValues = formState.values;
   const formErrors = formState.errors;
 
-  const { handleTextFieldChange } = useInputStateHandlers<
+  const {handleTextFieldChange} = useInputStateHandlers<
     NoticeFormState["values"]
   >(handleFormFieldChange);
 
@@ -64,7 +64,7 @@ export default function EgovNoticeFormPage() {
 
   // 검증 전용 함수
   const validateForm = React.useCallback(() => {
-    const { issues } = noticeFormVaildator(formValues);
+    const {issues} = noticeFormVaildator(formValues);
     if (issues && issues.length > 0) {
       setFormErrors(
         Object.fromEntries(
@@ -102,7 +102,7 @@ export default function EgovNoticeFormPage() {
   }, [validateForm, formValues, mode, createData, updatedData]);
 
   if (isLoading || error) {
-    return <PageStatus isLoading={isLoading} error={error} />;
+    return <PageStatus isLoading={isLoading} error={error}/>;
   }
 
   const pageTitle = `공지사항 ${mode}`;
@@ -111,8 +111,8 @@ export default function EgovNoticeFormPage() {
     <PageContainer
       title={pageTitle}
       breadcrumbs={[
-        { title: "알림마당", path: "/notice/list" },
-        { title: pageTitle },
+        {title: "알림마당", path: "/notice/list"},
+        {title: pageTitle},
       ]}
     >
       <Box

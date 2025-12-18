@@ -1,14 +1,14 @@
 import * as React from "react";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import type { ThemeOptions } from "@mui/material/styles";
-import { inputsCustomizations } from "./customizations/inputs";
-import { buttonCustomizations } from "./customizations/button";
-import { dataDisplayCustomizations } from "./customizations/dataDisplay";
-import { feedbackCustomizations } from "./customizations/feedback";
-import { navigationCustomizations } from "./customizations/navigation";
-import { surfacesCustomizations } from "./customizations/surfaces";
-import { tableCustomizations } from "./customizations/table";
-import { colorSchemes, typography, shadows, shape } from "./themePrimitives";
+import type {ThemeOptions} from "@mui/material/styles";
+import {createTheme, ThemeProvider} from "@mui/material/styles";
+import {inputsCustomizations} from "./customizations/inputs";
+// import { buttonCustomizations } from "./customizations/button";
+import {dataDisplayCustomizations} from "./customizations/dataDisplay";
+import {feedbackCustomizations} from "./customizations/feedback";
+import {navigationCustomizations} from "./customizations/navigation";
+import {surfacesCustomizations} from "./customizations/surfaces";
+import {tableCustomizations} from "./customizations/table";
+import {colorSchemes, shadows, shape, typography} from "./themePrimitives";
 
 interface AppThemeProps {
   children: React.ReactNode;
@@ -20,31 +20,31 @@ interface AppThemeProps {
 }
 
 export default function AppTheme(props: AppThemeProps) {
-  const { children, disableCustomTheme, themeComponents } = props;
+  const {children, disableCustomTheme, themeComponents} = props;
   const theme = React.useMemo(() => {
     return disableCustomTheme
       ? {}
       : createTheme({
-          // For more details about CSS variables configuration, see https://mui.com/material-ui/customization/css-theme-variables/configuration/
-          cssVariables: {
-            colorSchemeSelector: "data-mui-color-scheme",
-            cssVarPrefix: "template",
-          },
-          colorSchemes, // Recently added in v6 for building light & dark mode app, see https://mui.com/material-ui/customization/palette/#color-schemes
-          typography,
-          shadows,
-          shape,
-          components: {
-            ...inputsCustomizations,
-            ...buttonCustomizations,
-            ...dataDisplayCustomizations,
-            ...feedbackCustomizations,
-            ...navigationCustomizations,
-            ...surfacesCustomizations,
-            ...tableCustomizations,
-            ...themeComponents,
-          },
-        });
+        // For more details about CSS variables configuration, see https://mui.com/material-ui/customization/css-theme-variables/configuration/
+        cssVariables: {
+          colorSchemeSelector: "data-mui-color-scheme",
+          cssVarPrefix: "template",
+        },
+        colorSchemes, // Recently added in v6 for building light & dark mode app, see https://mui.com/material-ui/customization/palette/#color-schemes
+        typography,
+        shadows,
+        shape,
+        components: {
+          ...inputsCustomizations,
+          // ...buttonCustomizations,
+          ...dataDisplayCustomizations,
+          ...feedbackCustomizations,
+          ...navigationCustomizations,
+          ...surfacesCustomizations,
+          ...tableCustomizations,
+          ...themeComponents,
+        },
+      });
   }, [disableCustomTheme, themeComponents]);
   if (disableCustomTheme) {
     return <React.Fragment>{children}</React.Fragment>;

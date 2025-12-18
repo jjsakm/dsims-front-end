@@ -2,16 +2,16 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
-import { useNavigate } from "react-router";
-import PageContainer from "@/components/PageContainer";
+import {useNavigate} from "react-router";
+import PageContainer from "@/components/AgGridContainer/PageContainer.tsx";
 import AgGridContainer from "@/components/AgGridContainer/AgGridContainer";
-import { FormGroup, Grid, TextField } from "@mui/material";
+import {FormGroup, Grid, TextField} from "@mui/material";
 import MuiSelect from "@/components/Elements/MuiSelect";
-import type { ColDef } from "ag-grid-community";
-import { listDefs } from "./col-def";
-import type { DigitalDoc, DigitalDocSearchState } from "@/types/digitalDoc";
-import { getDigitalDocList } from "@/services/digitalDocService";
-import { useSearchStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
+import type {ColDef} from "ag-grid-community";
+import {listDefs} from "./col-def";
+import type {DigitalDoc, DigitalDocSearchState} from "@/types/digitalDoc";
+import {getDigitalDocList} from "@/services/digitalDocService";
+import {useSearchStateHandlers} from "@/hooks/InputStateHandlers/useInputStateHandlers";
 import PageStatus from "@/components/PageStatus";
 
 export default function DigitalDocListPage() {
@@ -19,7 +19,7 @@ export default function DigitalDocListPage() {
 
   const [columnDefs] = React.useState<ColDef<any>[]>(listDefs);
 
-  const { values, handleTextFieldChange, handleSelectFieldChange } =
+  const {values, handleTextFieldChange, handleSelectFieldChange} =
     useSearchStateHandlers<DigitalDocSearchState["values"]>();
 
   const [rowData, setRowsData] = React.useState<{
@@ -65,14 +65,14 @@ export default function DigitalDocListPage() {
   };
 
   if (isLoading || error) {
-    return <PageStatus isLoading={isLoading} error={error} />;
+    return <PageStatus isLoading={isLoading} error={error}/>;
   }
 
   const breadcrumbs = "문서고 관리 > 전자문서 관리";
   const pageTitle = "전자문서 관리";
 
   return (
-    <PageContainer title={pageTitle} breadcrumbs={[{ title: breadcrumbs }]}>
+    <PageContainer title={pageTitle} breadcrumbs={[{title: breadcrumbs}]}>
       <FormGroup>
         <Stack
           direction="row"
@@ -80,51 +80,51 @@ export default function DigitalDocListPage() {
           mb={2}
           justifyContent="space-between"
         >
-          <Grid container spacing={2} sx={{ mb: 2, width: "100%" }}>
+          <Grid container spacing={2} sx={{mb: 2, width: "100%"}}>
             {/* 1행 */}
-            <Grid size={{ xs: 12, sm: 3 }} sx={{ display: "flex" }}>
+            <Grid size={{xs: 12, sm: 3}} sx={{display: "flex"}}>
               <MuiSelect
                 id="largeCategory"
                 label="대분류"
                 items={[
-                  { value: "00", label: "전체" },
-                  { value: "01", label: "피해구제" },
+                  {value: "00", label: "전체"},
+                  {value: "01", label: "피해구제"},
                 ]}
                 value={values.largeCategory ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 3 }} sx={{ display: "flex" }}>
+            <Grid size={{xs: 12, sm: 3}} sx={{display: "flex"}}>
               <MuiSelect
                 id="midCategory"
                 label="중분류"
                 items={[
-                  { value: "00", label: "전체" },
-                  { value: "01", label: "접수서류" },
-                  { value: "02", label: "신청자 제출서류" },
-                  { value: "03", label: "직원보완자료" },
+                  {value: "00", label: "전체"},
+                  {value: "01", label: "접수서류"},
+                  {value: "02", label: "신청자 제출서류"},
+                  {value: "03", label: "직원보완자료"},
                 ]}
                 value={values.midCategory ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 3 }} sx={{ display: "flex" }}>
+            <Grid size={{xs: 12, sm: 3}} sx={{display: "flex"}}>
               <MuiSelect
                 id="smallCategory"
                 label="소분류"
                 items={[
-                  { value: "00", label: "전체" },
-                  { value: "01", label: "사망 신청" },
-                  { value: "02", label: "미성년자 신청" },
-                  { value: "03", label: "이전문서" },
-                  { value: "04", label: "의무기록" },
+                  {value: "00", label: "전체"},
+                  {value: "01", label: "사망 신청"},
+                  {value: "02", label: "미성년자 신청"},
+                  {value: "03", label: "이전문서"},
+                  {value: "04", label: "의무기록"},
                 ]}
                 value={values.smallCategory ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
             {/* 2행 */}
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{xs: 12, sm: 6}}>
               <TextField
                 fullWidth
                 name="docNum"
@@ -134,7 +134,7 @@ export default function DigitalDocListPage() {
                 onChange={handleTextFieldChange}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{xs: 12, sm: 6}}>
               <TextField
                 fullWidth
                 name="docTitle"
@@ -151,7 +151,7 @@ export default function DigitalDocListPage() {
         </Stack>
       </FormGroup>
 
-      <Box sx={{ flex: 1, width: "100%" }}>
+      <Box sx={{flex: 1, width: "100%"}}>
         <AgGridContainer
           isLoading={isLoading}
           colDefs={columnDefs}

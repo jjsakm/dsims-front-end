@@ -1,34 +1,18 @@
 "use client";
 import * as React from "react";
-import { styled } from "@mui/material/styles";
+import {styled} from "@mui/material/styles";
 import Box from "@mui/material/Box";
-import Breadcrumbs, { breadcrumbsClasses } from "@mui/material/Breadcrumbs";
-import Container, { type ContainerProps } from "@mui/material/Container";
-import MuiLink from "@mui/material/Link";
+import Container, {type ContainerProps} from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-import NavigateNextRoundedIcon from "@mui/icons-material/NavigateNextRounded";
-import { Link } from "react-router";
 
-const PageContentHeader = styled("div")(({ theme }) => ({
+const PageContentHeader = styled("div")(({theme}) => ({
   display: "flex",
   flexDirection: "row",
   justifyContent: "space-between",
   gap: theme.spacing(2),
 }));
 
-const PageHeaderBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
-  margin: theme.spacing(1, 0),
-  [`& .${breadcrumbsClasses.separator}`]: {
-    color: (theme.vars || theme).palette.action.disabled,
-    margin: 1,
-  },
-  [`& .${breadcrumbsClasses.ol}`]: {
-    alignItems: "center",
-  },
-}));
-
-const PageHeaderToolbar = styled("div")(({ theme }) => ({
+const PageHeaderToolbar = styled("div")(({theme}) => ({
   display: "flex",
   flexDirection: "row",
   gap: theme.spacing(1),
@@ -40,6 +24,7 @@ export interface Breadcrumb {
   title: string;
   path?: string;
 }
+
 export interface PageContainerProps extends ContainerProps {
   children?: React.ReactNode;
   breadcrumbs?: Breadcrumb[];
@@ -47,10 +32,10 @@ export interface PageContainerProps extends ContainerProps {
 }
 
 export default function PageContainer(props: PageContainerProps) {
-  const { children, actions = null } = props;
+  const {children, actions = null} = props;
 
   return (
-    <Container sx={{ my: 2 }}>
+    <Container sx={{my: 2}}>
       <Stack spacing={2}>
         <Stack>
           <PageContentHeader>

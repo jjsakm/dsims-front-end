@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useNavigate, useParams } from "react-router";
+import {useNavigate, useParams} from "react-router";
 import useNotifications from "@/hooks/useNotifications";
 import {
   getDocClassificationData,
@@ -7,14 +7,14 @@ import {
   docClassificationvalidator,
 } from "@/services/docClassificationService";
 import DocClassificationForm from "./DocClassificationForm";
-import PageContainer from "@/components/PageContainer";
-import { createDocClassificationData } from "@/services/docClassificationService";
+import PageContainer from "@/components/AgGridContainer/PageContainer.tsx";
+import {createDocClassificationData} from "@/services/docClassificationService";
 import type {
   DocClassification,
   DocClassificationFormState,
 } from "@/types/docClassification";
 import URL from "@/constants/url";
-import { useFormStateHandlers } from "@/hooks/InputStateHandlers/useFormStateHandlers";
+import {useFormStateHandlers} from "@/hooks/InputStateHandlers/useFormStateHandlers";
 import PageStatus from "@/components/PageStatus";
 
 const INITIAL_FORM_VALUES: Partial<DocClassificationFormState["values"]> = {
@@ -24,12 +24,12 @@ const INITIAL_FORM_VALUES: Partial<DocClassificationFormState["values"]> = {
 export default function DocClassificationFormPage() {
   const navigate = useNavigate();
   const notifications = useNotifications();
-  const { docClassificationId } = useParams();
+  const {docClassificationId} = useParams();
 
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
 
-  const { formState, setFormValues, setFormErrors, handleFormFieldChange } =
+  const {formState, setFormValues, setFormErrors, handleFormFieldChange} =
     useFormStateHandlers<DocClassificationFormState["values"]>(
       INITIAL_FORM_VALUES, // 초기값
       docClassificationvalidator // 이 폼에서 쓸 validator
@@ -118,7 +118,7 @@ export default function DocClassificationFormPage() {
   );
 
   const handleSubmit = React.useCallback(async () => {
-    const { issues } = docClassificationvalidator(formValues);
+    const {issues} = docClassificationvalidator(formValues);
     if (issues && issues.length > 0) {
       setFormErrors(
         Object.fromEntries(
@@ -138,7 +138,7 @@ export default function DocClassificationFormPage() {
   }, [formValues, setFormErrors, docClassificationId, createData, updatedData]);
 
   if (isLoading || error) {
-    return <PageStatus isLoading={isLoading} error={error} />;
+    return <PageStatus isLoading={isLoading} error={error}/>;
   }
 
   const pageTitle = docClassificationId ? "수정" : "등록";
@@ -147,9 +147,9 @@ export default function DocClassificationFormPage() {
     <PageContainer
       title={pageTitle}
       breadcrumbs={[
-        { title: "문서고 관리", path: "/docClassification/list" },
-        { title: "문서분류 관리", path: "/docClassification/list" },
-        { title: pageTitle },
+        {title: "문서고 관리", path: "/docClassification/list"},
+        {title: "문서분류 관리", path: "/docClassification/list"},
+        {title: pageTitle},
       ]}
     >
       <DocClassificationForm

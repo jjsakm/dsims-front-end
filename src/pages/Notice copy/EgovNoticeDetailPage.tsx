@@ -1,6 +1,6 @@
 import React from "react";
-import { NOTICE_BBS_ID } from "@/config";
-import { useNavigate, useParams } from "react-router";
+import {NOTICE_BBS_ID} from "@/config";
+import {useNavigate, useParams} from "react-router";
 // import EgovAttachFile from "@/components/EgovAttachFile";
 import {
   Button,
@@ -11,20 +11,20 @@ import {
   TableRow,
 } from "@mui/material";
 import URL from "@/constants/url";
-import PageContainer from "@/components/PageContainer";
-import { useDialogs } from "@/hooks/useDialogs/useDialogs";
-import { useNoticeFormQueries } from "./useNoticeFormQueries";
+import PageContainer from "@/components/AgGridContainer/PageContainer.tsx";
+import {useDialogs} from "@/hooks/useDialogs/useDialogs";
+import {useNoticeFormQueries} from "./useNoticeFormQueries";
 import PageStatus from "@/components/PageStatus";
 
 export default function EgovNoticeDetailPage() {
-  const { nttId } = useParams();
+  const {nttId} = useParams();
   const dialogs = useDialogs();
   const navigate = useNavigate();
 
   const bbsId = NOTICE_BBS_ID;
   const hasId = nttId != null && !Number.isNaN(Number(nttId));
 
-  const { detailData, isLoading, error, deleteNotice, isSubmitting } =
+  const {detailData, isLoading, error, deleteNotice, isSubmitting} =
     useNoticeFormQueries({
       bbsId,
       nttId: nttId?.toString(),
@@ -53,7 +53,7 @@ export default function EgovNoticeDetailPage() {
   );
 
   if (isLoading || error) {
-    return <PageStatus isLoading={isLoading} error={error} />;
+    return <PageStatus isLoading={isLoading} error={error}/>;
   }
 
   const pageTitle = `공지사항`;
@@ -62,8 +62,8 @@ export default function EgovNoticeDetailPage() {
     <PageContainer
       title={pageTitle}
       breadcrumbs={[
-        { title: "알림마당", path: "/notice/list" },
-        { title: pageTitle },
+        {title: "알림마당", path: "/notice/list"},
+        {title: pageTitle},
       ]}
     >
       {pageTitle}

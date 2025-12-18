@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { NOTICE_BBS_ID } from "@/config";
-import { useNavigate, useParams } from "react-router";
+import React, {useEffect, useState} from "react";
+import {NOTICE_BBS_ID} from "@/config";
+import {useNavigate, useParams} from "react-router";
 import {
   createNoticeItem,
   getNoticeItem,
@@ -9,17 +9,17 @@ import {
 } from "@/services/noticeService";
 import useNotifications from "@/hooks/useNotifications/useNotifications";
 import CODE from "@/constants/code";
-import type { NoticeFormState, NoticeListItem } from "@/types/notice";
-import PageContainer from "@/components/PageContainer";
+import type {NoticeFormState, NoticeListItem} from "@/types/notice";
+import PageContainer from "@/components/AgGridContainer/PageContainer.tsx";
 import EgovNoticeForm from "./EgovNoticeForm";
-import type { FormFieldValue } from "@/types/common";
-import { Alert, Box, CircularProgress } from "@mui/material";
+import type {FormFieldValue} from "@/types/common";
+import {Alert, Box, CircularProgress} from "@mui/material";
 import URL from "@/constants/url";
 
 export default function EgovNoticeFormPage() {
   const navigate = useNavigate();
   const notifications = useNotifications();
-  const { nttId } = useParams();
+  const {nttId} = useParams();
 
   const bbsId = NOTICE_BBS_ID;
   const [mode, setMode] = useState(null);
@@ -44,7 +44,7 @@ export default function EgovNoticeFormPage() {
         bbsId,
         nttId: nttId?.toString() || "",
       });
-      setFormState({ values: resp, errors: {} });
+      setFormState({values: resp, errors: {}});
       // setBoardAttachFiles(resp.result.resultFiles);
     } catch (viewDataError) {
       setError(viewDataError as Error);
@@ -95,14 +95,14 @@ export default function EgovNoticeFormPage() {
       const validateField = async (
         values: Partial<NoticeFormState["values"]>
       ) => {
-        const { issues } = noticeFormVaildator(values);
+        const {issues} = noticeFormVaildator(values);
         setFormErrors({
           ...formErrors,
           [name]: issues?.find((issue) => issue.path?.[0] === name)?.message,
         });
       };
 
-      const newFormValues = { ...formValues, [name]: value };
+      const newFormValues = {...formValues, [name]: value};
 
       setFormValues(newFormValues);
       validateField(newFormValues);
@@ -164,7 +164,7 @@ export default function EgovNoticeFormPage() {
   );
 
   const handleSubmit = React.useCallback(async () => {
-    const { issues } = noticeFormVaildator(formValues);
+    const {issues} = noticeFormVaildator(formValues);
     if (issues && issues.length > 0) {
       setFormErrors(
         Object.fromEntries(
@@ -205,14 +205,14 @@ export default function EgovNoticeFormPage() {
           m: 1,
         }}
       >
-        <CircularProgress />
+        <CircularProgress/>
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box sx={{ flexGrow: 1 }}>
+      <Box sx={{flexGrow: 1}}>
         <Alert severity="error">{error.message}</Alert>
       </Box>
     );
@@ -224,8 +224,8 @@ export default function EgovNoticeFormPage() {
     <PageContainer
       title={pageTitle}
       breadcrumbs={[
-        { title: "알림마당", path: "/notice/list" },
-        { title: pageTitle },
+        {title: "알림마당", path: "/notice/list"},
+        {title: pageTitle},
       ]}
     >
       <EgovNoticeForm

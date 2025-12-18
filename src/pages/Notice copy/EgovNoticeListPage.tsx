@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
-import { NOTICE_BBS_ID } from "@/config";
-import PageContainer from "@/components/PageContainer";
+import {useState} from "react";
+import {useNavigate} from "react-router";
+import {NOTICE_BBS_ID} from "@/config";
+import PageContainer from "@/components/AgGridContainer/PageContainer.tsx";
 import EgovPaging from "@/components/EgovPaging";
-import type { NoticeListItem, NoticeSearchState } from "@/types/notice";
+import type {NoticeListItem, NoticeSearchState} from "@/types/notice";
 import {
   Box,
   Button,
@@ -16,9 +16,9 @@ import {
   TableHead,
 } from "@mui/material";
 import URL from "@/constants/url";
-import { useSearchStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
+import {useSearchStateHandlers} from "@/hooks/InputStateHandlers/useInputStateHandlers";
 import MuiSelect from "@/components/Elements/MuiSelect";
-import { useNoticeFormQueries } from "./useNoticeFormQueries";
+import {useNoticeFormQueries} from "./useNoticeFormQueries";
 import PageStatus from "@/components/PageStatus";
 
 type NoticeSearchCondition = {
@@ -29,7 +29,7 @@ type NoticeSearchCondition = {
 export default function EgovNoticeListPage() {
   const navigate = useNavigate();
 
-  const { values, handleTextFieldChange, handleSelectFieldChange } =
+  const {values, handleTextFieldChange, handleSelectFieldChange} =
     useSearchStateHandlers<NoticeSearchState["values"]>();
 
   const bbsId = NOTICE_BBS_ID;
@@ -41,7 +41,7 @@ export default function EgovNoticeListPage() {
     }
   );
 
-  const { listData, isListLoading, listError } = useNoticeFormQueries({
+  const {listData, isListLoading, listError} = useNoticeFormQueries({
     bbsId,
     nttId: undefined,
     hasId: false,
@@ -82,14 +82,14 @@ export default function EgovNoticeListPage() {
   };
 
   if (isListLoading || listError) {
-    return <PageStatus isLoading={isListLoading} error={listError} />;
+    return <PageStatus isLoading={isListLoading} error={listError}/>;
   }
 
   const breadcrumbs = "공지사항";
   const pageTitle = "공지사항";
 
   return (
-    <PageContainer title={pageTitle} breadcrumbs={[{ title: breadcrumbs }]}>
+    <PageContainer title={pageTitle} breadcrumbs={[{title: breadcrumbs}]}>
       {/* <!-- 검색조건 --> */}
       <Stack direction="row" justifyContent="space-between" mb={2}>
         <Box
@@ -103,9 +103,9 @@ export default function EgovNoticeListPage() {
           <MuiSelect
             id="searchCnd"
             items={[
-              { value: "01", label: "제목" },
-              { value: "02", label: "내용" },
-              { value: "03", label: "작성자" },
+              {value: "01", label: "제목"},
+              {value: "02", label: "내용"},
+              {value: "03", label: "작성자"},
             ]}
             value={values.searchCnd ?? "01"}
             onChange={handleSelectFieldChange}
@@ -117,7 +117,7 @@ export default function EgovNoticeListPage() {
             placeholder="검색어를 입력하세요"
             value={values.searchWrd ?? ""}
             onChange={handleTextFieldChange}
-            sx={{ minWidth: 400 }}
+            sx={{minWidth: 400}}
           />
 
           <Button
@@ -125,7 +125,7 @@ export default function EgovNoticeListPage() {
             onClick={() => {
               handleSearch();
             }}
-            sx={{ whiteSpace: "nowrap" }}
+            sx={{whiteSpace: "nowrap"}}
           >
             조회
           </Button>
@@ -138,7 +138,7 @@ export default function EgovNoticeListPage() {
 
       {/* <!-- 게시판목록 --> */}
       <div className="board_list BRD002">
-        <Table size="small" sx={{ width: "100%" }} aria-label="공지사항 목록">
+        <Table size="small" sx={{width: "100%"}} aria-label="공지사항 목록">
           <TableHead>
             <TableRow>
               <TableCell align="center">번호</TableCell>
@@ -161,7 +161,7 @@ export default function EgovNoticeListPage() {
                   key={item.nttId}
                   hover
                   onClick={() => handleRowClick(item.nttId)}
-                  sx={{ cursor: "pointer" }}
+                  sx={{cursor: "pointer"}}
                 >
                   <TableCell align="center">{item.nttId}</TableCell>
                   {/* 제목은 왼쪽 정렬 */}

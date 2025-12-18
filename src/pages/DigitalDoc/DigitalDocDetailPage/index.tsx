@@ -12,11 +12,11 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-import { useNavigate, useParams } from "react-router";
-import PageContainer from "@/components/PageContainer";
-import type { DigitalDoc } from "@/types/digitalDoc";
-import { getDigitalDocData } from "@/services/digitalDocService";
-import { useDialogs } from "@/hooks/useDialogs/useDialogs";
+import {useNavigate, useParams} from "react-router";
+import PageContainer from "@/components/AgGridContainer/PageContainer.tsx";
+import type {DigitalDoc} from "@/types/digitalDoc";
+import {getDigitalDocData} from "@/services/digitalDocService";
+import {useDialogs} from "@/hooks/useDialogs/useDialogs";
 import useNotifications from "@/hooks/useNotifications";
 import DigitalDocHistoryButton from "@/components/Buttons/DigitalDocHistoryButton";
 import DigitalDocDownButton from "@/components/Buttons/DigitalDocDownButton";
@@ -25,7 +25,7 @@ import URL from "@/constants/url";
 import PageStatus from "@/components/PageStatus";
 
 export default function DigitalDocDetailPage() {
-  const { docId } = useParams();
+  const {docId} = useParams();
   const navigate = useNavigate();
 
   const dialogs = useDialogs();
@@ -39,8 +39,8 @@ export default function DigitalDocDetailPage() {
   const [approvalRows, setApprovalRows] = React.useState<
     { id: number; dept: string; name: string }[]
   >([
-    { id: 1, dept: "정보화팀", name: "전체" },
-    { id: 2, dept: "경영팀", name: "김길동" },
+    {id: 1, dept: "정보화팀", name: "전체"},
+    {id: 2, dept: "경영팀", name: "김길동"},
   ]);
 
   const [newDept, setNewDept] = React.useState("");
@@ -120,7 +120,7 @@ export default function DigitalDocDetailPage() {
   }, [navigate]);
 
   if (isLoading || error) {
-    return <PageStatus isLoading={isLoading} error={error} />;
+    return <PageStatus isLoading={isLoading} error={error}/>;
   }
 
   const pageTitle = `전자문서 상세`;
@@ -137,15 +137,15 @@ export default function DigitalDocDetailPage() {
           mt: 2,
         }}
       >
-        <DigitalDocHistoryButton />
+        <DigitalDocHistoryButton/>
         <Button variant="contained" onClick={handleBack}>
           목록
         </Button>
       </Stack>
-      <Box sx={{ width: "100%", overflowX: "auto" }}>
+      <Box sx={{width: "100%", overflowX: "auto"}}>
         <Table
           size="small"
-          sx={{ width: "100%" }}
+          sx={{width: "100%"}}
           aria-label="디지털 문서 상세 정보"
         >
           <TableBody>
@@ -202,8 +202,8 @@ export default function DigitalDocDetailPage() {
                   alignItems="center"
                 >
                   {viewData?.fileName ?? "피해구제 접수서류.pdf"}
-                  <DigitalDocViewerButton />
-                  <DigitalDocDownButton />
+                  <DigitalDocViewerButton/>
+                  <DigitalDocDownButton/>
                 </Stack>
               </TableCell>
             </TableRow>
@@ -219,14 +219,14 @@ export default function DigitalDocDetailPage() {
           mt: 2,
         }}
       >
-        <Box sx={{ width: "100%", maxWidth: 700 }}>
+        <Box sx={{width: "100%", maxWidth: 700}}>
           <Table aria-label="공람 이력">
             <TableBody>
               <TableRow>
                 <TableCell
                   rowSpan={approvalRows.length + 2}
                   align="center"
-                  sx={{ whiteSpace: "nowrap", fontWeight: 600 }}
+                  sx={{whiteSpace: "nowrap", fontWeight: 600}}
                 >
                   공람
                 </TableCell>
@@ -301,10 +301,10 @@ export default function DigitalDocDetailPage() {
             </TableBody>
           </Table>
         </Box>
-        <Box sx={{ width: "100%", maxWidth: 700 }}>
+        <Box sx={{width: "100%", maxWidth: 700}}>
           <Table
             size="small"
-            sx={{ width: "100%" }}
+            sx={{width: "100%"}}
             aria-label="문서분류 및 반환여부"
           >
             <TableBody>
@@ -315,7 +315,7 @@ export default function DigitalDocDetailPage() {
                     direction="row"
                     spacing={1}
                     alignItems="center"
-                    sx={{ width: "100%" }}
+                    sx={{width: "100%"}}
                   >
                     <Select size="small" fullWidth displayEmpty value="">
                       <MenuItem value="">
@@ -346,12 +346,12 @@ export default function DigitalDocDetailPage() {
                     >
                       <FormControlLabel
                         value="Y"
-                        control={<Radio size="small" />}
+                        control={<Radio size="small"/>}
                         label="반환"
                       />
                       <FormControlLabel
                         value="N"
-                        control={<Radio size="small" />}
+                        control={<Radio size="small"/>}
                         label="미반환"
                       />
                     </RadioGroup>

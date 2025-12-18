@@ -1,35 +1,35 @@
 import * as React from "react";
 import {useNavigate, useParams} from "react-router";
 import useNotifications from "@/hooks/useNotifications";
-import DocClassificationForm from "./DigitalDocForm";
-import PageContainer from "@/components/AgGridContainer/PageContainer.tsx";
-import type {DigitalDoc, DigitalDocFormState} from "@/types/digitalDoc";
 import {
-  createDigitalDocData,
-  digitalDocFormValidator,
-  getDigitalDocData,
-  updateDigitalDocData,
-} from "@/services/digitalDocService";
+  createDocClassificationData,
+  docClassificationvalidator,
+  getDocClassificationData,
+  updateDocClassificationData,
+} from "@/services/docClassificationService";
+import DocClassificationForm from "./DocClassificationForm";
+import PageContainer from "@/components/AgGridContainer/PageContainer.tsx";
+import type {DocClassification, DocClassificationFormState,} from "@/types/docClassification";
 import URL from "@/constants/url";
 import {useFormStateHandlers} from "@/hooks/InputStateHandlers/useFormStateHandlers";
 import PageStatus from "@/components/PageStatus";
 
-const INITIAL_FORM_VALUES: Partial<DigitalDocFormState["values"]> = {
-  // useYn: "N",
+const INITIAL_FORM_VALUES: Partial<DocClassificationFormState["values"]> = {
+  useYn: "N",
 };
 
-export default function DigitalDocFormPage() {
+export default function DocClassificationFormPage() {
   const navigate = useNavigate();
   const notifications = useNotifications();
-  const {docId} = useParams();
+  const {docClassificationId} = useParams();
 
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
 
   const {formState, setFormValues, setFormErrors, handleFormFieldChange} =
-    useFormStateHandlers<DigitalDocFormState["values"]>(
+    useFormStateHandlers<DocClassificationFormState["values"]>(
       INITIAL_FORM_VALUES, // 초기값
-      digitalDocFormValidator // 이 폼에서 쓸 validator
+      docClassificationvalidator // 이 폼에서 쓸 validator
     );
   const formValues = formState.values;
 
@@ -38,32 +38,37 @@ export default function DigitalDocFormPage() {
     setIsLoading(true);
 
     try {
-      const viewData = await getDigitalDocData(Number(docId));
+      const viewData = await getDocClassificationData(
+        Number(docClassificationId)
+      );
 
       setFormValues(viewData);
     } catch (viewDataError) {
       setError(viewDataError as Error);
     }
     setIsLoading(false);
-  }, [docId, setFormValues]);
+  }, [docClassificationId, setFormValues]);
 
   React.useEffect(() => {
-    if (!docId) {
+    if (!docClassificationId) {
       setIsLoading(false);
       return;
     }
 
     loadData();
-  }, [docId, loadData]);
+  }, [docClassificationId, loadData]);
 
   const createData = React.useCallback(
-    async (formValues: Partial<DigitalDocFormState["values"]>) => {
+    async (formValues: Partial<DocClassificationFormState["values"]>) => {
       try {
-        await createDigitalDocData(formValues as Omit<DigitalDoc, "id">);
+        await createDocClassificationData(
+          formValues as Omit<DocClassification, "id">
+        );
         notifications.show("생성 완료.", {
           severity: "success",
           autoHideDuration: 3000,
         });
+
         navigate(URL.DOC_CLASSIFICATION_LIST);
       } catch (createError) {
         notifications.show(
@@ -76,27 +81,28 @@ export default function DigitalDocFormPage() {
         throw createError;
       }
     },
-    [navigate, notifications]
+    [notifications, navigate]
   );
 
   const updatedData = React.useCallback(
     async (
-      docId: number,
-      formValues: Partial<DigitalDocFormState["values"]>
+      docClassificationId: number,
+      formValues: Partial<DocClassificationFormState["values"]>
     ) => {
       try {
-        const updatedData = await updateDigitalDocData(
-          docId,
-          formValues as Partial<Omit<DigitalDoc, "id">>
+        const updatedData = await updateDocClassificationData(
+          docClassificationId,
+          formValues as Partial<Omit<DocClassification, "id">>
         );
         setFormValues(updatedData);
-        notifications.show("생성 완료.", {
+
+        notifications.show("수정 완료.", {
           severity: "success",
           autoHideDuration: 3000,
         });
       } catch (editError) {
         notifications.show(
-          `데이터 생성 실패. 사유: ${(editError as Error).message}`,
+          `데이터 수정 실패. 사유: ${(editError as Error).message}`,
           {
             severity: "error",
             autoHideDuration: 3000,
@@ -109,7 +115,7 @@ export default function DigitalDocFormPage() {
   );
 
   const handleSubmit = React.useCallback(async () => {
-    const {issues} = digitalDocFormValidator(formValues);
+    const {issues} = docClassificationvalidator(formValues);
     if (issues && issues.length > 0) {
       setFormErrors(
         Object.fromEntries(
@@ -120,29 +126,31 @@ export default function DigitalDocFormPage() {
     }
     setFormErrors({});
 
-    const isEditMode = Boolean(docId);
+    const isEditMode = Boolean(docClassificationId);
     if (isEditMode) {
-      await updatedData(Number(docId), formValues);
+      await updatedData(Number(docClassificationId), formValues);
     } else {
       await createData(formValues);
     }
-  }, [formValues, setFormErrors, docId, createData, updatedData]);
+  }, [formValues, setFormErrors, docClassificationId, createData, updatedData]);
 
   if (isLoading || error) {
     return <PageStatus isLoading={isLoading} error={error}/>;
   }
-  const pageTitle = docId ? "수정" : "등록";
+
+  const pageTitle = docClassificationId ? "수정" : "등록";
 
   return (
     <PageContainer
       title={pageTitle}
       breadcrumbs={[
         {title: "문서고 관리", path: "/docClassification/list"},
-        {title: "문서전자 관리", path: "/docClassification/list"},
+        {title: "문서분류 관리", path: "/docClassification/list"},
         {title: pageTitle},
       ]}
     >
       <DocClassificationForm
+        isEditMode={!!docClassificationId}
         formState={formState}
         onFieldChange={handleFormFieldChange}
         onSubmit={handleSubmit}

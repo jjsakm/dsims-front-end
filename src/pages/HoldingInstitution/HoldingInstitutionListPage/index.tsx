@@ -1,30 +1,18 @@
 import * as React from "react";
-import PageContainer from "@/components/PageContainer";
+import PageContainer from "@/components/AgGridContainer/PageContainer.tsx";
 import AgGridContainer from "@/components/AgGridContainer/AgGridContainer";
-import {
-  Alert,
-  Box,
-  Button,
-  Stack,
-  FormGroup,
-  Grid,
-  TextField,
-  Typography,
-} from "@mui/material";
+import {Box, Button, FormGroup, Grid, Stack, TextField, Typography,} from "@mui/material";
 import MuiSelect from "@/components/Elements/MuiSelect";
 import MuiCheckbox from "@/components/Elements/MuiCheckbox";
-import type { ColDef } from "ag-grid-community";
-import { listDefs } from "./col-def";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import type {ColDef} from "ag-grid-community";
+import {listDefs} from "./col-def";
+import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import { getHoldingInstitutionList } from "@/services/holdingInstitutionService";
-import { useDialogs } from "@/hooks/useDialogs/useDialogs";
-import type {
-  HoldingInstitution,
-  HoldingInstitutionSearchState,
-} from "@/types/holdingInstitution";
-import { useSearchStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
+import {getHoldingInstitutionList} from "@/services/holdingInstitutionService";
+import {useDialogs} from "@/hooks/useDialogs/useDialogs";
+import type {HoldingInstitution, HoldingInstitutionSearchState,} from "@/types/holdingInstitution";
+import {useSearchStateHandlers} from "@/hooks/InputStateHandlers/useInputStateHandlers";
 import PageStatus from "@/components/PageStatus";
 
 export default function DocDestructionDetailPage() {
@@ -130,14 +118,14 @@ export default function DocDestructionDetailPage() {
   };
 
   if (isLoading || error) {
-    return <PageStatus isLoading={isLoading} error={error} />;
+    return <PageStatus isLoading={isLoading} error={error}/>;
   }
 
   const breadcrumbs = "보유기관 관리";
   const pageTitle = "보유기관 관리";
 
   return (
-    <PageContainer title={pageTitle} breadcrumbs={[{ title: breadcrumbs }]}>
+    <PageContainer title={pageTitle} breadcrumbs={[{title: breadcrumbs}]}>
       <FormGroup>
         <Stack
           direction="row"
@@ -145,9 +133,9 @@ export default function DocDestructionDetailPage() {
           mb={2}
           justifyContent="space-between"
         >
-          <Grid container spacing={2} sx={{ mb: 2, width: "100%" }}>
+          <Grid container spacing={2} sx={{mb: 2, width: "100%"}}>
             {/* 1행 */}
-            <Grid size={{ xs: 12, sm: 6 }} sx={{ display: "flex" }}>
+            <Grid size={{xs: 12, sm: 6}} sx={{display: "flex"}}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <Stack direction="row" spacing={2}>
                   <DatePicker
@@ -173,7 +161,7 @@ export default function DocDestructionDetailPage() {
                 </Stack>
               </LocalizationProvider>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }} sx={{ display: "flex" }}>
+            <Grid size={{xs: 12, sm: 6}} sx={{display: "flex"}}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <Stack direction="row" spacing={2}>
                   <DatePicker
@@ -200,64 +188,64 @@ export default function DocDestructionDetailPage() {
               </LocalizationProvider>
             </Grid>
             {/* 2행 */}
-            <Grid size={{ xs: 12, sm: 3 }} sx={{ display: "flex" }}>
+            <Grid size={{xs: 12, sm: 3}} sx={{display: "flex"}}>
               <MuiSelect
                 id="largeCategory"
                 label="대분류"
                 items={[
-                  { value: "00", label: "전체" },
-                  { value: "01", label: "피해구제" },
+                  {value: "00", label: "전체"},
+                  {value: "01", label: "피해구제"},
                 ]}
                 value={values.largeCategory ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 3 }} sx={{ display: "flex" }}>
+            <Grid size={{xs: 12, sm: 3}} sx={{display: "flex"}}>
               <MuiSelect
                 id="midCategory"
                 label="중분류"
                 items={[
-                  { value: "00", label: "전체" },
-                  { value: "01", label: "접수서류" },
-                  { value: "02", label: "신청자 제출서류" },
-                  { value: "03", label: "직원보완자료" },
+                  {value: "00", label: "전체"},
+                  {value: "01", label: "접수서류"},
+                  {value: "02", label: "신청자 제출서류"},
+                  {value: "03", label: "직원보완자료"},
                 ]}
                 value={values.midCategory ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 3 }} sx={{ display: "flex" }}>
+            <Grid size={{xs: 12, sm: 3}} sx={{display: "flex"}}>
               <MuiSelect
                 id="smallCategory"
                 label="소분류"
                 items={[
-                  { value: "00", label: "전체" },
-                  { value: "01", label: "사망 신청" },
-                  { value: "02", label: "미성년자 신청" },
-                  { value: "03", label: "이전문서" },
-                  { value: "04", label: "의무기록" },
+                  {value: "00", label: "전체"},
+                  {value: "01", label: "사망 신청"},
+                  {value: "02", label: "미성년자 신청"},
+                  {value: "03", label: "이전문서"},
+                  {value: "04", label: "의무기록"},
                 ]}
                 value={values.smallCategory ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 3 }} sx={{ display: "flex" }}>
+            <Grid size={{xs: 12, sm: 3}} sx={{display: "flex"}}>
               <MuiSelect
                 id="retentionPeriod"
                 label="보유기간"
                 items={[
-                  { value: "00", label: "전체" },
-                  { value: "01", label: "사망 신청" },
-                  { value: "02", label: "미성년자 신청" },
-                  { value: "03", label: "이전문서" },
-                  { value: "04", label: "의무기록" },
+                  {value: "00", label: "전체"},
+                  {value: "01", label: "사망 신청"},
+                  {value: "02", label: "미성년자 신청"},
+                  {value: "03", label: "이전문서"},
+                  {value: "04", label: "의무기록"},
                 ]}
                 value={values.retentionPeriod ?? "00"}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
             {/* 3행 */}
-            <Grid size={{ xs: 12, sm: 4 }}>
+            <Grid size={{xs: 12, sm: 4}}>
               <TextField
                 fullWidth
                 name="docNumber"
@@ -267,7 +255,7 @@ export default function DocDestructionDetailPage() {
                 onChange={handleTextFieldChange}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{xs: 12, sm: 6}}>
               <TextField
                 fullWidth
                 name="docTitle"
@@ -277,7 +265,7 @@ export default function DocDestructionDetailPage() {
                 onChange={handleTextFieldChange}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 2 }} sx={{ display: "flex" }}>
+            <Grid size={{xs: 12, sm: 2}} sx={{display: "flex"}}>
               <MuiCheckbox
                 id="agreeYn"
                 label="정보주체 동의여부"
@@ -299,7 +287,7 @@ export default function DocDestructionDetailPage() {
           일괄 반영
         </Button>
       </Stack>
-      <Box sx={{ flex: 1, width: "100%" }}>
+      <Box sx={{flex: 1, width: "100%"}}>
         <AgGridContainer
           isLoading={isLoading}
           enableRowSelection={true}

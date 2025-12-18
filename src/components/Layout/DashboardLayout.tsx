@@ -1,11 +1,11 @@
-/* eslint-disable react-hooks/refs */
+ 
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
-import { Outlet } from "react-router";
+import {Outlet} from "react-router";
 import EgovLeftNavInform from "../leftmenu/EgovLeftNavInform";
-import { Stack } from "@mui/material";
-import PageContainer from "../PageContainer";
+import {Stack} from "@mui/material";
+import PageContainer from "../AgGridContainer/PageContainer.tsx";
 
 export default function DashboardLayout() {
   const layoutRef = React.useRef<HTMLDivElement>(null);
@@ -31,12 +31,12 @@ export default function DashboardLayout() {
                 minWidth: 0,
               }}
             >
-              <Toolbar sx={{ displayPrint: "none" }} />
+              <Toolbar sx={{displayPrint: "none"}}/>
               <Stack direction="row">
-                <EgovLeftNavInform />
+                <EgovLeftNavInform/>
                 <PageContainer
                 >
-                  <Outlet />
+                  <Outlet/>
                 </PageContainer>
               </Stack>
             </Box>

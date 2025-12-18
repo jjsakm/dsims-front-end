@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { AgGridReact } from "ag-grid-react";
+import {useEffect, useMemo, useRef, useState} from "react";
+import {AgGridReact} from "ag-grid-react";
 import type {
   ColDef,
   GridApi,
@@ -9,8 +9,10 @@ import type {
   RowSelectionOptions,
   SelectionChangedEvent,
 } from "ag-grid-community";
-import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+import {AllCommunityModule, ModuleRegistry} from "ag-grid-community";
 import GlobalStyles from "@mui/material/GlobalStyles";
+import Typography from "@mui/material/Typography";
+import {Box, Pagination, Stack} from "@mui/material";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -105,7 +107,7 @@ export default function AgGridContainer<TData>(props: AgGridProps<TData>) {
   };
 
   const pages = useMemo(
-    () => Array.from({ length: totalPages }, (_, index) => index),
+    () => Array.from({length: totalPages}, (_, index) => index),
     [totalPages]
   );
   // Paging End
@@ -168,7 +170,7 @@ export default function AgGridContainer<TData>(props: AgGridProps<TData>) {
       <div
         id="myGrid"
         className="ag-theme-alpine"
-        style={{ width: "100%", height: 355, marginTop: 16 }}
+        style={{width: "100%", height: 355, marginTop: 16}}
       >
         <AgGridReact<TData>
           rowData={rowData}
@@ -189,63 +191,57 @@ export default function AgGridContainer<TData>(props: AgGridProps<TData>) {
       </div>
 
       {/* 커스텀 페이징 영역 */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: 8,
-        }}
-      >
-        <div style={{ fontWeight: 500 }}>
+      <Stack justify-content="center" direction="column">
+        <Typography>
           총 건수 : {totalRows.toLocaleString()} 건
-        </div>
+        </Typography>
+        {/*<Pagination count={10} shape="rounded"/>*/}
 
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button
-            type="button"
-            onClick={handlePrev}
-            disabled={currentPage <= 0}
-            style={{
-              border: "none",
-              background: "transparent",
-              cursor: currentPage <= 0 ? "default" : "pointer",
-            }}
-          >
-            {"<"}
-          </button>
+        <Box sx={{display: 'flex', justifyContent: 'center', mt: 2}}>
+          <Pagination
+            count={totalPages}
+            page={currentPage + 1}
+            onChange={(_event, page) => setCurrentPage(page - 1)}
+            color="primary"
+          />
+        </Box>
+        {/*<div>*/}
+        {/*  <button*/}
+        {/*    type="button"*/}
+        {/*    onClick={handlePrev}*/}
+        {/*    disabled={currentPage <= 0}*/}
 
-          {pages.map((page) => (
-            <button
-              key={page}
-              type="button"
-              onClick={() => handleGoToPage(page)}
-              style={{
-                border: "none",
-                background: "transparent",
-                cursor: "pointer",
-                fontWeight: currentPage === page ? "700" : "400",
-                textDecoration: currentPage === page ? "underline" : "none",
-              }}
-            >
-              {page + 1}
-            </button>
-          ))}
+        {/*  >*/}
+        {/*    {"<"}*/}
+        {/*  </button>*/}
 
-          <button
-            type="button"
-            onClick={handleNext}
-            disabled={currentPage >= totalPages - 1}
-            style={{
-              border: "none",
-              background: "transparent",
-              cursor: currentPage >= totalPages - 1 ? "default" : "pointer",
-            }}
-          >
-            {">"}
-          </button>
-        </div>
-      </div>
+        {/*  {pages.map((page) => (*/}
+        {/*    <button*/}
+        {/*      key={page}*/}
+        {/*      type="button"*/}
+        {/*      onClick={() => handleGoToPage(page)}*/}
+        {/*      style={{*/}
+        {/*        border: "none",*/}
+        {/*        background: "transparent",*/}
+        {/*        cursor: "pointer",*/}
+        {/*        fontWeight: currentPage === page ? "700" : "400",*/}
+        {/*        textDecoration: currentPage === page ? "underline" : "none",*/}
+        {/*      }}*/}
+        {/*    >*/}
+        {/*      {page + 1}*/}
+        {/*    </button>*/}
+        {/*  ))}*/}
+
+        {/*  <button*/}
+        {/*    type="button"*/}
+        {/*    onClick={handleNext}*/}
+        {/*    disabled={currentPage >= totalPages - 1}*/}
+        {/*  >*/}
+        {/*    {">"}*/}
+        {/*  </button>*/}
+        {/*</div>*/}
+      </Stack>
     </div>
   );
 }
+

@@ -10,16 +10,16 @@ import {
   TableCell,
   TableRow,
 } from "@mui/material";
-import { useNavigate, useParams } from "react-router";
-import PageContainer from "@/components/PageContainer";
-import { getDocDestructionData } from "@/services/docDestructionService";
-import type { DocDestruction } from "@/types/docDestruction";
+import {useNavigate, useParams} from "react-router";
+import PageContainer from "@/components/AgGridContainer/PageContainer.tsx";
+import {getDocDestructionData} from "@/services/docDestructionService";
+import type {DocDestruction} from "@/types/docDestruction";
 import DocDestructionHistoryButton from "@/components/Buttons/DocDestructionHistoryButton";
 import URL from "@/constants/url";
 import PageStatus from "@/components/PageStatus";
 
 export default function DocDestructionViewPage() {
-  const { docId } = useParams();
+  const {docId} = useParams();
   const navigate = useNavigate();
 
   const [viewData, setViewData] = React.useState<DocDestruction | null>(null);
@@ -49,7 +49,7 @@ export default function DocDestructionViewPage() {
   }, [navigate]);
 
   if (isLoading || error) {
-    return <PageStatus isLoading={isLoading} error={error} />;
+    return <PageStatus isLoading={isLoading} error={error}/>;
   }
 
   const pageTitle = `문서분류 관리`;
@@ -58,11 +58,11 @@ export default function DocDestructionViewPage() {
     <PageContainer
       title={pageTitle}
       breadcrumbs={[
-        { title: "문서고 관리", path: "/docDestruction/list" },
-        { title: pageTitle },
+        {title: "문서고 관리", path: "/docDestruction/list"},
+        {title: pageTitle},
       ]}
     >
-      <Box sx={{ flexGrow: 1, width: "100%" }}>
+      <Box sx={{flexGrow: 1, width: "100%"}}>
         <Table size="small" aria-label="문서파기 상세정보">
           <TableBody>
             {/* 문서분류 */}
@@ -130,7 +130,7 @@ export default function DocDestructionViewPage() {
         </Table>
         <Stack direction="row" spacing={2} justifyContent="right">
           <Stack direction="row" spacing={2}>
-            <DocDestructionHistoryButton />
+            <DocDestructionHistoryButton/>
             <Button variant="contained" onClick={handleBack}>
               목록
             </Button>
