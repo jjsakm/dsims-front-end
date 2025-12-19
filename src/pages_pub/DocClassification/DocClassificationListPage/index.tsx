@@ -26,7 +26,6 @@ import { listDefs } from "./col-def";
 import { getDocClassificationList } from "@/services/docClassificationService";
 import URL from "@/constants/url";
 import { useSearchStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
-import PageStatus from "@/components/PageStatus";
 import SearchFilterContainer from "@/components/Layout/docClassification/SearchFilterContainer.tsx";
 import type { SelectItem } from "@/types/common";
 import { getDocClsfList, getLclsfList } from "@/services/bizCommon";
@@ -75,7 +74,7 @@ export default function DocClassificationListPage() {
     setValues,
     handleTextFieldChange,
     handleSelectFieldChange,
-    handleCheckboxFieldYnChange,
+    handleCheckboxFieldNullChange,
   } =
     useSearchStateHandlers<DocClassificationSearchState["values"]>(
       initialValues
@@ -116,12 +115,12 @@ export default function DocClassificationListPage() {
     });
   };
 
-  const loadData = React.useCallback(async () => {
+  const loadData = async () => {
     setError(null);
     setIsLoading(true);
 
     try {
-      const listData = await getDocClassificationList();
+      const listData = await getDocClassificationList({ ...values });
 
       setRowsData({
         rows: listData.items,
@@ -129,10 +128,10 @@ export default function DocClassificationListPage() {
       });
     } catch (listDataError) {
       setError(listDataError as Error);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
-  }, []);
+  };
 
   const getLclsfCodeList = React.useCallback(async () => {
     setError(null);
@@ -181,25 +180,19 @@ export default function DocClassificationListPage() {
   React.useEffect(() => {
     loadData();
     getLclsfCodeList();
-  }, [getLclsfCodeList, loadData]);
-
-  const handleSearch = () => {
-    // TODO: 검색 로직은 이후 AgGrid 연동 시 구현
-    loadData();
-    console.log(values);
-  };
+  }, []);
 
   const handleCreateClick = React.useCallback(() => {
     navigate(URL.DIGITAL_DOC_CREATE);
   }, [navigate]);
 
   const handleRowClick = (row: DocClassification) => {
-    navigate(`/docClassification/${row.id}`);
+    navigate(`/docClassification/${row.docClsfNo}`);
   };
 
-  if (isLoading || error) {
-    return <PageStatus isLoading={isLoading} error={error} />;
-  }
+  // if (isLoading || error) {
+  //   return <PageStatus isLoading={isLoading} error={error} />;
+  // }
 
   const pageTitle = "문서분류 관리";
 
@@ -258,8 +251,8 @@ export default function DocClassificationListPage() {
               <MuiCheckbox
                 id="prvcInclYn"
                 label="개인정보 포함"
-                checked={values.prvcInclYn === "Y"}
-                onChange={handleCheckboxFieldYnChange}
+                checked={values.prvcInclYn === ""}
+                onChange={handleCheckboxFieldNullChange}
               />
             </Grid>
             {/* 2행: 사용유무 / 검색어 / 검색 버튼 */}
@@ -288,7 +281,7 @@ export default function DocClassificationListPage() {
             </Grid>
           </Grid>
           <Box display="flex" justifyContent="flex-end">
-            <Button variant="contained" onClick={handleSearch}>
+            <Button variant="contained" onClick={loadData}>
               검색
             </Button>
           </Box>
