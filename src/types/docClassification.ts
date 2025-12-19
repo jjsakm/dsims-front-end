@@ -1,10 +1,10 @@
 export interface SearchValues {
-  lclsfNo: string;
-  mclsfNo: string;
-  sclsfNo: string;
+  docLclsfNo: string;
+  docMclsfNo: string;
+  docSclsfNo: string;
   prvcInclYn: string;
-  useYn: string;
-  keyword: string;
+  useEn: string;
+  docClsfNm: string;
 }
 
 export interface DocClsf {
@@ -25,21 +25,22 @@ export interface DocClassificationSearchState {
 }
 
 export interface DocClassification {
-  id: number; // 번호
-  largeCategory: string; // 대분류
-  largeCategoryMeta?: string; // 대분류 메타정보
-  midCategory: string; // 중분류
-  midCategoryMeta?: string; // 중분류 메타정보
-  smallCategory: string; // 소분류
-  smallCategoryMeta?: string; // 소분류 메타정보
-  hasPersonalInfo: boolean; // 개인정보 포함유무
-  useYn: "" | "Y" | "N"; // 사용유무
-  registrant: string; // 등록자
-  regDate: string; // 등록일자
-
-  // 개인정보 포함에 체크시에만 입력되는 필드
-  departmentName?: string; // 부서명
-  fileName?: string; // 파일명
+  docClsfNo: string;
+  docClsfSeCd: string;
+  docClsfNm: string;
+  upDocClsfNo: string;
+  docLclsfNo: string;
+  docMclsfNo: string;
+  docSclsfNo: string;
+  docLclsfNm: string;
+  docMclsfNm: string;
+  docSclsfNm: string;
+  prvcInclYn: string;
+  useEn: string;
+  regYmd: string;
+  rgtrId: string;
+  mdfcnYmd: string;
+  mdfrId: string;
 }
 
 export interface DocClassificationFormState {

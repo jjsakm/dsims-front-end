@@ -46,6 +46,14 @@ export function useInputStateHandlers<TValues>(
     [onFieldChange]
   );
 
+  const handleCheckboxFieldNullChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+      const { name } = event.target;
+      onFieldChange(name as keyof TValues, checked ? "" : "N");
+    },
+    [onFieldChange]
+  );
+
   const handleDateFieldChange = React.useCallback(
     (name: keyof TValues) => (value: Dayjs | null) => {
       const normalizedValue =
@@ -62,6 +70,7 @@ export function useInputStateHandlers<TValues>(
     handleRadioFieldChange,
     handleCheckboxFieldChange,
     handleCheckboxFieldYnChange,
+    handleCheckboxFieldNullChange,
     handleDateFieldChange,
   };
 }

@@ -26,7 +26,6 @@ import { listDefs } from "./col-def";
 import { getDocClassificationList } from "@/services/docClassificationService";
 import URL from "@/constants/url";
 import { useSearchStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
-import PageStatus from "@/components/PageStatus";
 import SearchFilterContainer from "@/components/Layout/docClassification/SearchFilterContainer.tsx";
 import type { SelectItem } from "@/types/common";
 import { getDocClsfList, getLclsfList } from "@/services/bizCommon";
@@ -62,12 +61,12 @@ export default function DocClassificationListPage() {
   const [error, setError] = React.useState<Error | null>(null);
 
   const initialValues: SearchValues = {
-    lclsfNo: "",
-    mclsfNo: "",
-    sclsfNo: "",
+    docLclsfNo: "",
+    docMclsfNo: "",
+    docSclsfNo: "",
     prvcInclYn: "N",
-    useYn: "",
-    keyword: "",
+    useEn: "",
+    docClsfNm: "",
   };
 
   const {
@@ -75,7 +74,7 @@ export default function DocClassificationListPage() {
     setValues,
     handleTextFieldChange,
     handleSelectFieldChange,
-    handleCheckboxFieldYnChange,
+    handleCheckboxFieldNullChange,
   } =
     useSearchStateHandlers<DocClassificationSearchState["values"]>(
       initialValues
@@ -89,14 +88,23 @@ export default function DocClassificationListPage() {
       const next = { ...prev, [name]: value as string };
 
       switch (name) {
-        case "lclsfNo":
-          next.mclsfNo = "";
-          next.sclsfNo = "";
-          getDocClsfCodeList(name, value);
+        case "docLclsfNo":
+          next.docMclsfNo = "";
+          next.docSclsfNo = "";
+          if (value !== "") {
+            getDocClsfCodeList(name, value);
+          } else {
+            setMclsfList(initSelectItem);
+            setSclsfList(initSelectItem);
+          }
           break;
-        case "mclsfNo":
-          next.sclsfNo = "";
-          getDocClsfCodeList(name, value);
+        case "docMclsfNo":
+          next.docSclsfNo = "";
+          if (value !== "") {
+            getDocClsfCodeList(name, value);
+          } else {
+            setSclsfList(initSelectItem);
+          }
           break;
         default:
           break;
@@ -107,12 +115,12 @@ export default function DocClassificationListPage() {
     });
   };
 
-  const loadData = React.useCallback(async () => {
+  const loadData = async () => {
     setError(null);
     setIsLoading(true);
 
     try {
-      const listData = await getDocClassificationList();
+      const listData = await getDocClassificationList({ ...values });
 
       setRowsData({
         rows: listData.items,
@@ -120,10 +128,10 @@ export default function DocClassificationListPage() {
       });
     } catch (listDataError) {
       setError(listDataError as Error);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
-  }, []);
+  };
 
   const getLclsfCodeList = React.useCallback(async () => {
     setError(null);
@@ -157,7 +165,7 @@ export default function DocClassificationListPage() {
           };
         });
 
-        if (name === "lclsfNo") {
+        if (name === "docLclsfNo") {
           setMclsfList([...initSelectItem, ...resultList]);
         } else {
           setSclsfList([...initSelectItem, ...resultList]);
@@ -172,25 +180,19 @@ export default function DocClassificationListPage() {
   React.useEffect(() => {
     loadData();
     getLclsfCodeList();
-  }, [getLclsfCodeList, loadData]);
-
-  const handleSearch = () => {
-    // TODO: 검색 로직은 이후 AgGrid 연동 시 구현
-
-    console.log(values);
-  };
+  }, []);
 
   const handleCreateClick = React.useCallback(() => {
     navigate(URL.DIGITAL_DOC_CREATE);
   }, [navigate]);
 
   const handleRowClick = (row: DocClassification) => {
-    navigate(`/docClassification/${row.id}`);
+    navigate(`/docClassification/${row.docClsfNo}`);
   };
 
-  if (isLoading || error) {
-    return <PageStatus isLoading={isLoading} error={error} />;
-  }
+  // if (isLoading || error) {
+  //   return <PageStatus isLoading={isLoading} error={error} />;
+  // }
 
   const pageTitle = "문서분류 관리";
 
@@ -220,28 +222,28 @@ export default function DocClassificationListPage() {
             {/* 1행: 대분류 / 중분류 / 소분류 / 개인정보 포함 */}
             <Grid size={{ xs: 12, sm: 3 }} sx={{ display: "flex" }}>
               <MuiSelect
-                id="lclsfNo"
+                id="docLclsfNo"
                 label="대분류"
                 items={lclsfList}
-                value={values.lclsfNo ?? ""}
+                value={values.docLclsfNo ?? ""}
                 onChange={handleSelectChange}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 3 }} sx={{ display: "flex" }}>
               <MuiSelect
-                id="mclsfNo"
+                id="docMclsfNo"
                 label="중분류"
                 items={mclsfList}
-                value={values.mclsfNo ?? ""}
+                value={values.docMclsfNo ?? ""}
                 onChange={handleSelectChange}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 3 }} sx={{ display: "flex" }}>
               <MuiSelect
-                id="sclsfNo"
+                id="docSclsfNo"
                 label="소분류"
                 items={sclsfList}
-                value={values.sclsfNo ?? ""}
+                value={values.docSclsfNo ?? ""}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
@@ -249,37 +251,37 @@ export default function DocClassificationListPage() {
               <MuiCheckbox
                 id="prvcInclYn"
                 label="개인정보 포함"
-                checked={values.prvcInclYn === "Y"}
-                onChange={handleCheckboxFieldYnChange}
+                checked={values.prvcInclYn === ""}
+                onChange={handleCheckboxFieldNullChange}
               />
             </Grid>
             {/* 2행: 사용유무 / 검색어 / 검색 버튼 */}
             <Grid size={{ xs: 12, sm: 3 }} sx={{ display: "flex" }}>
               <MuiSelect
-                id="useYn"
+                id="useEn"
                 label="사용유무"
                 items={[
                   { value: "", label: "전체" },
                   { value: "Y", label: "사용" },
                   { value: "N", label: "사용안함" },
                 ]}
-                value={values.useYn ?? ""}
+                value={values.useEn ?? ""}
                 onChange={handleSelectFieldChange}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 9 }}>
               <TextField
                 fullWidth
-                name="keyword"
+                name="docClsfNm"
                 placeholder="검색어"
                 label="검색어"
-                value={values.keyword ?? ""}
+                value={values.docClsfNm ?? ""}
                 onChange={handleTextFieldChange}
               />
             </Grid>
           </Grid>
           <Box display="flex" justifyContent="flex-end">
-            <Button variant="contained" onClick={handleSearch}>
+            <Button variant="contained" onClick={loadData}>
               검색
             </Button>
           </Box>

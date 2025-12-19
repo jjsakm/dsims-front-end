@@ -1,23 +1,31 @@
 import { DUMMY_DOC_CLASSIFICATION_DATA } from "@/data/docClassificationDummyData";
-import type { DocClassification } from "@/types/docClassification";
+import type {
+  DocClassification,
+  SearchValues,
+} from "@/types/docClassification";
+import axios from "axios";
 
-export async function getDocClassificationList(): Promise<{
+export async function getDocClassificationList(
+  values?: Partial<SearchValues>
+): Promise<{
   items: DocClassification[];
   itemCount: number;
 }> {
-  const rows = DUMMY_DOC_CLASSIFICATION_DATA;
+  const res = await axios.get("/api/documentclassification/search", {
+    params: values,
+  });
 
   return {
-    items: rows,
-    itemCount: rows.length,
+    items: res.data.result.list,
+    itemCount: res.data.result.list.length,
   };
 }
 
 export async function getDocClassificationData(
-  docClassificationId: number
+  docClassificationId: string
 ): Promise<DocClassification> {
   const rows = DUMMY_DOC_CLASSIFICATION_DATA;
-  const data = rows.find((data) => data.id === docClassificationId);
+  const data = rows.find((data) => data.docClsfNo === docClassificationId);
 
   if (!data) {
     throw new Error("data not found");
@@ -55,35 +63,37 @@ export async function updateDocClassificationData(
   return updatedData;
 }
 
-export async function deleteDocClassificationData(docClassificationId: number) {
+export async function deleteDocClassificationData(docClassificationId: string) {
   const rows = DUMMY_DOC_CLASSIFICATION_DATA;
-  const data = rows.find((data) => data.id === docClassificationId);
+  const data = rows.find((data) => data.docClsfNo === docClassificationId);
   // TODO: delete logic here
-  console.log("Deleted docClassification data:", data?.id);
+  console.log("Deleted docClassification data:", data?.docClsfNo);
 }
 
 type ValidationResult = {
   issues: { message: string; path: (keyof DocClassification)[] }[];
 };
 
-export function docClassificationvalidator(data: Partial<DocClassification>): ValidationResult {
+export function docClassificationvalidator(
+  data: Partial<DocClassification>
+): ValidationResult {
   let issues: ValidationResult["issues"] = [];
 
-  if (!data.largeCategory) {
-    issues = [...issues, { message: "필수 입니다.", path: ["largeCategory"] }];
+  if (!data.docLclsfNo) {
+    issues = [...issues, { message: "필수 입니다.", path: ["docLclsfNo"] }];
   }
 
-  if (!data.midCategory) {
-    issues = [...issues, { message: "필수 입니다.", path: ["midCategory"] }];
+  if (!data.docMclsfNo) {
+    issues = [...issues, { message: "필수 입니다.", path: ["docMclsfNo"] }];
   }
 
-  if (data.hasPersonalInfo) {
-    issues = [
-      ...issues,
-      { message: "필수 입니다.", path: ["departmentName"] },
-      { message: "필수 입니다.", path: ["fileName"] },
-    ];
-  }
+  // if (data.prvcInclYn) {
+  //   issues = [
+  //     ...issues,
+  //     { message: "필수 입니다.", path: ["departmentName"] },
+  //     { message: "필수 입니다.", path: ["fileName"] },
+  //   ];
+  // }
   // TODO: add more validation rules as needed
   return { issues };
 }
