@@ -47,7 +47,7 @@ export const listDefs = [
       if (v === "N") return "사용안함";
       return ""; // null/undefined 대비
     },
-    cellStyle: (params: any) => {
+    cellStyle: (params) => {
       const isNotUsed = params.value === "N";
       return {
         textAlign: "center",
@@ -64,6 +64,10 @@ export const listDefs = [
   {
     headerName: "등록일자",
     field: "regYmd",
+    valueFormatter: (params) => {
+      return formatDate(params.value); // null/undefined 대비
+    },
+
     cellStyle: { textAlign: "center" },
   },
 ];

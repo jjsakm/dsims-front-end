@@ -7,6 +7,8 @@ import { BrowserRouter } from "react-router-dom";
 
 import App from "./App.tsx";
 
+import "./utils/globalFunc";
+
 import "ag-grid-community/styles/ag-theme-alpine.css";
 
 const queryClient = new QueryClient();
