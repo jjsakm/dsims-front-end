@@ -170,8 +170,7 @@ export default function AgGridContainer<TData>(props: AgGridProps<TData>) {
       <div
         id="myGrid"
         className="ag-theme-alpine"
-        style={{width: "100%", height: 355, marginTop: 16}}
-      >
+        style={{ width: "100%", height: 355, marginTop: 16 }}>
         <AgGridReact<TData>
           rowData={rowData}
           columnDefs={colDefs}
@@ -191,55 +190,44 @@ export default function AgGridContainer<TData>(props: AgGridProps<TData>) {
       </div>
 
       {/* 커스텀 페이징 영역 */}
-      <Stack justify-content="center" direction="column">
-        <Typography>
-          총 건수 : {totalRows.toLocaleString()} 건
-        </Typography>
-        {/*<Pagination count={10} shape="rounded"/>*/}
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        mt={2}>
+        <Typography>총 건수 : {totalRows.toLocaleString()} 건</Typography>
 
-        <Box sx={{display: 'flex', justifyContent: 'center', mt: 2}}>
-          <Pagination
-            count={totalPages}
-            page={currentPage + 1}
-            onChange={(_event, page) => setCurrentPage(page - 1)}
-            color="primary"
-          />
-        </Box>
-        {/*<div>*/}
-        {/*  <button*/}
-        {/*    type="button"*/}
-        {/*    onClick={handlePrev}*/}
-        {/*    disabled={currentPage <= 0}*/}
+        <div>
+          <button
+            type="button"
+            onClick={handlePrev}
+            disabled={currentPage <= 0}>
+            {"<"}
+          </button>
 
-        {/*  >*/}
-        {/*    {"<"}*/}
-        {/*  </button>*/}
+          {pages.map((page) => (
+            <button
+              key={page}
+              type="button"
+              onClick={() => handleGoToPage(page)}
+              style={{
+                border: "none",
+                background: "transparent",
+                cursor: "pointer",
+                fontWeight: currentPage === page ? "700" : "400",
+                textDecoration: currentPage === page ? "underline" : "none",
+              }}>
+              {page + 1}
+            </button>
+          ))}
 
-        {/*  {pages.map((page) => (*/}
-        {/*    <button*/}
-        {/*      key={page}*/}
-        {/*      type="button"*/}
-        {/*      onClick={() => handleGoToPage(page)}*/}
-        {/*      style={{*/}
-        {/*        border: "none",*/}
-        {/*        background: "transparent",*/}
-        {/*        cursor: "pointer",*/}
-        {/*        fontWeight: currentPage === page ? "700" : "400",*/}
-        {/*        textDecoration: currentPage === page ? "underline" : "none",*/}
-        {/*      }}*/}
-        {/*    >*/}
-        {/*      {page + 1}*/}
-        {/*    </button>*/}
-        {/*  ))}*/}
-
-        {/*  <button*/}
-        {/*    type="button"*/}
-        {/*    onClick={handleNext}*/}
-        {/*    disabled={currentPage >= totalPages - 1}*/}
-        {/*  >*/}
-        {/*    {">"}*/}
-        {/*  </button>*/}
-        {/*</div>*/}
+          <button
+            type="button"
+            onClick={handleNext}
+            disabled={currentPage >= totalPages - 1}>
+            {">"}
+          </button>
+        </div>
       </Stack>
     </div>
   );
