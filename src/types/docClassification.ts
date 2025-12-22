@@ -57,7 +57,9 @@ export interface DocClassDetail {
   docSclsfNm: string;
   prvcInclYn: string;
   useEn: string;
-  subDetail: Partial<DocClassSubDetail>;
+  regYmd: string;
+  rgtrId: string;
+  prvcFileHldPrst: Partial<DocClassSubDetail>;
 }
 
 export interface DocClassSubDetail {

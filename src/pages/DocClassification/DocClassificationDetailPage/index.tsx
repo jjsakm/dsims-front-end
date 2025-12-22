@@ -8,26 +8,26 @@ import {
   TableCell,
   TableRow,
 } from "@mui/material";
-import {useNavigate, useParams} from "react-router";
-import {useDialogs} from "@/hooks/useDialogs/useDialogs";
+import { useNavigate, useParams } from "react-router";
+import { useDialogs } from "@/hooks/useDialogs/useDialogs";
 import useNotifications from "@/hooks/useNotifications";
 import PageContainer from "@/components/AgGridContainer/PageContainer.tsx";
 import {
   deleteDocClassificationData,
   getDocClassificationData,
 } from "@/services/docClassificationService";
-import type {DocClassification} from "@/types/docClassification";
+import type { DocClassDetail } from "@/types/docClassification";
 import DocClassificationHistoryButton from "@/components/Buttons/DocClassificationHistoryButton";
 import PageStatus from "@/components/PageStatus";
 
 export default function DocClassificationDetailPage() {
-  const {docClassificationId} = useParams();
+  const { docClsfNo } = useParams();
   const navigate = useNavigate();
 
   const dialogs = useDialogs();
   const notifications = useNotifications();
 
-  const [detailData, setDetailData] = React.useState<DocClassification | null>(
+  const [detailData, setDetailData] = React.useState<DocClassDetail | null>(
     null
   );
   const [isLoading, setIsLoading] = React.useState(true);
@@ -38,22 +38,22 @@ export default function DocClassificationDetailPage() {
     setIsLoading(true);
 
     try {
-      const rst = await getDocClassificationData(Number(docClassificationId));
+      const rst = await getDocClassificationData(docClsfNo ?? "");
 
       setDetailData(rst);
     } catch (viewDataError) {
       setError(viewDataError as Error);
     }
     setIsLoading(false);
-  }, [docClassificationId]);
+  }, [docClsfNo]);
 
   React.useEffect(() => {
     loadData();
   }, [loadData]);
 
   const handleViewDataEdit = React.useCallback(() => {
-    navigate(`/docClassification/${docClassificationId}/modify`);
-  }, [navigate, docClassificationId]);
+    navigate(`/docClassification/${docClsfNo}/modify`);
+  }, [navigate, docClsfNo]);
 
   const handleViewDataDelete = React.useCallback(async () => {
     if (!detailData) {
@@ -61,7 +61,7 @@ export default function DocClassificationDetailPage() {
     }
 
     const confirmed = await dialogs.confirm(
-      `${detailData.midCategory} 데이터를 삭제 할까요?`,
+      `${detailData.docClsfNm} 데이터를 삭제 할까요?`,
       {
         title: `삭제 확인`,
         severity: "error",
@@ -73,7 +73,7 @@ export default function DocClassificationDetailPage() {
     if (confirmed) {
       setIsLoading(true);
       try {
-        await deleteDocClassificationData(Number(docClassificationId));
+        //await deleteDocClassificationData(docClsfNo);
 
         navigate("/docClassification/list");
 
@@ -92,14 +92,14 @@ export default function DocClassificationDetailPage() {
       }
       setIsLoading(false);
     }
-  }, [detailData, dialogs, docClassificationId, navigate, notifications]);
+  }, [detailData, dialogs, docClsfNo, navigate, notifications]);
 
   const handleBack = React.useCallback(() => {
     navigate("/docClassification/list");
   }, [navigate]);
 
   if (isLoading || error) {
-    return <PageStatus isLoading={isLoading} error={error}/>;
+    return <PageStatus isLoading={isLoading} error={error} />;
   }
 
   const pageTitle = `문서분류 관리`;
@@ -108,18 +108,18 @@ export default function DocClassificationDetailPage() {
     <PageContainer
       title={pageTitle}
       breadcrumbs={[
-        {title: "문서고 관리", path: "/docClassification/list"},
-        {title: pageTitle},
+        { title: "문서고 관리", path: "/docClassification/list" },
+        { title: pageTitle },
       ]}
     >
-      <Box sx={{width: "100%"}}>
-        <Box sx={{width: "100%"}}>
+      <Box sx={{ width: "100%" }}>
+        <Box sx={{ width: "100%" }}>
           <Stack direction="row" spacing={2} justifyContent="space-between">
             <Stack direction="row" gap={2}>
               <Button variant="outlined" onClick={handleBack}>
                 목록
               </Button>
-              <DocClassificationHistoryButton/>
+              <DocClassificationHistoryButton />
             </Stack>
             <Stack direction="row" gap={2}>
               <Button variant="contained" onClick={handleViewDataEdit}>
@@ -135,10 +135,10 @@ export default function DocClassificationDetailPage() {
             </Stack>
           </Stack>
 
-          <Box sx={{width: "100%", overflowX: "auto"}}>
+          <Box sx={{ width: "100%", overflowX: "auto" }}>
             <Table
               size="small"
-              sx={{mt: "12px"}}
+              sx={{ mt: "12px" }}
               aria-label="문서분류 기본 정보"
             >
               <TableBody>
@@ -146,131 +146,210 @@ export default function DocClassificationDetailPage() {
                 <TableRow>
                   <TableCell>문서분류</TableCell>
                   <TableCell colSpan={3}>
-                    {`${detailData?.largeCategory} > ${detailData?.midCategory} > ${detailData?.smallCategory}`}
+                    {detailData?.docClsfDvcd === "L" &&
+                      `${detailData?.docLclsfNm}`}
+                    {detailData?.docClsfDvcd === "M" &&
+                      `${detailData?.docLclsfNm} > ${detailData?.docMclsfNm}`}
+                    {detailData?.docClsfDvcd === "S" &&
+                      `${detailData?.docLclsfNm} > ${detailData?.docMclsfNm} > ${detailData?.docSclsfNm}`}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>개인정보 포함</TableCell>
                   <TableCell>
-                    {detailData?.fileName ? "포함" : "미포함"}
+                    {detailData?.prvcInclYn === "Y" ? "포함" : "미포함"}
                   </TableCell>
                   <TableCell>사용여부</TableCell>
                   <TableCell>
-                    {detailData?.useYn === "Y"
-                      ? "사용"
-                      : detailData?.useYn === "N"
-                        ? "사용안함"
-                        : "-"}
+                    {detailData?.useEn === "Y" ? "사용" : "사용안함"}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>등록일자</TableCell>
-                  <TableCell>{detailData?.regDate ?? "-"}</TableCell>
+                  <TableCell>
+                    {detailData?.regYmd ? formatDate(detailData?.regYmd) : "-"}
+                  </TableCell>
                   <TableCell>등록자</TableCell>
-                  <TableCell>{detailData?.registrant ?? "-"}</TableCell>
+                  <TableCell>{detailData?.rgtrId ?? "-"}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
 
             {/* 상세 정보 영역 */}
-            <Table
-              size="small"
-              sx={{mt: "12px"}}
-              aria-label="문서분류 상세 정보"
-            >
-              <TableBody>
-                <TableRow>
-                  <TableCell>부서명</TableCell>
-                  <TableCell>{detailData?.departmentName ?? ""}</TableCell>
-                  <TableCell>파일명</TableCell>
-                  <TableCell>{detailData?.fileName ?? ""}</TableCell>
-                </TableRow>
+            {detailData?.prvcInclYn === "Y" && (
+              <Table
+                size="small"
+                sx={{ mt: "12px" }}
+                aria-label="문서분류 상세 정보"
+              >
+                <TableBody>
+                  <TableRow>
+                    <TableCell>부서명</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.deptNm ?? ""}
+                    </TableCell>
+                    <TableCell>파일명</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.fileNm ?? ""}
+                    </TableCell>
+                  </TableRow>
 
-                <TableRow>
-                  <TableCell>보유목적</TableCell>
-                  <TableCell>보유목적</TableCell>
-                  <TableCell>사용부서(내부, 외부)</TableCell>
-                  <TableCell>내부</TableCell>
-                </TableRow>
+                  <TableRow>
+                    <TableCell>보유목적</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.hldPrps ?? ""}
+                    </TableCell>
+                    <TableCell>사용부서(내부, 외부)</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.useDeptNm ?? ""}
+                    </TableCell>
+                  </TableRow>
 
-                <TableRow>
-                  <TableCell>개인정보 처리방법</TableCell>
-                  <TableCell>개인정보 처리방법</TableCell>
-                  <TableCell>보유기간</TableCell>
-                  <TableCell>5년</TableCell>
-                </TableRow>
+                  <TableRow>
+                    <TableCell>개인정보 처리방법</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.prvcPrcsMthdExpln ?? ""}
+                    </TableCell>
+                    <TableCell>보유기간</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.hldPrdDfyrs ?? ""}
+                    </TableCell>
+                  </TableRow>
 
-                <TableRow>
-                  <TableCell>정보주체의 개인정보항목</TableCell>
-                  <TableCell>정보주체의 개인정보항목</TableCell>
-                  <TableCell>법정대리인의 개인정보항목</TableCell>
-                  <TableCell>법정대리인의 개인정보항목</TableCell>
-                </TableRow>
+                  <TableRow>
+                    <TableCell>정보주체의 개인정보항목</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.infoMnbdPrvcMttr ?? ""}
+                    </TableCell>
+                    <TableCell>법정대리인의 개인정보항목</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.sttyAgtPrvcMttr ?? ""}
+                    </TableCell>
+                  </TableRow>
 
-                <TableRow>
-                  <TableCell>주민등록번호 수집여부</TableCell>
-                  <TableCell>수집</TableCell>
-                  <TableCell>주민등록번호 수집 법령근거</TableCell>
-                  <TableCell>주민등록번호 수집 법령근거</TableCell>
-                </TableRow>
+                  <TableRow>
+                    <TableCell>주민등록번호 수집여부</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.rrnoClctYn === "Y"
+                        ? "수집"
+                        : "미수집"}
+                    </TableCell>
+                    <TableCell>주민등록번호 수집 법령근거</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.rrnoClctSttBssExpln ?? ""}
+                    </TableCell>
+                  </TableRow>
 
-                <TableRow>
-                  <TableCell>정보주체 동의여부</TableCell>
-                  <TableCell>동의</TableCell>
-                  <TableCell>정보주체 동의 없이 수집 법령근거</TableCell>
-                  <TableCell>정보주체 동의 없이 수집 법령근거</TableCell>
-                </TableRow>
+                  <TableRow>
+                    <TableCell>정보주체 동의여부</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.infoMnbdAgreYn === "Y"
+                        ? "동의"
+                        : "미동의"}
+                    </TableCell>
+                    <TableCell>정보주체 동의 없이 수집 법령근거</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst
+                        .infoMnbdDsagClctSttBssExpln ?? ""}
+                    </TableCell>
+                  </TableRow>
 
-                <TableRow>
-                  <TableCell>민감 정보 보유여부</TableCell>
-                  <TableCell>보유</TableCell>
-                  <TableCell>민감 정보 별도동의 여부</TableCell>
-                  <TableCell>동의</TableCell>
-                </TableRow>
+                  <TableRow>
+                    <TableCell>민감 정보 보유여부</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.sensInfoHldYn === "Y"
+                        ? "보유"
+                        : "미보유"}
+                    </TableCell>
+                    <TableCell>민감 정보 별도동의 여부</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.sensInfoIndivAgreYn === "Y"
+                        ? "동의"
+                        : "미동의"}
+                    </TableCell>
+                  </TableRow>
 
-                <TableRow>
-                  <TableCell>고유식별정보 보유여부</TableCell>
-                  <TableCell>보유</TableCell>
-                  <TableCell>고유식별정보 별도동의 여부</TableCell>
-                  <TableCell>동의</TableCell>
-                </TableRow>
+                  <TableRow>
+                    <TableCell>고유식별정보 보유여부</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.uiiHldYn === "Y"
+                        ? "보유"
+                        : "미보유"}
+                    </TableCell>
+                    <TableCell>고유식별정보 별도동의 여부</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.uiiIndivAgreYn === "Y"
+                        ? "동의"
+                        : "미동의"}
+                    </TableCell>
+                  </TableRow>
 
-                <TableRow>
-                  <TableCell>개인정보영향평가 대상여부</TableCell>
-                  <TableCell>대상</TableCell>
-                  <TableCell>취급담당자</TableCell>
-                  <TableCell>취급담당자</TableCell>
-                </TableRow>
+                  <TableRow>
+                    <TableCell>개인정보영향평가 대상여부</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.prvcEvlTrgtYn === "Y"
+                        ? "대상"
+                        : "미대상"}
+                    </TableCell>
+                    <TableCell>취급담당자</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.hndlPicNm ?? ""}
+                    </TableCell>
+                  </TableRow>
 
-                <TableRow>
-                  <TableCell>제3자 제공받는 자</TableCell>
-                  <TableCell>제3자 제공받는 자</TableCell>
-                  <TableCell>제3자 제공 근거</TableCell>
-                  <TableCell>제3자 제공 근거</TableCell>
-                </TableRow>
+                  <TableRow>
+                    <TableCell>제3자 제공받는 자</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.tdptySplrcpNm ?? ""}
+                    </TableCell>
+                    <TableCell>제3자 제공 근거</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.tdptyPvsnBssExpln ?? ""}
+                    </TableCell>
+                  </TableRow>
 
-                <TableRow>
-                  <TableCell>제3자 제공 항목</TableCell>
-                  <TableCell>제3자 제공 항목</TableCell>
-                  <TableCell>개인정보처리 위탁 업체명</TableCell>
-                  <TableCell>개인정보처리 위탁 업체명</TableCell>
-                </TableRow>
+                  <TableRow>
+                    <TableCell>제3자 제공 항목</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.tdptyPvsnMttr ?? ""}
+                    </TableCell>
+                    <TableCell>개인정보처리 위탁 업체명</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.prvcPrcsCnsgnBzentyNm ?? ""}
+                    </TableCell>
+                  </TableRow>
 
-                <TableRow>
-                  <TableCell>개인정보위탁 계약서 여부</TableCell>
-                  <TableCell>있음</TableCell>
-                  <TableCell>개인정보위탁사실 게재여부</TableCell>
-                  <TableCell>게재</TableCell>
-                </TableRow>
+                  <TableRow>
+                    <TableCell>개인정보위탁 계약서 여부</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.prvcCnsgnCtrtYn === "Y"
+                        ? "있음"
+                        : "없음"}
+                    </TableCell>
+                    <TableCell>개인정보위탁사실 게재여부</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.prvcCnsgnFactIndctYn === "Y"
+                        ? "게재"
+                        : "미게재"}
+                    </TableCell>
+                  </TableRow>
 
-                <TableRow>
-                  <TableCell>목적 외 이용·제공 여부</TableCell>
-                  <TableCell>있음</TableCell>
-                  <TableCell>목적 외 이용·제공 근거</TableCell>
-                  <TableCell>목적 외 이용·제공 근거</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+                  <TableRow>
+                    <TableCell>목적 외 이용·제공 여부</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.prpsExclUtztnPvsnYn === "Y"
+                        ? "있음"
+                        : "없음"}
+                    </TableCell>
+                    <TableCell>목적 외 이용·제공 근거</TableCell>
+                    <TableCell>
+                      {detailData?.prvcFileHldPrst.prpsExclUtztnPvsnBssExpln ??
+                        ""}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            )}
           </Box>
         </Box>
       </Box>

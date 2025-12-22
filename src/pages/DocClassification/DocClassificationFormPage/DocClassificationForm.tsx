@@ -30,7 +30,7 @@ export interface DocClassificationProps {
 
 /** 개인정보 상세 테이블 (subDetail 전용) */
 interface PrvcDetailProps {
-  values: NonNullable<DocClassDetailFormState["values"]["subDetail"]>;
+  values: NonNullable<DocClassDetailFormState["values"]["prvcFileHldPrst"]>;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -368,15 +368,15 @@ function DocClassificationFormComponent(props: DocClassificationProps) {
 
   /** 1) 기본 정보와 개인정보 상세를 분리해서 로컬 state 관리 */
   const [basicValues, setBasicValues] = React.useState<
-    Omit<DocClassDetailFormState["values"], "subDetail">
+    Omit<DocClassDetailFormState["values"], "prvcFileHldPrst">
   >(() => {
-    const { subDetail, ...rest } = initialValues;
+    const { prvcFileHldPrst, ...rest } = initialValues;
     return rest;
   });
 
   const [subValues, setSubValues] = React.useState<
-    NonNullable<DocClassDetailFormState["values"]["subDetail"]>
-  >(() => initialValues.subDetail ?? {});
+    NonNullable<DocClassDetailFormState["values"]["prvcFileHldPrst"]>
+  >(() => initialValues.prvcFileHldPrst ?? {});
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -414,7 +414,7 @@ function DocClassificationFormComponent(props: DocClassificationProps) {
       try {
         const payload: DocClassDetailFormState["values"] = {
           ...(basicValues as DocClassDetailFormState["values"]),
-          subDetail: subValues,
+          prvcFileHldPrst: subValues,
         };
         await onSubmit(payload);
       } finally {

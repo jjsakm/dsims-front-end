@@ -1,4 +1,3 @@
-import { DUMMY_DOC_CLASSIFICATION_DATA } from "@/data/docClassificationDummyData";
 import type {
   DocClassDetail,
   DocClassification,
@@ -23,15 +22,14 @@ export async function getDocClassificationList(
 }
 
 export async function getDocClassificationData(
-  docClassificationId: string
-): Promise<DocClassification> {
-  const rows = DUMMY_DOC_CLASSIFICATION_DATA;
-  const data = rows.find((data) => data.docClsfNo === docClassificationId);
+  docClsfNo: string
+): Promise<DocClassDetail> {
+  const res = await axios.get(`/api/documentclassification/${docClsfNo}`);
 
-  if (!data) {
+  if (!res) {
     throw new Error("data not found");
   }
-  return data;
+  return res.data.result.detail;
 }
 
 export async function createDocClassificationData(
@@ -65,10 +63,10 @@ export async function updateDocClassificationData(
 }
 
 export async function deleteDocClassificationData(docClassificationId: string) {
-  const rows = DUMMY_DOC_CLASSIFICATION_DATA;
-  const data = rows.find((data) => data.docClsfNo === docClassificationId);
+  //const rows = DUMMY_DOC_CLASSIFICATION_DATA;
+  //const data = rows.find((data) => data.docClsfNo === docClassificationId);
   // TODO: delete logic here
-  console.log("Deleted docClassification data:", data?.docClsfNo);
+  //console.log("Deleted docClassification data:", data?.docClsfNo);
 }
 
 type ValidationResult = {

@@ -186,7 +186,7 @@ export default function DocClassificationListPage() {
     navigate(`/docClassification/create`);
   };
   const handleRowClick = (row: DocClassification) => {
-    navigate(`/docClassification/${row.docClsfNo}/modify`);
+    navigate(`/docClassification/${row.docClsfNo}`);
   };
 
   // if (isLoading || error) {

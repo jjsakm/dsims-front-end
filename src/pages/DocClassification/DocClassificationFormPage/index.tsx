@@ -56,11 +56,11 @@ const INITIAL_FORM_VALUES: DocClassDetailFormState["values"] = {
   docSclsfNm: "",
   prvcInclYn: "N",
   useEn: "Y",
-  subDetail: {},
+  prvcFileHldPrst: {},
 };
 
 type Values = DocClassDetailFormState["values"];
-type SubDetailValues = NonNullable<Values["subDetail"]>;
+type SubDetailValues = NonNullable<Values["prvcFileHldPrst"]>;
 
 /* ------------------------------------------------------------------ */
 /* 개인정보 상세 테이블 (subDetail 전용) – 전부 비제어                  */
@@ -656,10 +656,11 @@ export default function DocClassificationFormPage() {
       if (!formRef.current) return;
 
       // 폼데이터로 안하고 수정될때마다 컬럼의 값을 바꿔주는 형태로 가면 입력이 너무 느려짐..
+      // 추후 좋은 방안 나오면 수정가능
       const fd = new FormData(formRef.current);
 
       const subDetail: SubDetailValues = {
-        ...(defaults.subDetail ?? {}),
+        ...(defaults.prvcFileHldPrst ?? {}),
         deptNm: (fd.get("deptNm") as string) ?? "",
         fileNm: (fd.get("fileNm") as string) ?? "",
         hldPrps: (fd.get("hldPrps") as string) ?? "",
@@ -709,7 +710,7 @@ export default function DocClassificationFormPage() {
         docSclsfNm: (fd.get("docSclsfNm") as string) ?? "",
         prvcInclYn: fd.get("prvcInclYn") ? "Y" : "N",
         useEn: (fd.get("useEn") as string) ?? defaults.useEn,
-        subDetail,
+        prvcFileHldPrst: subDetail,
       };
       console.log(payload);
       // 검증
@@ -941,7 +942,7 @@ export default function DocClassificationFormPage() {
 
           {/* 개인정보 상세 – defaults.subDetail을 defaultValue로만 사용 */}
           {defaults.prvcInclYn === "Y" && (
-            <PrvcDetailTable defaults={defaults.subDetail ?? {}} />
+            <PrvcDetailTable defaults={defaults.prvcFileHldPrst ?? {}} />
           )}
         </FormGroup>
 
