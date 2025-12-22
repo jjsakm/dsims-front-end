@@ -34,6 +34,7 @@ export const router_pub = createBrowserRouter([
     id: "docClassification_pub",
     path: URL.DOC_CLASSIFICATION_LIST,
     Component: DocClassificationListPage,
+    handle: { breadcrumb: "문서분류 관리" },
   },
   {
     id: "docClassification_detail_pub",

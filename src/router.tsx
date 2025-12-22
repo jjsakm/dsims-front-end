@@ -57,30 +57,41 @@ export const router = createBrowserRouter([
       },
       // 문서고 관리
       {
-        id: "docClassification",
-        path: URL.DOC_CLASSIFICATION_LIST,
-        Component: DocClassificationListPage,
-      },
-      {
-        id: "docClassification-detail",
-        path: URL.DOC_CLASSIFICATION_DETAIL,
-        Component: ManagementDetaiilPage,
-      },
-      {
-        id: "docClassification-create",
-        path: URL.DOC_CLASSIFICATION_CREATE,
-        Component: DocClassificationFormPage,
-      },
-      {
-        id: "docClassification-modify",
-        path: URL.DOC_CLASSIFICATION_MODIFY,
-        Component: DocClassificationFormPage,
-      },
-      // 보유기관 관리
-      {
-        id: "holdingInstitution",
-        path: URL.HOLDING_INSTITUTION_LIST,
-        Component: HoldingInstitutionListPage,
+        id: "docManagementGroup",
+        handle: { breadcrumb: "문서고 관리" },
+        children: [
+          {
+            id: "docClassification",
+            path: URL.DOC_CLASSIFICATION_LIST,
+            Component: DocClassificationListPage,
+            handle: { breadcrumb: "문서분류 관리" },
+          },
+          {
+            id: "docClassification-detail",
+            path: URL.DOC_CLASSIFICATION_DETAIL,
+            Component: ManagementDetaiilPage,
+            handle: { breadcrumb: "문서분류 상세" },
+          },
+          {
+            id: "docClassification-create",
+            path: URL.DOC_CLASSIFICATION_CREATE,
+            Component: DocClassificationFormPage,
+            handle: { breadcrumb: "문서분류 등록" },
+          },
+          {
+            id: "docClassification-modify",
+            path: URL.DOC_CLASSIFICATION_MODIFY,
+            Component: DocClassificationFormPage,
+            handle: { breadcrumb: "문서분류 수정" },
+          },
+          // 보유기관 관리
+          {
+            id: "holdingInstitution",
+            path: URL.HOLDING_INSTITUTION_LIST,
+            Component: HoldingInstitutionListPage,
+            handle: { breadcrumb: "보유기간 관리" },
+          },
+        ],
       },
       // 전자문서 관리
       {
@@ -126,8 +137,8 @@ export const router = createBrowserRouter([
       },
       {
         id: "pub",
-        path: '/pub',
-        children: [...router_pub.routes]
+        path: "/pub",
+        children: [...router_pub.routes],
       },
       // Fallback route for the example routes in dashboard sidebar items
       {
