@@ -10,7 +10,8 @@ import {
   styled,
   Typography,
 } from "@mui/material";
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import { ExpandLess, ExpandMore, Padding } from "@mui/icons-material";
+import { yellow } from "@mui/material/colors";
 
 const Nav = styled(Box)({
   display: "table-cell",
@@ -67,6 +68,85 @@ const MENU_ITEMS = [
       { label: "전자문서 파기목록", to: URL.DOC_DESTRUCTION_LIST },
     ],
   },
+  // 퍼블 메뉴
+  // { label: "대시보드", to: URL.DASHBOARD },
+  // { label: "공지사항", to: URL.NOTICE_LIST },
+  // {
+  //   label: "문서고 관리",
+  //   id: "docManagement",
+  //   children: [
+  //     {
+  //       label: "문서분류 목록",
+  //       to: "/pub/docClassification/list",
+  //       isPublisher: true,
+  //     },
+  //     {
+  //       label: "문서분류 상세",
+  //       to: "/pub/docClassification/:docClassificationId",
+  //       isPublisher: true,
+  //     },
+  //     {
+  //       label: "문서분류 등록",
+  //       to: "/pub/docClassification/create",
+  //       isPublisher: true,
+  //     },
+  //     {
+  //       label: "문서분류 수정",
+  //       to: "/pub/docClassification/:docClassificationId/modify",
+  //       isPublisher: true,
+  //     },
+  //     {
+  //       label: "보유기간 변경",
+  //       to: "/pub/holdingInstitution/list",
+  //       isPublisher: true,
+  //     },
+  //   ],
+  // },
+  // {
+  //   label: "문서고 조회",
+  //   id: "docInquiry",
+  //   children: [
+  //     { label: "문서고 목록", to: "/pub/digitalDoc/list", isPublisher: true },
+  //     {
+  //       label: "문서고 상세",
+  //       to: "/pub/digitalDoc/:digitalDocId",
+  //       isPublisher: true,
+  //     },
+  //     { label: "문서고 등록", to: "/pub/digitalDoc/create", isPublisher: true },
+  //     {
+  //       label: "문서고 수정",
+  //       to: "/pub/digitalDoc/:digitalDocId/edit",
+  //       isPublisher: true,
+  //     },
+  //   ],
+  // },
+  // {
+  //   label: "파기문서 관리",
+  //   id: "docDestruction",
+  //   children: [
+  //     {
+  //       label: "전자문서 파기신청",
+  //       to: "/pub/docDestruction/reqList",
+  //       isPublisher: true,
+  //     },
+  //     {
+  //       label: "전자문서 파기승인",
+  //       to: "/pub/docDestruction/appvList",
+  //       isPublisher: true,
+  //     },
+  //     {
+  //       label: "전자문서 파기목록",
+  //       to: "/pub/docDestruction/list",
+  //       isPublisher: true,
+  //     },
+  //     {
+  //       label: "전자문서 파기상세",
+  //       to: "/pub/docDestruction/:docDestructionId/detail",
+
+  //       isPublisher: true,
+  //     },
+  //   ],
+  // },
 ];
 
 function EgovLeftNavInform() {
@@ -103,16 +183,29 @@ function EgovLeftNavInform() {
               {hasChildren && (
                 <Collapse in={openStates[item.id]} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
-                    {item.children.map((child, childIdx) => (
-                      /* 2. sx 대신 스타일 정의된 컴포넌트 사용 */
-                      <ChildMenuButton
-                        key={childIdx}
-                        disableRipple
-                        component={NavLink}
-                        to={child.to}>
-                        <ListItemText primary={child.label} />
-                      </ChildMenuButton>
-                    ))}
+                    {item.children?.map((child, childIdx) => {
+                      // ✨ 여기에 스타일 조건문 추가!
+                      const childListItemTextStyle = child.isPublisher
+                        ? {
+                            color: "blue",
+                            fontWeight: "bold",
+                          }
+                        : {
+                            color: "gray",
+                          };
+                      return (
+                        <ListItemButton
+                          key={childIdx}
+                          disableRipple
+                          component={NavLink}
+                          to={child.to}>
+                          <ListItemText
+                            primary={child.label}
+                            sx={childListItemTextStyle}
+                          />
+                        </ListItemButton>
+                      );
+                    })}
                   </List>
                 </Collapse>
               )}

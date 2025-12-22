@@ -40,22 +40,26 @@ export const router_pub = createBrowserRouter([
     id: "docClassification_detail_pub",
     path: URL.DOC_CLASSIFICATION_DETAIL,
     Component: ManagementDetaiilPage,
+    handle: { breadcrumb: "문서분류 상세" },
   },
   {
     id: "docClassification_create_pub",
     path: URL.DOC_CLASSIFICATION_CREATE,
     Component: DocClassificationFormPage,
+    handle: { breadcrumb: "문서분류 등록" },
   },
   {
     id: "docClassification_modify_pub",
     path: URL.DOC_CLASSIFICATION_MODIFY,
     Component: DocClassificationFormPage,
+    handle: { breadcrumb: "문서분류 수정" },
   },
-  // 보유기관 관리
+  // 보유기간 관리
   {
     id: "holdingInstitution_pub",
     path: URL.HOLDING_INSTITUTION_LIST,
     Component: HoldingInstitutionListPage,
+    handle: { breadcrumb: "보유기간 관리" },
   },
   // 전자문서 관리
   {
