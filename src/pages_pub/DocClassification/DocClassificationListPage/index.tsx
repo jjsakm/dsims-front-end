@@ -182,10 +182,9 @@ export default function DocClassificationListPage() {
     getLclsfCodeList();
   }, []);
 
-  const handleCreateClick = React.useCallback(() => {
-    navigate(URL.DIGITAL_DOC_CREATE);
-  }, [navigate]);
-
+  const handleCreateClick = () => {
+    navigate(`/docClassification/create`);
+  };
   const handleRowClick = (row: DocClassification) => {
     navigate(`/docClassification/${row.docClsfNo}`);
   };
