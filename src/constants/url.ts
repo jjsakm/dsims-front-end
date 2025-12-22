@@ -10,9 +10,9 @@ const URL = {
   NOTICE_MODIFY: "/notice/:nttId/modify",
   // 문서고 관리
   DOC_CLASSIFICATION_LIST: "/docClassification/list",
-  DOC_CLASSIFICATION_DETAIL: "/docClassification/:docClassificationId",
+  DOC_CLASSIFICATION_DETAIL: "/docClassification/:docClsfNo",
   DOC_CLASSIFICATION_CREATE: "/docClassification/create",
-  DOC_CLASSIFICATION_MODIFY: "/docClassification/:docClassificationId/modify",
+  DOC_CLASSIFICATION_MODIFY: "/docClassification/:docClsfNo/modify",
   // 보유기관 관리
   HOLDING_INSTITUTION_LIST: "/holdingInstitution/list",
   // 전자문서 관리

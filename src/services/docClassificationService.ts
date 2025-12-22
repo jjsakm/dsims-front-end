@@ -1,5 +1,6 @@
 import { DUMMY_DOC_CLASSIFICATION_DATA } from "@/data/docClassificationDummyData";
 import type {
+  DocClassDetail,
   DocClassification,
   SearchValues,
 } from "@/types/docClassification";
@@ -75,16 +76,32 @@ type ValidationResult = {
 };
 
 export function docClassificationvalidator(
-  data: Partial<DocClassification>
+  data: Partial<DocClassDetail>
 ): ValidationResult {
   let issues: ValidationResult["issues"] = [];
 
-  if (!data.docLclsfNo) {
+  if (data.docClsfDvcd === "L" && !data.docLclsfNm) {
+    issues = [...issues, { message: "필수 입니다.", path: ["docLclsfNm"] }];
+  }
+
+  if (data.docClsfDvcd === "M" && !data.docLclsfNo) {
     issues = [...issues, { message: "필수 입니다.", path: ["docLclsfNo"] }];
   }
 
-  if (!data.docMclsfNo) {
+  if (data.docClsfDvcd === "M" && !data.docMclsfNm) {
+    issues = [...issues, { message: "필수 입니다.", path: ["docMclsfNm"] }];
+  }
+
+  if (data.docClsfDvcd === "S" && !data.docLclsfNo) {
+    issues = [...issues, { message: "필수 입니다.", path: ["docLclsfNo"] }];
+  }
+
+  if (data.docClsfDvcd === "S" && !data.docMclsfNo) {
     issues = [...issues, { message: "필수 입니다.", path: ["docMclsfNo"] }];
+  }
+
+  if (data.docClsfDvcd === "S" && !data.docSclsfNm) {
+    issues = [...issues, { message: "필수 입니다.", path: ["docMclsfNm"] }];
   }
 
   // if (data.prvcInclYn) {

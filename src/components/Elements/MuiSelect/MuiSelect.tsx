@@ -19,6 +19,7 @@ type MuiSelectProps = {
   defaultValue?: string;
   value?: string;
   error?: string;
+  isDisabled?: boolean;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
@@ -32,6 +33,7 @@ export default function MuiSelect(props: MuiSelectProps) {
     defaultValue,
     value,
     error,
+    isDisabled,
     onChange,
   } = props;
   return (
@@ -48,6 +50,7 @@ export default function MuiSelect(props: MuiSelectProps) {
         value={value ?? ""}
         onChange={onChange as SelectProps["onChange"]}
         displayEmpty
+        disabled={isDisabled}
         sx={{
           "& .MuiSelect-select": {
             display: "block !important",
