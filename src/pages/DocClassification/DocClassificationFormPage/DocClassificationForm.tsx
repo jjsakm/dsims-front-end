@@ -445,8 +445,8 @@ function DocClassificationFormComponent(props: DocClassificationProps) {
                   <FormControl component="fieldset">
                     <RadioGroup
                       row
-                      name="docClsfDvcd"
-                      value={basicValues.docClsfDvcd}
+                      name="docClsfSeCd"
+                      value={basicValues.docClsfSeCd}
                       onChange={handleBasicChange}
                     >
                       <FormControlLabel
@@ -475,7 +475,7 @@ function DocClassificationFormComponent(props: DocClassificationProps) {
               <TableCell>대분류</TableCell>
               <TableCell>
                 <Stack direction="row" spacing={2}>
-                  {basicValues.docClsfDvcd === "L" ? (
+                  {basicValues.docClsfSeCd === "L" ? (
                     <TextField
                       value={basicValues.docLclsfNo ?? ""}
                       onChange={handleBasicChange}
@@ -497,13 +497,13 @@ function DocClassificationFormComponent(props: DocClassificationProps) {
             </TableRow>
 
             {/* 중분류 */}
-            {(basicValues.docClsfDvcd === "M" ||
-              basicValues.docClsfDvcd === "S") && (
+            {(basicValues.docClsfSeCd === "M" ||
+              basicValues.docClsfSeCd === "S") && (
               <TableRow>
                 <TableCell>중분류</TableCell>
                 <TableCell>
                   <Stack direction="row" spacing={2}>
-                    {basicValues.docClsfDvcd === "M" ? (
+                    {basicValues.docClsfSeCd === "M" ? (
                       <TextField
                         value={basicValues.docMclsfNo ?? ""}
                         onChange={handleBasicChange}
@@ -530,7 +530,7 @@ function DocClassificationFormComponent(props: DocClassificationProps) {
             )}
 
             {/* 소분류 */}
-            {basicValues.docClsfDvcd === "S" && (
+            {basicValues.docClsfSeCd === "S" && (
               <TableRow>
                 <TableCell>소분류</TableCell>
                 <TableCell>

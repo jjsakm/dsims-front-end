@@ -29,6 +29,7 @@ import type {
   DocClassification,
   DocClassDetailFormState,
   DocClsf,
+  DocClassDetail,
 } from "@/types/docClassification";
 import URL from "@/constants/url";
 import PageContainer from "@/components/AgGridContainer/PageContainer";
@@ -44,8 +45,7 @@ import { getDocClsfList, getLclsfList } from "@/services/bizCommon";
 
 const INITIAL_FORM_VALUES: DocClassDetailFormState["values"] = {
   docClsfNo: "",
-  docClsfDvcd: "L",
-  docClsfSeCd: "",
+  docClsfSeCd: "L",
   docClsfNm: "",
   upDocClsfNo: "",
   docLclsfNo: "",
@@ -534,7 +534,7 @@ export default function DocClassificationFormPage() {
     {}
   );
 
-  const [docClsfDvcd, setDocClsfDvcd] = React.useState<string>("L");
+  const [docClsfSeCd, setdocClsfSeCd] = React.useState<string>("L");
 
   const [lclsfList, setLclsfList] = React.useState<SelectItem[]>();
   const [mclsfList, setMclsfList] = React.useState<SelectItem[]>();
@@ -561,23 +561,52 @@ export default function DocClassificationFormPage() {
     }
   }, []);
 
+  const getDocClsfCodeList = React.useCallback(
+    async (name: string, docClsfNo: string) => {
+      setError(null);
+
+      try {
+        const list = await getDocClsfList(docClsfNo);
+
+        const resultList: SelectItem[] = list.map((vo: DocClsf) => {
+          return {
+            label: vo.docClsfNm,
+            value: vo.docClsfNo,
+          };
+        });
+
+        if (name === "docLclsfNo") {
+          setMclsfList(resultList);
+        }
+      } catch (e) {
+        setError(e as Error);
+      }
+    },
+    []
+  );
+
   const loadData = React.useCallback(async () => {
     setError(null);
     setIsLoading(true);
-    // try {
-    //   if (docClsfNo) {
-    //     const viewData = await getDocClassificationData(docClsfNo);
-    //     setDefaults(viewData as Values);
-    //   } else {
-    //     setDefaults(INITIAL_FORM_VALUES);
-    //   }
-    // } catch (e) {
-    //   setError(e as Error);
-    // } finally {
-    //   setIsLoading(false);
-    // }
+    try {
+      if (docClsfNo) {
+        const viewData = await getDocClassificationData(docClsfNo);
+        setDefaults(viewData as Values);
+        setdocClsfSeCd(viewData.docClsfSeCd);
+
+        if (viewData.docClsfSeCd === "S") {
+          getDocClsfCodeList("docLclsfNo", viewData.docLclsfNo);
+        }
+      } else {
+        setDefaults(INITIAL_FORM_VALUES);
+      }
+    } catch (e) {
+      setError(e as Error);
+    } finally {
+      setIsLoading(false);
+    }
     setIsLoading(false);
-  }, [docClsfNo]);
+  }, [docClsfNo, getDocClsfCodeList]);
 
   React.useEffect(() => {
     loadData();
@@ -624,30 +653,6 @@ export default function DocClassificationFormPage() {
     });
   };
 
-  const getDocClsfCodeList = React.useCallback(
-    async (name: string, docClsfNo: string) => {
-      setError(null);
-
-      try {
-        const list = await getDocClsfList(docClsfNo);
-
-        const resultList: SelectItem[] = list.map((vo: DocClsf) => {
-          return {
-            label: vo.docClsfNm,
-            value: vo.docClsfNo,
-          };
-        });
-
-        if (name === "docLclsfNo") {
-          setMclsfList(resultList);
-        }
-      } catch (e) {
-        setError(e as Error);
-      }
-    },
-    []
-  );
-
   /* ---------------- 제출 처리 ---------------- */
 
   const handleSubmit = React.useCallback(
@@ -670,7 +675,7 @@ export default function DocClassificationFormPage() {
         hldPrdDfyrs: (fd.get("hldPrdDfyrs") as string) ?? "",
         hldPrdMmCnt: (fd.get("hldPrdMmCnt") as string) ?? "",
         infoMnbdPrvcMttr: (fd.get("infoMnbdPrvcMttr") as string) ?? "",
-        sttyAgtPrvcMttr: (fd.get("legalRepItem") as string) ?? "",
+        sttyAgtPrvcMttr: (fd.get("sttyAgtPrvcMttr") as string) ?? "",
         rrnoClctYn: (fd.get("rrnoClctYn") as string) ?? "",
         rrnoClctSttBssExpln: (fd.get("rrnoClctSttBssExpln") as string) ?? "",
         infoMnbdAgreYn: fd.get("infoMnbdAgreYn") ? "Y" : "N",
@@ -699,9 +704,28 @@ export default function DocClassificationFormPage() {
         // 필요하면 나머지도 여기서만 추가
       };
 
+      let docClsfNm = "";
+      let upDocClsfNo: string | null = null;
+
+      switch (docClsfSeCd) {
+        case "L":
+          docClsfNm = fd.get("docLclsfNm") as string;
+          break;
+        case "M":
+          docClsfNm = fd.get("docMclsfNm") as string;
+          upDocClsfNo = fd.get("docLclsfNo") as string;
+          break;
+        default:
+          docClsfNm = fd.get("docSclsfNm") as string;
+          upDocClsfNo = fd.get("docMclsfNo") as string;
+          break;
+      }
+
       const payload: Values = {
         ...defaults,
-        docClsfDvcd: (fd.get("docClsfDvcd") as string) ?? docClsfDvcd,
+        docClsfNm: docClsfNm,
+        upDocClsfNo: upDocClsfNo,
+        docClsfSeCd: (fd.get("docClsfSeCd") as string) ?? docClsfSeCd,
         docLclsfNo: (fd.get("docLclsfNo") as string) ?? "",
         docMclsfNo: (fd.get("docMclsfNo") as string) ?? "",
         docSclsfNo: (fd.get("docSclsfNo") as string) ?? "",
@@ -730,17 +754,14 @@ export default function DocClassificationFormPage() {
         const isEditMode = Boolean(docClsfNo);
 
         if (isEditMode) {
-          await updateDocClassificationData(
-            Number(docClsfNo),
-            payload as Partial<Omit<DocClassification, "id">>
-          );
+          await updateDocClassificationData(payload as DocClassDetail);
           notifications.show("수정 완료.", {
             severity: "success",
             autoHideDuration: 3000,
           });
         } else {
           await createDocClassificationData(
-            payload as Omit<DocClassification, "id">
+            payload as Omit<DocClassDetail, "docClsfNo">
           );
           notifications.show("생성 완료.", {
             severity: "success",
@@ -804,9 +825,9 @@ export default function DocClassificationFormPage() {
                     <FormControl component="fieldset">
                       <RadioGroup
                         row
-                        name="docClsfDvcd"
-                        value={docClsfDvcd}
-                        onChange={(e) => setDocClsfDvcd(e.target.value)}
+                        name="docClsfSeCd"
+                        value={docClsfSeCd}
+                        onChange={(e) => setdocClsfSeCd(e.target.value)}
                       >
                         <FormControlLabel
                           value="L"
@@ -834,7 +855,7 @@ export default function DocClassificationFormPage() {
                 <TableCell>대분류</TableCell>
                 <TableCell>
                   <Stack direction="row" spacing={2}>
-                    {docClsfDvcd === "L" ? (
+                    {docClsfSeCd === "L" ? (
                       <TextField
                         name="docLclsfNm"
                         defaultValue={defaults.docLclsfNm ?? ""}
@@ -849,7 +870,6 @@ export default function DocClassificationFormPage() {
                         items={lclsfList}
                         value={defaults.docLclsfNo}
                         error={formErrors.docLclsfNo}
-                        isDisabled={!!defaults.docClsfNo}
                         onChange={handleSelectChange}
                       />
                     )}
@@ -858,12 +878,12 @@ export default function DocClassificationFormPage() {
               </TableRow>
 
               {/* 중분류 */}
-              {(docClsfDvcd === "M" || docClsfDvcd === "S") && (
+              {(docClsfSeCd === "M" || docClsfSeCd === "S") && (
                 <TableRow>
                   <TableCell>중분류</TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={2}>
-                      {docClsfDvcd === "M" ? (
+                      {docClsfSeCd === "M" ? (
                         <TextField
                           name="docMclsfNm"
                           defaultValue={defaults.docMclsfNm ?? ""}
@@ -878,7 +898,6 @@ export default function DocClassificationFormPage() {
                           items={mclsfList}
                           value={defaults.docMclsfNo}
                           error={formErrors.docMclsfNo}
-                          isDisabled={!!defaults.docClsfNo}
                           onChange={handleSelectChange}
                         />
                       )}
@@ -888,7 +907,7 @@ export default function DocClassificationFormPage() {
               )}
 
               {/* 소분류 */}
-              {docClsfDvcd === "S" && (
+              {docClsfSeCd === "S" && (
                 <TableRow>
                   <TableCell>소분류</TableCell>
                   <TableCell>

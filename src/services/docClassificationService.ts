@@ -3,7 +3,7 @@ import type {
   DocClassification,
   SearchValues,
 } from "@/types/docClassification";
-import axios from "axios";
+import axios, { type AxiosRequestConfig } from "axios";
 
 export async function getDocClassificationList(
   values?: Partial<SearchValues>
@@ -33,33 +33,21 @@ export async function getDocClassificationData(
 }
 
 export async function createDocClassificationData(
-  data: Omit<DocClassification, "id">
+  data: Omit<DocClassDetail, "docClsfNo">
 ) {
-  const newEmployee = {
-    ...data,
-  };
+  const res = await axios.post("/api/documentclassification/add", data);
 
-  // TODO: create logic here
-  console.log("Created docClassification data:", newEmployee);
-
-  return newEmployee;
+  if (!res) {
+    throw new Error("data not found");
+  }
 }
 
-export async function updateDocClassificationData(
-  docClassificationId: number,
-  data: Partial<Omit<DocClassification, "id">>
-) {
-  console.log("Updating docClassification data:", docClassificationId, data);
-  const updatedData = data;
+export async function updateDocClassificationData(data: DocClassDetail) {
+  const res = await axios.post("/api/documentclassification/update", data);
 
-  // TODO: update logic here
-  if (data) {
-    console.log("수정 완료:", docClassificationId, updatedData);
-  } else {
-    throw new Error("수정할 데이터가 없습니다.");
+  if (!res) {
+    throw new Error("data not found");
   }
-
-  return updatedData;
 }
 
 export async function deleteDocClassificationData(docClassificationId: string) {
@@ -78,27 +66,27 @@ export function docClassificationvalidator(
 ): ValidationResult {
   let issues: ValidationResult["issues"] = [];
 
-  if (data.docClsfDvcd === "L" && !data.docLclsfNm) {
+  if (data.docClsfSeCd === "L" && !data.docLclsfNm) {
     issues = [...issues, { message: "필수 입니다.", path: ["docLclsfNm"] }];
   }
 
-  if (data.docClsfDvcd === "M" && !data.docLclsfNo) {
+  if (data.docClsfSeCd === "M" && !data.docLclsfNo) {
     issues = [...issues, { message: "필수 입니다.", path: ["docLclsfNo"] }];
   }
 
-  if (data.docClsfDvcd === "M" && !data.docMclsfNm) {
+  if (data.docClsfSeCd === "M" && !data.docMclsfNm) {
     issues = [...issues, { message: "필수 입니다.", path: ["docMclsfNm"] }];
   }
 
-  if (data.docClsfDvcd === "S" && !data.docLclsfNo) {
+  if (data.docClsfSeCd === "S" && !data.docLclsfNo) {
     issues = [...issues, { message: "필수 입니다.", path: ["docLclsfNo"] }];
   }
 
-  if (data.docClsfDvcd === "S" && !data.docMclsfNo) {
+  if (data.docClsfSeCd === "S" && !data.docMclsfNo) {
     issues = [...issues, { message: "필수 입니다.", path: ["docMclsfNo"] }];
   }
 
-  if (data.docClsfDvcd === "S" && !data.docSclsfNm) {
+  if (data.docClsfSeCd === "S" && !data.docSclsfNm) {
     issues = [...issues, { message: "필수 입니다.", path: ["docMclsfNm"] }];
   }
 

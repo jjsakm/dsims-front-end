@@ -45,10 +45,10 @@ export interface DocClassification {
 
 export interface DocClassDetail {
   docClsfNo: string;
-  docClsfDvcd: string;
+  //docClsfSeCd: string;
   docClsfSeCd: string;
   docClsfNm: string;
-  upDocClsfNo: string;
+  upDocClsfNo: string | null;
   docLclsfNo: string;
   docMclsfNo: string;
   docSclsfNo: string;

@@ -146,11 +146,11 @@ export default function DocClassificationDetailPage() {
                 <TableRow>
                   <TableCell>문서분류</TableCell>
                   <TableCell colSpan={3}>
-                    {detailData?.docClsfDvcd === "L" &&
+                    {detailData?.docClsfSeCd === "L" &&
                       `${detailData?.docLclsfNm}`}
-                    {detailData?.docClsfDvcd === "M" &&
+                    {detailData?.docClsfSeCd === "M" &&
                       `${detailData?.docLclsfNm} > ${detailData?.docMclsfNm}`}
-                    {detailData?.docClsfDvcd === "S" &&
+                    {detailData?.docClsfSeCd === "S" &&
                       `${detailData?.docLclsfNm} > ${detailData?.docMclsfNm} > ${detailData?.docSclsfNm}`}
                   </TableCell>
                 </TableRow>
