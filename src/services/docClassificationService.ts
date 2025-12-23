@@ -3,7 +3,7 @@ import type {
   DocClassification,
   SearchValues,
 } from "@/types/docClassification";
-import axios, { type AxiosRequestConfig } from "axios";
+import axios from "axios";
 
 export async function getDocClassificationList(
   values?: Partial<SearchValues>

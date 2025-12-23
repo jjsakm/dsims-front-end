@@ -29,6 +29,7 @@ import { useSearchStateHandlers } from "@/hooks/InputStateHandlers/useInputState
 import SearchFilterContainer from "@/components/Layout/docClassification/SearchFilterContainer.tsx";
 import type { SelectItem } from "@/types/common";
 import { getDocClsfList, getLclsfList } from "@/services/bizCommon";
+import { useLclsfListLive } from "@/hooks/query/useDocClsfTree";
 
 const initSelectItem: SelectItem[] = [
   {
@@ -133,23 +134,25 @@ export default function DocClassificationListPage() {
     }
   };
 
-  const getLclsfCodeList = React.useCallback(async () => {
-    setError(null);
+  // 1) 컴포넌트 최상단에서 훅 호출
+  const { data: topLevelDocs } = useLclsfListLive();
 
-    try {
-      const list = await getLclsfList();
-
-      const resultList: SelectItem[] = list.map((vo: DocClsf) => {
-        return {
-          label: vo.docClsfNm,
-          value: vo.docClsfNo,
-        };
-      });
-      setLclsfList([...initSelectItem, ...resultList]);
-    } catch (e) {
-      setError(e as Error);
+  const getLclsfCodeList = React.useCallback(() => {
+    console.log(topLevelDocs);
+    if (!topLevelDocs) {
+      setLclsfList(initSelectItem); // 아직 데이터 없으면 기본값
+      return;
     }
-  }, []);
+
+    const resultList: SelectItem[] = (topLevelDocs ?? []).map(
+      (vo: DocClsf) => ({
+        label: vo.docClsfNm,
+        value: vo.docClsfNo,
+      })
+    );
+    console.log(resultList);
+    setLclsfList([...initSelectItem, ...resultList]);
+  }, [topLevelDocs]);
 
   const getDocClsfCodeList = React.useCallback(
     async (name: string, docClsfNo: string) => {
@@ -178,8 +181,11 @@ export default function DocClassificationListPage() {
   );
 
   React.useEffect(() => {
-    loadData();
     getLclsfCodeList();
+  }, [topLevelDocs]);
+
+  React.useEffect(() => {
+    loadData();
   }, []);
 
   const handleCreateClick = () => {
