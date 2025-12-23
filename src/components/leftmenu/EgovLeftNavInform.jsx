@@ -69,84 +69,84 @@ const MENU_ITEMS = [
     ],
   },
   // 퍼블 메뉴
-  // { label: "대시보드", to: URL.DASHBOARD },
-  // { label: "공지사항", to: URL.NOTICE_LIST },
-  // {
-  //   label: "문서고 관리",
-  //   id: "docManagement",
-  //   children: [
-  //     {
-  //       label: "문서분류 목록",
-  //       to: "/pub/docClassification/list",
-  //       isPublisher: true,
-  //     },
-  //     {
-  //       label: "문서분류 상세",
-  //       to: "/pub/docClassification/:docClassificationId",
-  //       isPublisher: true,
-  //     },
-  //     {
-  //       label: "문서분류 등록",
-  //       to: "/pub/docClassification/create",
-  //       isPublisher: true,
-  //     },
-  //     {
-  //       label: "문서분류 수정",
-  //       to: "/pub/docClassification/:docClassificationId/modify",
-  //       isPublisher: true,
-  //     },
-  //     {
-  //       label: "보유기간 변경",
-  //       to: "/pub/holdingInstitution/list",
-  //       isPublisher: true,
-  //     },
-  //   ],
-  // },
-  // {
-  //   label: "문서고 조회",
-  //   id: "docInquiry",
-  //   children: [
-  //     { label: "문서고 목록", to: "/pub/digitalDoc/list", isPublisher: true },
-  //     {
-  //       label: "문서고 상세",
-  //       to: "/pub/digitalDoc/:digitalDocId",
-  //       isPublisher: true,
-  //     },
-  //     { label: "문서고 등록", to: "/pub/digitalDoc/create", isPublisher: true },
-  //     {
-  //       label: "문서고 수정",
-  //       to: "/pub/digitalDoc/:digitalDocId/edit",
-  //       isPublisher: true,
-  //     },
-  //   ],
-  // },
-  // {
-  //   label: "파기문서 관리",
-  //   id: "docDestruction",
-  //   children: [
-  //     {
-  //       label: "전자문서 파기신청",
-  //       to: "/pub/docDestruction/reqList",
-  //       isPublisher: true,
-  //     },
-  //     {
-  //       label: "전자문서 파기승인",
-  //       to: "/pub/docDestruction/appvList",
-  //       isPublisher: true,
-  //     },
-  //     {
-  //       label: "전자문서 파기목록",
-  //       to: "/pub/docDestruction/list",
-  //       isPublisher: true,
-  //     },
-  //     {
-  //       label: "전자문서 파기상세",
-  //       to: "/pub/docDestruction/:docDestructionId/detail",
+  { label: "대시보드", to: URL.DASHBOARD },
+  { label: "공지사항", to: URL.NOTICE_LIST },
+  {
+    label: "문서고 관리",
+    id: "docManagement",
+    children: [
+      {
+        label: "문서분류 목록",
+        to: "/pub/docClassification/list",
+        isPublisher: true,
+      },
+      {
+        label: "문서분류 상세",
+        to: "/pub/docClassification/DocClassificationDetailPage",
+        isPublisher: true,
+      },
+      {
+        label: "문서분류 등록",
+        to: "/pub/docClassification/create",
+        isPublisher: true,
+      },
+      {
+        label: "문서분류 수정",
+        to: "/pub/docClassification/:docClassificationId/modify",
+        isPublisher: true,
+      },
+      {
+        label: "보유기간 변경",
+        to: "/pub/holdingInstitution/list",
+        isPublisher: true,
+      },
+    ],
+  },
+  {
+    label: "문서고 조회",
+    id: "docInquiry",
+    children: [
+      { label: "문서고 목록", to: "/pub/digitalDoc/list", isPublisher: true },
+      {
+        label: "문서고 상세",
+        to: "/pub/digitalDoc/:digitalDocId",
+        isPublisher: true,
+      },
+      { label: "문서고 등록", to: "/pub/digitalDoc/create", isPublisher: true },
+      {
+        label: "문서고 수정",
+        to: "/pub/digitalDoc/:digitalDocId/edit",
+        isPublisher: true,
+      },
+    ],
+  },
+  {
+    label: "파기문서 관리",
+    id: "docDestruction",
+    children: [
+      {
+        label: "전자문서 파기신청",
+        to: "/pub/docDestruction/reqList",
+        isPublisher: true,
+      },
+      {
+        label: "전자문서 파기승인",
+        to: "/pub/docDestruction/appvList",
+        isPublisher: true,
+      },
+      {
+        label: "전자문서 파기목록",
+        to: "/pub/docDestruction/list",
+        isPublisher: true,
+      },
+      {
+        label: "전자문서 파기상세",
+        to: "/pub/docDestruction/:docDestructionId/detail",
 
-  //       isPublisher: true,
-  //     },
-  //   ],
-  // },
+        isPublisher: true,
+      },
+    ],
+  },
 ];
 
 function EgovLeftNavInform() {

@@ -14,7 +14,7 @@ import {useDialogs} from "@/hooks/useDialogs/useDialogs";
 import type {HoldingInstitution, HoldingInstitutionSearchState,} from "@/types/holdingInstitution";
 import {useSearchStateHandlers} from "@/hooks/InputStateHandlers/useInputStateHandlers";
 import PageStatus from "@/components/PageStatus";
-import SearchFilterContainer from "@/components/Layout/docClassification/SearchFilterContainer.tsx";
+import SearchFilterContainer from "@/components/Container/SearchFilterContainer";
 
 export default function DocDestructionDetailPage() {
   const dialogs = useDialogs();

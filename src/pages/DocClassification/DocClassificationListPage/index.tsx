@@ -25,7 +25,7 @@ import { listDefs } from "./col-def";
 import { getDocClassificationList } from "@/services/docClassificationService";
 import URL from "@/constants/url";
 import { useSearchStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
-import SearchFilterContainer from "@/components/Layout/docClassification/SearchFilterContainer.tsx";
+import SearchFilterContainer from "@/components/Container/SearchFilterContainer";
 import type { SelectItem } from "@/types/common";
 import {
   useDocClsfChildrenLive,
