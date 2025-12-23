@@ -80,12 +80,6 @@ export const router_pub = createBrowserRouter([
     Component: DigitalDocFormPage,
     handle: { breadcrumb: "문서고 등록" },
   },
-  {
-    id: "digitalDoc-edit_pub",
-    path: URL.DIGITAL_DOC_EDIT,
-    Component: DigitalDocFormPage,
-    handle: { breadcrumb: "문서고 수정" },
-  },
   // 전자문서 파기
   {
     id: "docDestruction-req-list_pub",
