@@ -31,6 +31,7 @@ import {
   useDocClsfChildrenLive,
   useLclsfListLive,
 } from "@/hooks/query/useDocClsfTree";
+import PageStatus from "@/components/PageStatus";
 
 const initSelectItem: SelectItem[] = [
   {
@@ -51,13 +52,6 @@ export default function DocClassificationListPage() {
     rows: [],
     rowCount: 0,
   });
-
-  // const [lclsfList, setLclsfList] =
-  //   React.useState<SelectItem[]>(initSelectItem);
-  // const [mclsfList, setMclsfList] =
-  //   React.useState<SelectItem[]>(initSelectItem);
-  // const [sclsfList, setSclsfList] =
-  //   React.useState<SelectItem[]>(initSelectItem);
 
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
@@ -169,9 +163,9 @@ export default function DocClassificationListPage() {
     navigate(`/docClassification/${row.docClsfNo}`);
   };
 
-  // if (isLoading || error) {
-  //   return <PageStatus isLoading={isLoading} error={error} />;
-  // }
+  if (isLoading || error) {
+    return <PageStatus isLoading={isLoading} error={error} />;
+  }
 
   const pageTitle = "문서분류 관리";
 

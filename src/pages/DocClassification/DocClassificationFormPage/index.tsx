@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import useNotifications from "@/hooks/useNotifications";
+import { useDialogs } from "@/hooks/useDialogs/useDialogs";
 import {
   getDocClassificationData,
   updateDocClassificationData,
@@ -68,452 +69,557 @@ type SubDetailValues = NonNullable<Values["prvcFileHldPrst"]>;
 
 interface PrvcDetailProps {
   defaults: SubDetailValues;
+  isDirectInputYear: boolean;
+  onChangeDirectInputYear: (value: boolean) => void;
+  isInfoAgree: boolean;
+  onChangeInfoAgree: (value: boolean) => void;
+  formErrors: Record<string, string>; // ← 추가
 }
 
-const PrvcDetailTable = React.memo(({ defaults }: PrvcDetailProps) => (
-  <Table size="small" aria-label="개인정보 상세 입력">
-    <TableBody>
-      {/* 부서명 / 파일명 */}
-      <TableRow>
-        <TableCell>부서명</TableCell>
-        <TableCell>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="부서명"
-            name="deptNm"
-            defaultValue={defaults.deptNm ?? ""}
-          />
-        </TableCell>
-        <TableCell>파일명</TableCell>
-        <TableCell>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="파일명"
-            name="fileNm"
-            defaultValue={defaults.fileNm ?? ""}
-          />
-        </TableCell>
-      </TableRow>
+const PrvcDetailTable = React.memo(
+  ({
+    defaults,
+    isDirectInputYear,
+    onChangeDirectInputYear,
+    isInfoAgree,
+    onChangeInfoAgree,
+    formErrors,
+  }: PrvcDetailProps) => {
+    const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      const isDirect = value === "0";
 
-      {/* 보유목적 / 사용부서(내부, 외부) */}
-      <TableRow>
-        <TableCell>보유목적</TableCell>
-        <TableCell>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="보유목적"
-            name="hldPrps"
-            defaultValue={defaults.hldPrps ?? ""}
-          />
-        </TableCell>
-        <TableCell>사용부서</TableCell>
-        <TableCell>
-          <RadioGroup row name="useDeptNm">
-            <TextField
-              fullWidth
-              size="small"
-              placeholder="사용부서"
-              name="useDeptNm"
-              defaultValue={defaults.useDeptNm ?? ""}
-            />
-          </RadioGroup>
-        </TableCell>
-      </TableRow>
+      // 상위 플래그 갱신 (disable 토글용)
+      onChangeDirectInputYear(isDirect);
 
-      {/* 개인정보 처리방법 / 보유기간 */}
-      <TableRow>
-        <TableCell>개인정보 처리방법</TableCell>
-        <TableCell>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="개인정보 처리방법"
-            name="prvcPrcsMthdExpln"
-            defaultValue={defaults.prvcPrcsMthdExpln ?? ""}
-          />
-        </TableCell>
-        <TableCell>보유기간</TableCell>
-        <TableCell>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <TextField
-              select
-              size="small"
-              name="hldPrdDfyrs"
-              defaultValue={defaults.hldPrdDfyrs ?? ""}
-              sx={{ width: 80 }}
-            >
-              <MenuItem value="">년</MenuItem>
-              <MenuItem value="1">1년</MenuItem>
-              <MenuItem value="3">3년</MenuItem>
-              <MenuItem value="5">5년</MenuItem>
-            </TextField>
-            <TextField
-              size="small"
-              name="hldPrdMmCnt"
-              sx={{ width: 80 }}
-              placeholder="월"
-              defaultValue={defaults.hldPrdMmCnt ?? ""}
-            />
-            개월
-          </Stack>
-        </TableCell>
-      </TableRow>
+      // 직접입력이 아닌 경우 월 값 비우기
+      if (!isDirect) {
+        const mmInput = document.querySelector<HTMLInputElement>(
+          'input[name="hldPrdMmCnt"]'
+        );
+        if (mmInput) {
+          mmInput.value = ""; // 또는 "0"으로 고정하고 싶으면 "0"
+        }
+      }
+    };
 
-      {/* 정보주체의 개인정보항목 / 법정대리인의 개인정보항목 */}
-      <TableRow>
-        <TableCell>정보주체의 개인정보항목</TableCell>
-        <TableCell>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="정보주체의 개인정보항목"
-            name="infoMnbdPrvcMttr"
-            defaultValue={defaults.infoMnbdPrvcMttr ?? ""}
-          />
-        </TableCell>
-        <TableCell>법정대리인의 개인정보항목</TableCell>
-        <TableCell>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="법정대리인의 개인정보항목"
-            name="sttyAgtPrvcMttr"
-            defaultValue={defaults.sttyAgtPrvcMttr ?? ""}
-          />
-        </TableCell>
-      </TableRow>
+    const handleInfoAgreeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const checked = e.target.checked; // checked == 동의(Y)
+      const notAgree = !checked; // 동의가 아니면 true
+      onChangeInfoAgree(notAgree);
 
-      {/* 주민등록번호 수집여부 / 주민등록번호 수집 법령근거 */}
-      <TableRow>
-        <TableCell>주민등록번호 수집여부</TableCell>
-        <TableCell>
-          <RadioGroup
-            row
-            name="rrnoClctYn"
-            defaultValue={defaults.rrnoClctYn ?? "N"}
-          >
-            <FormControlLabel
-              value="Y"
-              control={<Radio size="small" />}
-              label="수집"
-            />
-            <FormControlLabel
-              value="N"
-              control={<Radio size="small" />}
-              label="미수집"
-            />
-          </RadioGroup>
-        </TableCell>
-        <TableCell>주민등록번호 수집 법령근거</TableCell>
-        <TableCell>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="주민등록번호 수집 법령근거"
-            name="rrnoClctSttBssExpln"
-            defaultValue={defaults.rrnoClctSttBssExpln ?? ""}
-          />
-        </TableCell>
-      </TableRow>
+      const target = document.querySelector<HTMLInputElement>(
+        'input[name="infoMnbdDsagClctSttBssExpln"]'
+      );
+      if (!target) return;
 
-      {/* 정보주체 동의여부 / 정보주체 동의 없이 수집 법령근거 */}
-      <TableRow>
-        <TableCell>정보주체 동의여부</TableCell>
-        <TableCell>
-          <FormControlLabel
-            control={
-              <Checkbox
+      if (!notAgree) {
+        // 동의(Y)인 경우: 값 초기화 + 비활성
+        target.value = "";
+        target.disabled = true;
+      } else {
+        // 비동의인 경우: 활성
+        target.disabled = false;
+      }
+    };
+    return (
+      <Table size="small" aria-label="개인정보 상세 입력">
+        <TableBody>
+          {/* 부서명 / 파일명 */}
+          <TableRow>
+            <TableCell>부서명</TableCell>
+            <TableCell>
+              <TextField
+                fullWidth
                 size="small"
-                name="infoMnbdAgreYn"
-                defaultChecked={defaults.infoMnbdAgreYn === "Y"}
+                placeholder="부서명"
+                name="deptNm"
+                defaultValue={defaults.deptNm ?? ""}
+                error={!!formErrors.deptNm}
+                helperText={formErrors.deptNm ?? ""}
               />
-            }
-            label="동의"
-          />
-        </TableCell>
-        <TableCell>정보주체 동의 없이 수집 법령근거</TableCell>
-        <TableCell>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="정보주체 동의 없이 수집 법령근거"
-            name="infoMnbdDsagClctSttBssExpln"
-            defaultValue={defaults.infoMnbdDsagClctSttBssExpln ?? ""}
-          />
-        </TableCell>
-      </TableRow>
+            </TableCell>
+            <TableCell>파일명</TableCell>
+            <TableCell>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="파일명"
+                name="fileNm"
+                defaultValue={defaults.fileNm ?? ""}
+                error={!!formErrors.fileNm}
+                helperText={formErrors.fileNm ?? ""}
+              />
+            </TableCell>
+          </TableRow>
 
-      {/* 민감 정보 보유여부 / 민감 정보 별도동의여부 */}
-      <TableRow>
-        <TableCell>민감 정보 보유여부</TableCell>
-        <TableCell>
-          <RadioGroup
-            row
-            name="sensInfoHldYn"
-            defaultValue={defaults.sensInfoHldYn ?? "N"}
-          >
-            <FormControlLabel
-              value="Y"
-              control={<Radio size="small" />}
-              label="보유"
-            />
-            <FormControlLabel
-              value="N"
-              control={<Radio size="small" />}
-              label="미보유"
-            />
-          </RadioGroup>
-        </TableCell>
-        <TableCell>민감 정보 별도동의여부</TableCell>
-        <TableCell>
-          <RadioGroup
-            row
-            name="sensInfoIndivAgreYn"
-            defaultValue={defaults.sensInfoIndivAgreYn ?? "N"}
-          >
-            <FormControlLabel
-              value="Y"
-              control={<Radio size="small" />}
-              label="동의"
-            />
-            <FormControlLabel
-              value="N"
-              control={<Radio size="small" />}
-              label="미동의"
-            />
-          </RadioGroup>
-        </TableCell>
-      </TableRow>
+          {/* 보유목적 / 사용부서(내부, 외부) */}
+          <TableRow>
+            <TableCell>보유목적</TableCell>
+            <TableCell>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="보유목적"
+                name="hldPrps"
+                defaultValue={defaults.hldPrps ?? ""}
+                error={!!formErrors.hldPrps}
+                helperText={formErrors.hldPrps ?? ""}
+              />
+            </TableCell>
+            <TableCell>사용부서</TableCell>
+            <TableCell>
+              <RadioGroup row name="useDeptNm">
+                <TextField
+                  fullWidth
+                  size="small"
+                  placeholder="사용부서"
+                  name="useDeptNm"
+                  defaultValue={defaults.useDeptNm ?? ""}
+                  error={!!formErrors.useDeptNm}
+                  helperText={formErrors.useDeptNm ?? ""}
+                />
+              </RadioGroup>
+            </TableCell>
+          </TableRow>
 
-      <TableRow>
-        <TableCell>민감 정보 보유 법령근거</TableCell>
-        <TableCell colSpan={3}>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="민감 정보 보유 법령근거"
-            name="sensInfoHldSttBssExpln"
-            defaultValue={defaults.sensInfoHldSttBssExpln ?? ""}
-          />
-        </TableCell>
-      </TableRow>
+          {/* 개인정보 처리방법 / 보유기간 */}
+          <TableRow>
+            <TableCell>개인정보 처리방법</TableCell>
+            <TableCell>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="개인정보 처리방법"
+                name="prvcPrcsMthdExpln"
+                defaultValue={defaults.prvcPrcsMthdExpln ?? ""}
+                error={!!formErrors.prvcPrcsMthdExpln}
+                helperText={formErrors.prvcPrcsMthdExpln ?? ""}
+              />
+            </TableCell>
+            <TableCell>보유기간</TableCell>
+            <TableCell>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <TextField
+                  select
+                  size="small"
+                  name="hldPrdDfyrs"
+                  defaultValue={defaults.hldPrdDfyrs ?? 1}
+                  sx={{ width: 100 }}
+                  onChange={handleYearChange}
+                >
+                  <MenuItem value="1">1년</MenuItem>
+                  <MenuItem value="3">3년</MenuItem>
+                  <MenuItem value="5">5년</MenuItem>
+                  <MenuItem value="10">10년</MenuItem>
+                  <MenuItem value="30">30년</MenuItem>
+                  <MenuItem value="90">준영구</MenuItem>
+                  <MenuItem value="99">영구</MenuItem>
+                  <MenuItem value="0">직접입력</MenuItem>
+                </TextField>
+                <TextField
+                  size="small"
+                  name="hldPrdMmCnt"
+                  sx={{ width: 80 }}
+                  placeholder="월"
+                  type="text"
+                  disabled={!isDirectInputYear}
+                  defaultValue={defaults.hldPrdMmCnt ?? null}
+                  error={!!formErrors.hldPrdMmCnt}
+                  helperText={formErrors.hldPrdMmCnt ?? null}
+                  onChange={(e) => {
+                    const onlyNumber = e.target.value.replace(/[^0-9]/g, "");
+                    // 비제어라면 DOM 값만 수정
+                    if (onlyNumber !== e.target.value) {
+                      e.target.value = onlyNumber;
+                    }
+                  }}
+                />
+                개월
+              </Stack>
+            </TableCell>
+          </TableRow>
 
-      {/* 고유식별정보 보유여부 / 고유식별정보 별도동의여부 */}
-      <TableRow>
-        <TableCell>고유식별정보 보유여부</TableCell>
-        <TableCell>
-          <RadioGroup
-            row
-            name="uiiHldYn"
-            defaultValue={defaults.uiiHldYn ?? "N"}
-          >
-            <FormControlLabel
-              value="Y"
-              control={<Radio size="small" />}
-              label="보유"
-            />
-            <FormControlLabel
-              value="N"
-              control={<Radio size="small" />}
-              label="미보유"
-            />
-          </RadioGroup>
-        </TableCell>
-        <TableCell>고유식별정보 별도동의여부</TableCell>
-        <TableCell>
-          <RadioGroup
-            row
-            name="uiiIndivAgreYn"
-            defaultValue={defaults.uiiIndivAgreYn ?? "N"}
-          >
-            <FormControlLabel
-              value="Y"
-              control={<Radio size="small" />}
-              label="동의"
-            />
-            <FormControlLabel
-              value="N"
-              control={<Radio size="small" />}
-              label="미동의"
-            />
-          </RadioGroup>
-        </TableCell>
-      </TableRow>
+          {/* 정보주체의 개인정보항목 / 법정대리인의 개인정보항목 */}
+          <TableRow>
+            <TableCell>정보주체의 개인정보항목</TableCell>
+            <TableCell>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="정보주체의 개인정보항목"
+                name="infoMnbdPrvcMttr"
+                defaultValue={defaults.infoMnbdPrvcMttr ?? ""}
+                error={!!formErrors.infoMnbdPrvcMttr}
+                helperText={formErrors.infoMnbdPrvcMttr ?? ""}
+              />
+            </TableCell>
+            <TableCell>법정대리인의 개인정보항목</TableCell>
+            <TableCell>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="법정대리인의 개인정보항목"
+                name="sttyAgtPrvcMttr"
+                defaultValue={defaults.sttyAgtPrvcMttr ?? ""}
+                error={!!formErrors.sttyAgtPrvcMttr}
+                helperText={formErrors.sttyAgtPrvcMttr ?? ""}
+              />
+            </TableCell>
+          </TableRow>
 
-      <TableRow>
-        <TableCell>고유식별정보 보유 법령근거</TableCell>
-        <TableCell colSpan={3}>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="고유식별정보 보유 법령근거"
-            name="uiiHldSttBssExpln"
-            defaultValue={defaults.uiiHldSttBssExpln ?? ""}
-          />
-        </TableCell>
-      </TableRow>
+          {/* 주민등록번호 수집여부 / 주민등록번호 수집 법령근거 */}
+          <TableRow>
+            <TableCell>주민등록번호 수집여부</TableCell>
+            <TableCell>
+              <RadioGroup
+                row
+                name="rrnoClctYn"
+                defaultValue={defaults.rrnoClctYn ?? "N"}
+              >
+                <FormControlLabel
+                  value="Y"
+                  control={<Radio size="small" />}
+                  label="수집"
+                />
+                <FormControlLabel
+                  value="N"
+                  control={<Radio size="small" />}
+                  label="미수집"
+                />
+              </RadioGroup>
+            </TableCell>
+            <TableCell>주민등록번호 수집 법령근거</TableCell>
+            <TableCell>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="주민등록번호 수집 법령근거"
+                name="rrnoClctSttBssExpln"
+                defaultValue={defaults.rrnoClctSttBssExpln ?? ""}
+                error={!!formErrors.rrnoClctSttBssExpln}
+                helperText={formErrors.rrnoClctSttBssExpln ?? ""}
+              />
+            </TableCell>
+          </TableRow>
 
-      {/* 개인정보영향평가 대상여부 / 취급담당자 */}
-      <TableRow>
-        <TableCell>개인정보영향평가 대상여부</TableCell>
-        <TableCell>
-          <RadioGroup
-            row
-            name="prvcEvlTrgtYn"
-            defaultValue={defaults.prvcEvlTrgtYn ?? "N"}
-          >
-            <FormControlLabel
-              value="Y"
-              control={<Radio size="small" />}
-              label="대상"
-            />
-            <FormControlLabel
-              value="N"
-              control={<Radio size="small" />}
-              label="미대상"
-            />
-          </RadioGroup>
-        </TableCell>
-        <TableCell>취급담당자</TableCell>
-        <TableCell>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="민감 정보 보유 법령근거"
-            name="hndlPicNm"
-            defaultValue={defaults.hndlPicNm ?? ""}
-          />
-        </TableCell>
-      </TableRow>
+          {/* 정보주체 동의여부 / 정보주체 동의 없이 수집 법령근거 */}
+          <TableRow>
+            <TableCell>정보주체 동의여부</TableCell>
+            <TableCell>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    size="small"
+                    name="infoMnbdAgreYn"
+                    defaultChecked={defaults.infoMnbdAgreYn === "Y"} // ← 플래그로 제어
+                    onChange={handleInfoAgreeChange}
+                  />
+                }
+                label="동의"
+              />
+            </TableCell>
+            <TableCell>정보주체 동의 없이 수집 법령근거</TableCell>
+            <TableCell>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="정보주체 동의 없이 수집 법령근거"
+                name="infoMnbdDsagClctSttBssExpln"
+                defaultValue={defaults.infoMnbdDsagClctSttBssExpln ?? ""}
+                error={!!formErrors.infoMnbdDsagClctSttBssExpln}
+                helperText={formErrors.infoMnbdDsagClctSttBssExpln ?? ""}
+                disabled={!isInfoAgree} // 최초 렌더 기준
+              />
+            </TableCell>
+          </TableRow>
 
-      {/* 제3자 제공받는 자 / 제3자 제공 근거 */}
-      <TableRow>
-        <TableCell>제3자 제공받는 자</TableCell>
-        <TableCell>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="제3자 제공받는 자"
-            name="tdptySplrcpNm"
-            defaultValue={defaults.tdptySplrcpNm ?? ""}
-          />
-        </TableCell>
-        <TableCell>제3자 제공 근거</TableCell>
-        <TableCell>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="제3자 제공 근거"
-            name="tdptyPvsnBssExpln"
-            defaultValue={defaults.tdptyPvsnBssExpln ?? ""}
-          />
-        </TableCell>
-      </TableRow>
+          {/* 민감 정보 보유여부 / 민감 정보 별도동의여부 */}
+          <TableRow>
+            <TableCell>민감 정보 보유여부</TableCell>
+            <TableCell>
+              <RadioGroup
+                row
+                name="sensInfoHldYn"
+                defaultValue={defaults.sensInfoHldYn ?? "N"}
+              >
+                <FormControlLabel
+                  value="Y"
+                  control={<Radio size="small" />}
+                  label="보유"
+                />
+                <FormControlLabel
+                  value="N"
+                  control={<Radio size="small" />}
+                  label="미보유"
+                />
+              </RadioGroup>
+            </TableCell>
+            <TableCell>민감 정보 별도동의여부</TableCell>
+            <TableCell>
+              <RadioGroup
+                row
+                name="sensInfoIndivAgreYn"
+                defaultValue={defaults.sensInfoIndivAgreYn ?? "N"}
+              >
+                <FormControlLabel
+                  value="Y"
+                  control={<Radio size="small" />}
+                  label="동의"
+                />
+                <FormControlLabel
+                  value="N"
+                  control={<Radio size="small" />}
+                  label="미동의"
+                />
+              </RadioGroup>
+            </TableCell>
+          </TableRow>
 
-      {/* 제3자 제공사항 / 개인정보처리 위탁 업체명 */}
-      <TableRow>
-        <TableCell>제3자 제공사항</TableCell>
-        <TableCell>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="제3자 제공사항"
-            name="tdptyPvsnMttr"
-            defaultValue={defaults.tdptyPvsnMttr ?? ""}
-          />
-        </TableCell>
-        <TableCell>개인정보처리 위탁 업체명</TableCell>
-        <TableCell>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="개인정보처리 위탁 업체명"
-            name="prvcPrcsCnsgnBzentyNm"
-            defaultValue={defaults.prvcPrcsCnsgnBzentyNm ?? ""}
-          />
-        </TableCell>
-      </TableRow>
+          <TableRow>
+            <TableCell>민감 정보 보유 법령근거</TableCell>
+            <TableCell colSpan={3}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="민감 정보 보유 법령근거"
+                name="sensInfoHldSttBssExpln"
+                defaultValue={defaults.sensInfoHldSttBssExpln ?? ""}
+                error={!!formErrors.sensInfoHldSttBssExpln}
+                helperText={formErrors.sensInfoHldSttBssExpln ?? ""}
+              />
+            </TableCell>
+          </TableRow>
 
-      {/* 개인정보위탁계약서 여부 / 개인정보 윈탁사실 게재여부 */}
-      <TableRow>
-        <TableCell>개인정보위탁계약서 여부</TableCell>
-        <TableCell>
-          <RadioGroup
-            row
-            name="prvcCnsgnCtrtYn"
-            defaultValue={defaults.prvcCnsgnCtrtYn ?? "N"}
-          >
-            <FormControlLabel
-              value="Y"
-              control={<Radio size="small" />}
-              label="있음"
-            />
-            <FormControlLabel
-              value="N"
-              control={<Radio size="small" />}
-              label="없음"
-            />
-          </RadioGroup>
-        </TableCell>
-        <TableCell>개인정보 윈탁사실 게재여부</TableCell>
-        <TableCell>
-          <RadioGroup
-            row
-            name="prvcCnsgnFactIndctYn"
-            defaultValue={defaults.prvcCnsgnFactIndctYn ?? "N"}
-          >
-            <FormControlLabel
-              value="Y"
-              control={<Radio size="small" />}
-              label="게재"
-            />
-            <FormControlLabel
-              value="N"
-              control={<Radio size="small" />}
-              label="미게재"
-            />
-          </RadioGroup>
-        </TableCell>
-      </TableRow>
+          {/* 고유식별정보 보유여부 / 고유식별정보 별도동의여부 */}
+          <TableRow>
+            <TableCell>고유식별정보 보유여부</TableCell>
+            <TableCell>
+              <RadioGroup
+                row
+                name="uiiHldYn"
+                defaultValue={defaults.uiiHldYn ?? "N"}
+              >
+                <FormControlLabel
+                  value="Y"
+                  control={<Radio size="small" />}
+                  label="보유"
+                />
+                <FormControlLabel
+                  value="N"
+                  control={<Radio size="small" />}
+                  label="미보유"
+                />
+              </RadioGroup>
+            </TableCell>
+            <TableCell>고유식별정보 별도동의여부</TableCell>
+            <TableCell>
+              <RadioGroup
+                row
+                name="uiiIndivAgreYn"
+                defaultValue={defaults.uiiIndivAgreYn ?? "N"}
+              >
+                <FormControlLabel
+                  value="Y"
+                  control={<Radio size="small" />}
+                  label="동의"
+                />
+                <FormControlLabel
+                  value="N"
+                  control={<Radio size="small" />}
+                  label="미동의"
+                />
+              </RadioGroup>
+            </TableCell>
+          </TableRow>
 
-      {/* 목적 외 이용 제공 여부 / 목적 외 이용 제공 근거 */}
-      <TableRow>
-        <TableCell>목적 외 이용 제공 여부</TableCell>
-        <TableCell>
-          <RadioGroup
-            row
-            name="prpsExclUtztnPvsnYn"
-            defaultValue={defaults.prpsExclUtztnPvsnYn ?? "N"}
-          >
-            <FormControlLabel
-              value="Y"
-              control={<Radio size="small" />}
-              label="있음"
-            />
-            <FormControlLabel
-              value="N"
-              control={<Radio size="small" />}
-              label="없음"
-            />
-          </RadioGroup>
-        </TableCell>
-        <TableCell>목적 외 이용 제공 근거</TableCell>
-        <TableCell>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="목적 외 이용 제공 근거"
-            name="prpsExclUtztnPvsnBssExpln"
-            defaultValue={defaults.prpsExclUtztnPvsnBssExpln ?? ""}
-          />
-        </TableCell>
-      </TableRow>
-    </TableBody>
-  </Table>
-));
+          <TableRow>
+            <TableCell>고유식별정보 보유 법령근거</TableCell>
+            <TableCell colSpan={3}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="고유식별정보 보유 법령근거"
+                name="uiiHldSttBssExpln"
+                defaultValue={defaults.uiiHldSttBssExpln ?? ""}
+                error={!!formErrors.uiiHldSttBssExpln}
+                helperText={formErrors.uiiHldSttBssExpln ?? ""}
+              />
+            </TableCell>
+          </TableRow>
+
+          {/* 개인정보영향평가 대상여부 / 취급담당자 */}
+          <TableRow>
+            <TableCell>개인정보영향평가 대상여부</TableCell>
+            <TableCell>
+              <RadioGroup
+                row
+                name="prvcEvlTrgtYn"
+                defaultValue={defaults.prvcEvlTrgtYn ?? "N"}
+              >
+                <FormControlLabel
+                  value="Y"
+                  control={<Radio size="small" />}
+                  label="대상"
+                />
+                <FormControlLabel
+                  value="N"
+                  control={<Radio size="small" />}
+                  label="미대상"
+                />
+              </RadioGroup>
+            </TableCell>
+            <TableCell>취급담당자</TableCell>
+            <TableCell>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="민감 정보 보유 법령근거"
+                name="hndlPicNm"
+                defaultValue={defaults.hndlPicNm ?? ""}
+                error={!!formErrors.hndlPicNm}
+                helperText={formErrors.hndlPicNm ?? ""}
+              />
+            </TableCell>
+          </TableRow>
+
+          {/* 제3자 제공받는 자 / 제3자 제공 근거 */}
+          <TableRow>
+            <TableCell>제3자 제공받는 자</TableCell>
+            <TableCell>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="제3자 제공받는 자"
+                name="tdptySplrcpNm"
+                defaultValue={defaults.tdptySplrcpNm ?? ""}
+                error={!!formErrors.tdptySplrcpNm}
+                helperText={formErrors.tdptySplrcpNm ?? ""}
+              />
+            </TableCell>
+            <TableCell>제3자 제공 근거</TableCell>
+            <TableCell>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="제3자 제공 근거"
+                name="tdptyPvsnBssExpln"
+                defaultValue={defaults.tdptyPvsnBssExpln ?? ""}
+                error={!!formErrors.tdptyPvsnBssExpln}
+                helperText={formErrors.tdptyPvsnBssExpln ?? ""}
+              />
+            </TableCell>
+          </TableRow>
+
+          {/* 제3자 제공사항 / 개인정보처리 위탁 업체명 */}
+          <TableRow>
+            <TableCell>제3자 제공사항</TableCell>
+            <TableCell>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="제3자 제공사항"
+                name="tdptyPvsnMttr"
+                defaultValue={defaults.tdptyPvsnMttr ?? ""}
+                error={!!formErrors.tdptyPvsnMttr}
+                helperText={formErrors.tdptyPvsnMttr ?? ""}
+              />
+            </TableCell>
+            <TableCell>개인정보처리 위탁 업체명</TableCell>
+            <TableCell>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="개인정보처리 위탁 업체명"
+                name="prvcPrcsCnsgnBzentyNm"
+                defaultValue={defaults.prvcPrcsCnsgnBzentyNm ?? ""}
+                error={!!formErrors.prvcPrcsCnsgnBzentyNm}
+                helperText={formErrors.prvcPrcsCnsgnBzentyNm ?? ""}
+              />
+            </TableCell>
+          </TableRow>
+
+          {/* 개인정보위탁계약서 여부 / 개인정보 윈탁사실 게재여부 */}
+          <TableRow>
+            <TableCell>개인정보위탁계약서 여부</TableCell>
+            <TableCell>
+              <RadioGroup
+                row
+                name="prvcCnsgnCtrtYn"
+                defaultValue={defaults.prvcCnsgnCtrtYn ?? "N"}
+              >
+                <FormControlLabel
+                  value="Y"
+                  control={<Radio size="small" />}
+                  label="있음"
+                />
+                <FormControlLabel
+                  value="N"
+                  control={<Radio size="small" />}
+                  label="없음"
+                />
+              </RadioGroup>
+            </TableCell>
+            <TableCell>개인정보 윈탁사실 게재여부</TableCell>
+            <TableCell>
+              <RadioGroup
+                row
+                name="prvcCnsgnFactIndctYn"
+                defaultValue={defaults.prvcCnsgnFactIndctYn ?? "N"}
+              >
+                <FormControlLabel
+                  value="Y"
+                  control={<Radio size="small" />}
+                  label="게재"
+                />
+                <FormControlLabel
+                  value="N"
+                  control={<Radio size="small" />}
+                  label="미게재"
+                />
+              </RadioGroup>
+            </TableCell>
+          </TableRow>
+
+          {/* 목적 외 이용 제공 여부 / 목적 외 이용 제공 근거 */}
+          <TableRow>
+            <TableCell>목적 외 이용 제공 여부</TableCell>
+            <TableCell>
+              <RadioGroup
+                row
+                name="prpsExclUtztnPvsnYn"
+                defaultValue={defaults.prpsExclUtztnPvsnYn ?? "N"}
+              >
+                <FormControlLabel
+                  value="Y"
+                  control={<Radio size="small" />}
+                  label="있음"
+                />
+                <FormControlLabel
+                  value="N"
+                  control={<Radio size="small" />}
+                  label="없음"
+                />
+              </RadioGroup>
+            </TableCell>
+            <TableCell>목적 외 이용 제공 근거</TableCell>
+            <TableCell>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="목적 외 이용 제공 근거"
+                name="prpsExclUtztnPvsnBssExpln"
+                defaultValue={defaults.prpsExclUtztnPvsnBssExpln ?? ""}
+                error={!!formErrors.prpsExclUtztnPvsnBssExpln}
+                helperText={formErrors.prpsExclUtztnPvsnBssExpln ?? ""}
+              />
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    );
+  }
+);
 
 /* ------------------------------------------------------------------ */
 /* 메인 페이지 컴포넌트 – 비제어 폼                                   */
@@ -528,6 +634,8 @@ export default function DocClassificationFormPage() {
   const [error, setError] = React.useState<Error | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
+  const dialogs = useDialogs();
+
   // 초기값/조회값만 들고 있음 (입력 중에는 state 변경 없음)
   const [defaults, setDefaults] = React.useState<Values>(INITIAL_FORM_VALUES);
   const [formErrors, setFormErrors] = React.useState<Record<string, string>>(
@@ -535,6 +643,9 @@ export default function DocClassificationFormPage() {
   );
 
   const [docClsfSeCd, setdocClsfSeCd] = React.useState<string>("L");
+
+  const [hldPrdDfyrs, setHldPrdDfyrs] = React.useState<number | null>();
+  const [hldPrdMmCnt, setHldPrdMmCnt] = React.useState<number | null>();
 
   const formRef = React.useRef<HTMLFormElement | null>(null);
 
@@ -559,6 +670,9 @@ export default function DocClassificationFormPage() {
       ]
     : [];
 
+  const [isDirectInputYear, setIsDirectInputYear] = React.useState(false);
+  const [isInfoAgree, setIsInfoAgree] = React.useState(false);
+
   const loadData = React.useCallback(async () => {
     setError(null);
     setIsLoading(true);
@@ -567,10 +681,15 @@ export default function DocClassificationFormPage() {
         const viewData = await getDocClassificationData(docClsfNo);
         setDefaults(viewData as Values);
         setdocClsfSeCd(viewData.docClsfSeCd);
+        if (viewData?.prvcFileHldPrst) {
+          const y = viewData.prvcFileHldPrst.hldPrdDfyrs ?? 1;
+          setIsDirectInputYear(String(y) === "0");
 
-        // if (viewData.docClsfSeCd === "S") {
-        //   getDocClsfCodeList("docLclsfNo", viewData.docLclsfNo);
-        // }
+          setIsInfoAgree(viewData.prvcFileHldPrst.infoMnbdAgreYn !== "Y");
+
+          setHldPrdDfyrs(viewData.prvcFileHldPrst.hldPrdDfyrs ?? null);
+          setHldPrdMmCnt(viewData.prvcFileHldPrst.hldPrdMmCnt ?? null);
+        }
       } else {
         setDefaults(INITIAL_FORM_VALUES);
       }
@@ -638,8 +757,8 @@ export default function DocClassificationFormPage() {
         clctSttBssExpln: (fd.get("clctSttBssExpln") as string) ?? "",
         useDeptNm: (fd.get("useDeptNm") as string) ?? "",
         prvcPrcsMthdExpln: (fd.get("prvcPrcsMthdExpln") as string) ?? "",
-        hldPrdDfyrs: (fd.get("hldPrdDfyrs") as string) ?? "",
-        hldPrdMmCnt: (fd.get("hldPrdMmCnt") as string) ?? "",
+        hldPrdDfyrs: (fd.get("hldPrdDfyrs") as unknown as number) ?? "",
+        hldPrdMmCnt: (fd.get("hldPrdMmCnt") as unknown as number) ?? "",
         infoMnbdPrvcMttr: (fd.get("infoMnbdPrvcMttr") as string) ?? "",
         sttyAgtPrvcMttr: (fd.get("sttyAgtPrvcMttr") as string) ?? "",
         rrnoClctYn: (fd.get("rrnoClctYn") as string) ?? "",
@@ -702,7 +821,7 @@ export default function DocClassificationFormPage() {
         useEn: (fd.get("useEn") as string) ?? defaults.useEn,
         prvcFileHldPrst: subDetail,
       };
-      console.log(payload);
+
       // 검증
       const { issues } = docClassificationvalidator(payload);
       if (issues && issues.length > 0) {
@@ -716,15 +835,37 @@ export default function DocClassificationFormPage() {
       setFormErrors({});
 
       setIsSubmitting(true);
+
+      return;
       try {
         const isEditMode = Boolean(docClsfNo);
 
         if (isEditMode) {
-          await updateDocClassificationData(payload as DocClassDetail);
-          notifications.show("수정 완료.", {
-            severity: "success",
-            autoHideDuration: 3000,
-          });
+          if (
+            payload.prvcInclYn === "Y" &&
+            (payload.prvcFileHldPrst?.hldPrdDfyrs !== hldPrdDfyrs ||
+              payload.prvcFileHldPrst?.hldPrdMmCnt !== hldPrdMmCnt)
+          ) {
+            const confirmed = await dialogs.confirm(
+              "보유기간 변경 시, 기존 개인정보파일에 대한 보유기간 수정에 대한 검토가 필요합니다. 해당화면으로 이동 하시겠습니다?",
+              {
+                severity: "error",
+                okText: "확인",
+                cancelText: "취소",
+              }
+            );
+
+            if (confirmed) {
+              navigate(URL.HOLDING_INSTITUTION_LIST);
+              return;
+            }
+          } else {
+            await updateDocClassificationData(payload as DocClassDetail);
+            notifications.show("수정 완료.", {
+              severity: "success",
+              autoHideDuration: 3000,
+            });
+          }
         } else {
           await createDocClassificationData(
             payload as Omit<DocClassDetail, "docClsfNo">
@@ -745,7 +886,16 @@ export default function DocClassificationFormPage() {
         setIsSubmitting(false);
       }
     },
-    [defaults, docClsfSeCd, docClsfNo, navigate, notifications]
+    [
+      defaults,
+      docClsfSeCd,
+      docClsfNo,
+      navigate,
+      hldPrdDfyrs,
+      hldPrdMmCnt,
+      dialogs,
+      notifications,
+    ]
   );
 
   const handleBack = React.useCallback(() => {
@@ -927,7 +1077,14 @@ export default function DocClassificationFormPage() {
 
           {/* 개인정보 상세 – defaults.subDetail을 defaultValue로만 사용 */}
           {defaults.prvcInclYn === "Y" && (
-            <PrvcDetailTable defaults={defaults.prvcFileHldPrst ?? {}} />
+            <PrvcDetailTable
+              defaults={defaults.prvcFileHldPrst ?? {}}
+              isDirectInputYear={isDirectInputYear}
+              onChangeDirectInputYear={setIsDirectInputYear}
+              isInfoAgree={isInfoAgree}
+              onChangeInfoAgree={setIsInfoAgree}
+              formErrors={formErrors}
+            />
           )}
         </FormGroup>
 

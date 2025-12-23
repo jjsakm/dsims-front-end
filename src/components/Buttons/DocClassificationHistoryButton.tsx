@@ -1,69 +1,38 @@
 import * as React from "react";
-import { Box, Button, Dialog, DialogContent, DialogTitle, IconButton } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-
-interface HistoryRow {
-  id: number;
-  date: string;
-  actor: string;
-  action: string;
-  ip: string;
-  device: string;
-}
-
-const historyRows: HistoryRow[] = [
-  {
-    id: 1,
-    date: "2025. 10. 27.",
-    actor: "홍길동",
-    action: "문서분류 수정",
-    ip: "111.111.\n111.111",
-    device: "PC",
-  },
-  {
-    id: 2,
-    date: "2025. 10. 15.",
-    actor: "홍길동",
-    action: "개인정보파일 현황 수정",
-    ip: "111.111.\n111.111",
-    device: "PC",
-  },
-  {
-    id: 3,
-    date: "2025. 10. 02.",
-    actor: "홍길동",
-    action: "개인정보파일 현황 수정",
-    ip: "111.111.\n111.111",
-    device: "PC",
-  },
-  {
-    id: 4,
-    date: "2025. 10. 01.",
-    actor: "홍길동",
-    action: "문서분류 수정",
-    ip: "111.111.\n111.111",
-    device: "PC",
-  },
-  {
-    id: 5,
-    date: "2025. 09. 30.",
-    actor: "홍길동",
-    action: "문서분류 수정",
-    ip: "111.111.\n111.111",
-    device: "PC",
-  },
-  {
-    id: 6,
-    date: "2025. 09. 26.",
-    actor: "홍길동",
-    action: "문서분류 등록",
-    ip: "111.111.\n111.111",
-    device: "PC",
-  },
-];
+import type { DocClassHistory } from "@/types/docClassification";
+import PageStatus from "../PageStatus";
 
 export default function DocClassificationHistoryButton() {
   const [open, setOpen] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<Error | null>(null);
+  const [rowData, setRowsData] = React.useState<DocClassHistory[]>([]);
+
+  const loadData = async () => {
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      console.log(111);
+    } catch (listDataError) {
+      setError(listDataError as Error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    loadData();
+  }, []);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -72,6 +41,10 @@ export default function DocClassificationHistoryButton() {
   const handleClose = () => {
     setOpen(false);
   };
+
+  if (isLoading || error) {
+    return <PageStatus isLoading={isLoading} error={error} />;
+  }
 
   return (
     <React.Fragment>
@@ -174,8 +147,8 @@ export default function DocClassificationHistoryButton() {
                 </tr>
               </thead>
               <tbody>
-                {historyRows.map((row) => (
-                  <tr key={row.id}>
+                {rowData.map((row) => (
+                  <tr key={row.docClsfNm}>
                     <td
                       style={{
                         border: "1px solid #000",
@@ -183,7 +156,7 @@ export default function DocClassificationHistoryButton() {
                         textAlign: "center",
                       }}
                     >
-                      {row.id}
+                      {row.docClsfNm}
                     </td>
                     <td
                       style={{
@@ -192,7 +165,7 @@ export default function DocClassificationHistoryButton() {
                         textAlign: "center",
                       }}
                     >
-                      {row.date}
+                      {row.docClsfNm}
                     </td>
                     <td
                       style={{
@@ -201,7 +174,7 @@ export default function DocClassificationHistoryButton() {
                         textAlign: "center",
                       }}
                     >
-                      {row.actor}
+                      {row.docClsfNm}
                     </td>
                     <td
                       style={{
@@ -210,7 +183,7 @@ export default function DocClassificationHistoryButton() {
                         textAlign: "center",
                       }}
                     >
-                      {row.action}
+                      {row.docClsfNm}
                     </td>
                     <td
                       style={{
@@ -220,7 +193,7 @@ export default function DocClassificationHistoryButton() {
                         whiteSpace: "pre-line",
                       }}
                     >
-                      {row.ip}
+                      {row.docClsfNm}
                     </td>
                     <td
                       style={{
@@ -229,7 +202,7 @@ export default function DocClassificationHistoryButton() {
                         textAlign: "center",
                       }}
                     >
-                      {row.device}
+                      {row.docClsfNm}
                     </td>
                   </tr>
                 ))}

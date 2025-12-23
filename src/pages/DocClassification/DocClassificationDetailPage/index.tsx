@@ -73,14 +73,13 @@ export default function DocClassificationDetailPage() {
     if (confirmed) {
       setIsLoading(true);
       try {
-        //await deleteDocClassificationData(docClsfNo);
-
-        navigate("/docClassification/list");
+        await deleteDocClassificationData(docClsfNo ?? "");
 
         notifications.show("삭제 되었습니다..", {
           severity: "success",
           autoHideDuration: 3000,
         });
+        navigate("/docClassification/list");
       } catch (deleteError) {
         notifications.show(
           `삭제를 실패하였습니다. 사유:' ${(deleteError as Error).message}`,
