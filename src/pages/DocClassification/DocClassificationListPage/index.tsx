@@ -18,7 +18,6 @@ import MuiCheckbox from "@/components/Elements/MuiCheckbox";
 import type {
   DocClassification,
   DocClassificationSearchState,
-  DocClsf,
   SearchValues,
 } from "@/types/docClassification";
 import type { ColDef } from "ag-grid-community";
@@ -28,8 +27,10 @@ import URL from "@/constants/url";
 import { useSearchStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
 import SearchFilterContainer from "@/components/Layout/docClassification/SearchFilterContainer.tsx";
 import type { SelectItem } from "@/types/common";
-import { getDocClsfList, getLclsfList } from "@/services/bizCommon";
-import { useLclsfListLive } from "@/hooks/query/useDocClsfTree";
+import {
+  useDocClsfChildrenLive,
+  useLclsfListLive,
+} from "@/hooks/query/useDocClsfTree";
 
 const initSelectItem: SelectItem[] = [
   {
@@ -51,12 +52,12 @@ export default function DocClassificationListPage() {
     rowCount: 0,
   });
 
-  const [lclsfList, setLclsfList] =
-    React.useState<SelectItem[]>(initSelectItem);
-  const [mclsfList, setMclsfList] =
-    React.useState<SelectItem[]>(initSelectItem);
-  const [sclsfList, setSclsfList] =
-    React.useState<SelectItem[]>(initSelectItem);
+  // const [lclsfList, setLclsfList] =
+  //   React.useState<SelectItem[]>(initSelectItem);
+  // const [mclsfList, setMclsfList] =
+  //   React.useState<SelectItem[]>(initSelectItem);
+  // const [sclsfList, setSclsfList] =
+  //   React.useState<SelectItem[]>(initSelectItem);
 
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
@@ -92,25 +93,15 @@ export default function DocClassificationListPage() {
         case "docLclsfNo":
           next.docMclsfNo = "";
           next.docSclsfNo = "";
-          if (value !== "") {
-            getDocClsfCodeList(name, value);
-          } else {
-            setMclsfList(initSelectItem);
-            setSclsfList(initSelectItem);
-          }
+
           break;
         case "docMclsfNo":
           next.docSclsfNo = "";
-          if (value !== "") {
-            getDocClsfCodeList(name, value);
-          } else {
-            setSclsfList(initSelectItem);
-          }
           break;
         default:
           break;
       }
-      // 대분류 변경 시 중분류/소분류 초기화
+      //대분류 변경 시 중분류/소분류 초기화
 
       return next;
     });
@@ -134,55 +125,76 @@ export default function DocClassificationListPage() {
     }
   };
 
-  // 1) 컴포넌트 최상단에서 훅 호출
-  const { data: topLevelDocs } = useLclsfListLive();
+  // react-query 적용 소스
+  const { data: lclsfDocs } = useLclsfListLive();
+  const { data: mclsfDocs } = useDocClsfChildrenLive(values.docLclsfNo);
+  const { data: sclsfDocs } = useDocClsfChildrenLive(values.docMclsfNo);
 
-  const getLclsfCodeList = React.useCallback(() => {
-    console.log(topLevelDocs);
-    if (!topLevelDocs) {
-      setLclsfList(initSelectItem); // 아직 데이터 없으면 기본값
-      return;
-    }
+  const lclsfList = lclsfDocs
+    ? [
+        ...initSelectItem,
+        ...lclsfDocs.map((vo) => ({
+          label: vo.docClsfNm,
+          value: vo.docClsfNo,
+        })),
+      ]
+    : initSelectItem;
+  const mclsfList = mclsfDocs
+    ? [
+        ...initSelectItem,
+        ...mclsfDocs.map((vo) => ({
+          label: vo.docClsfNm,
+          value: vo.docClsfNo,
+        })),
+      ]
+    : initSelectItem;
+  const sclsfList = sclsfDocs
+    ? [
+        ...initSelectItem,
+        ...sclsfDocs.map((vo) => ({
+          label: vo.docClsfNm,
+          value: vo.docClsfNo,
+        })),
+      ]
+    : initSelectItem;
 
-    const resultList: SelectItem[] = (topLevelDocs ?? []).map(
-      (vo: DocClsf) => ({
-        label: vo.docClsfNm,
-        value: vo.docClsfNo,
-      })
-    );
-    console.log(resultList);
-    setLclsfList([...initSelectItem, ...resultList]);
-  }, [topLevelDocs]);
+  // const getDocClsfCodeList = React.useCallback(
+  //   async (name: string, docClsfNo: string) => {
+  //     setError(null);
 
-  const getDocClsfCodeList = React.useCallback(
-    async (name: string, docClsfNo: string) => {
-      setError(null);
+  //     try {
+  //       const list = await getDocClsfList(docClsfNo);
 
-      try {
-        const list = await getDocClsfList(docClsfNo);
+  //       const resultList: SelectItem[] = list.map((vo: DocClsf) => {
+  //         return {
+  //           label: vo.docClsfNm,
+  //           value: vo.docClsfNo,
+  //         };
+  //       });
 
-        const resultList: SelectItem[] = list.map((vo: DocClsf) => {
-          return {
-            label: vo.docClsfNm,
-            value: vo.docClsfNo,
-          };
-        });
+  //       if (name === "docLclsfNo") {
+  //         setMclsfList([...initSelectItem, ...resultList]);
+  //       } else {
+  //         setSclsfList([...initSelectItem, ...resultList]);
+  //       }
+  //     } catch (e) {
+  //       setError(e as Error);
+  //     }
+  //   },
+  //   []
+  // );
 
-        if (name === "docLclsfNo") {
-          setMclsfList([...initSelectItem, ...resultList]);
-        } else {
-          setSclsfList([...initSelectItem, ...resultList]);
-        }
-      } catch (e) {
-        setError(e as Error);
-      }
-    },
-    []
-  );
-
-  React.useEffect(() => {
-    getLclsfCodeList();
-  }, [topLevelDocs]);
+  // React.useEffect(() => {
+  //   if (topLevelDocs && topLevelDocs.length > 0) {
+  //     const resultList: SelectItem[] = topLevelDocs.map((vo: DocClsf) => ({
+  //       label: vo.docClsfNm,
+  //       value: vo.docClsfNo,
+  //     }));
+  //     setLclsfList([...initSelectItem, ...resultList]);
+  //   } else {
+  //     setLclsfList(initSelectItem); // 아직 데이터 없으면 기본값
+  //   }
+  // }, [topLevelDocs]);
 
   React.useEffect(() => {
     loadData();

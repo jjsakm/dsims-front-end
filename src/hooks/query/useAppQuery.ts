@@ -1,7 +1,6 @@
 import {
   useQuery,
   useMutation,
-  useQueryClient,
   type UseQueryOptions,
   type UseQueryResult,
   type UseMutationOptions,
@@ -33,8 +32,6 @@ export function useAppMutation<TData, TVariables = void, TError = unknown>(
   mutationFn: (vars: TVariables) => Promise<TData>,
   options?: UseMutationOptions<TData, TError, TVariables>
 ): UseMutationResult<TData, TError, TVariables> {
-  const queryClient = useQueryClient();
-
   return useMutation<TData, TError, TVariables>({
     mutationFn,
     ...options,

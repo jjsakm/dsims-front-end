@@ -1,7 +1,7 @@
 import type { DocClsf } from "@/types/docClassification";
 import axios from "axios";
 
-export async function getLclsfList(): Promise<any[]> {
+export async function getLclsfList(): Promise<DocClsf[]> {
   const res = await axios.get("/api/documentclassification/toplevel");
 
   return res.data.result.list;
