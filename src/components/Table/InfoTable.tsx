@@ -30,10 +30,7 @@ export interface InfoTableProps {
   tableAriaLabel: string;
 }
 
-export const InfoTableView: React.FC<InfoTableProps> = ({
-  rows,
-  tableAriaLabel,
-}) => {
+export const InfoTableView = ({ rows, tableAriaLabel }) => {
   return (
     <Table size="small" width="100%" aria-label={tableAriaLabel}>
       <TableBody>
@@ -60,10 +57,7 @@ export const InfoTableView: React.FC<InfoTableProps> = ({
   );
 };
 
-export const InfoTableCreate: React.FC<InfoTableProps> = ({
-  rows,
-  tableAriaLabel,
-}) => {
+export const InfoTableCreate = ({ rows, tableAriaLabel }) => {
   return (
     <Table size="small" width="100%" aria-label={tableAriaLabel}>
       <TableBody>
