@@ -1,9 +1,7 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
-import {useNavigate} from "react-router";
-import PageContainer from "@/components/AgGridContainer/PageContainer.tsx";
+import { useNavigate } from "react-router";
 import AgGridContainer from "@/components/AgGridContainer/AgGridContainer";
 import {FormGroup, Grid, TextField} from "@mui/material";
 import MuiSelect from "@/components/Elements/MuiSelect";
@@ -75,7 +73,7 @@ export default function DigitalDocListPage() {
         <FormGroup>
           <Grid container mt={2} spacing={2} width="100%">
             {/* 1행 */}
-            <Grid size={{ xs: 12, sm: 3 }} sx={{ display: "flex" }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <MuiSelect
                 id="largeCategory"
                 label="대분류"
@@ -87,7 +85,7 @@ export default function DigitalDocListPage() {
                 onChange={handleSelectFieldChange}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 3 }} sx={{ display: "flex" }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <MuiSelect
                 id="midCategory"
                 label="중분류"
@@ -101,7 +99,7 @@ export default function DigitalDocListPage() {
                 onChange={handleSelectFieldChange}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 3 }} sx={{ display: "flex" }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <MuiSelect
                 id="smallCategory"
                 label="소분류"
@@ -138,7 +136,7 @@ export default function DigitalDocListPage() {
               />
             </Grid>
           </Grid>
-          <Box display="flex" justifyContent="flex-end">
+          <Box display="flex" justifyContent="flex-end" mt={1}>
             <Button variant="contained" onClick={handleSearch}>
               검색
             </Button>
@@ -146,7 +144,7 @@ export default function DigitalDocListPage() {
         </FormGroup>
       </SearchFilterContainer>
 
-      <Box sx={{ flex: 1, width: "100%" }}>
+      <Box>
         <AgGridContainer
           isLoading={isLoading}
           colDefs={columnDefs}
