@@ -39,6 +39,7 @@ import {
   useDocClsfChildrenLive,
   useLclsfListLive,
 } from "@/hooks/query/useDocClsfTree";
+import { continuousColorLegendClasses } from "@mui/x-charts";
 
 /* ------------------------------------------------------------------ */
 /* 타입/초기값                                                         */
@@ -105,7 +106,7 @@ const PrvcDetailTable = React.memo(
 
     const handleInfoAgreeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const checked = e.target.checked; // checked == 동의(Y)
-      const notAgree = !checked; // 동의가 아니면 true
+      const notAgree = checked; // 동의가 아니면 true
       onChangeInfoAgree(notAgree);
 
       const target = document.querySelector<HTMLInputElement>(
@@ -119,6 +120,7 @@ const PrvcDetailTable = React.memo(
         target.disabled = true;
       } else {
         // 비동의인 경우: 활성
+        target.value = "";
         target.disabled = false;
       }
     };
@@ -153,10 +155,10 @@ const PrvcDetailTable = React.memo(
             </TableCell>
           </TableRow>
 
-          {/* 보유목적 / 사용부서(내부, 외부) */}
+          {/* 보유목적 */}
           <TableRow>
             <TableCell>보유목적</TableCell>
-            <TableCell>
+            <TableCell colSpan={3}>
               <TextField
                 fullWidth
                 size="small"
@@ -167,7 +169,29 @@ const PrvcDetailTable = React.memo(
                 helperText={formErrors.hldPrps ?? ""}
               />
             </TableCell>
-            <TableCell>사용부서</TableCell>
+          </TableRow>
+
+          {/* 수집근거(법령) */}
+          <TableRow>
+            <TableCell>수집근거(법령)</TableCell>
+            <TableCell colSpan={3}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="수집근거(법령)"
+                name="clctSttBssExpln"
+                multiline
+                rows={5}
+                defaultValue={defaults.clctSttBssExpln ?? ""}
+                error={!!formErrors.clctSttBssExpln}
+                helperText={formErrors.clctSttBssExpln ?? ""}
+              />
+            </TableCell>
+          </TableRow>
+
+          {/* 사용부서명(내부,외부) / 보유기간 */}
+          <TableRow>
+            <TableCell>사용부서명(내부,외부)</TableCell>
             <TableCell>
               <RadioGroup row name="useDeptNm">
                 <TextField
@@ -180,22 +204,6 @@ const PrvcDetailTable = React.memo(
                   helperText={formErrors.useDeptNm ?? ""}
                 />
               </RadioGroup>
-            </TableCell>
-          </TableRow>
-
-          {/* 개인정보 처리방법 / 보유기간 */}
-          <TableRow>
-            <TableCell>개인정보 처리방법</TableCell>
-            <TableCell>
-              <TextField
-                fullWidth
-                size="small"
-                placeholder="개인정보 처리방법"
-                name="prvcPrcsMthdExpln"
-                defaultValue={defaults.prvcPrcsMthdExpln ?? ""}
-                error={!!formErrors.prvcPrcsMthdExpln}
-                helperText={formErrors.prvcPrcsMthdExpln ?? ""}
-              />
             </TableCell>
             <TableCell>보유기간</TableCell>
             <TableCell>
@@ -240,27 +248,52 @@ const PrvcDetailTable = React.memo(
             </TableCell>
           </TableRow>
 
-          {/* 정보주체의 개인정보항목 / 법정대리인의 개인정보항목 */}
+          {/* 개인정보 처리방법  */}
+          <TableRow>
+            <TableCell>개인정보 처리방법</TableCell>
+            <TableCell colSpan={3}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="개인정보 처리방법"
+                name="prvcPrcsMthdExpln"
+                multiline
+                rows={5}
+                defaultValue={defaults.prvcPrcsMthdExpln ?? ""}
+                error={!!formErrors.prvcPrcsMthdExpln}
+                helperText={formErrors.prvcPrcsMthdExpln ?? ""}
+              />
+            </TableCell>
+          </TableRow>
+
+          {/* 정보주체의 개인정보항목 */}
           <TableRow>
             <TableCell>정보주체의 개인정보항목</TableCell>
-            <TableCell>
+            <TableCell colSpan={3}>
               <TextField
                 fullWidth
                 size="small"
                 placeholder="정보주체의 개인정보항목"
                 name="infoMnbdPrvcMttr"
+                multiline
+                rows={5}
                 defaultValue={defaults.infoMnbdPrvcMttr ?? ""}
                 error={!!formErrors.infoMnbdPrvcMttr}
                 helperText={formErrors.infoMnbdPrvcMttr ?? ""}
               />
             </TableCell>
+          </TableRow>
+          {/* 법정대리인의 개인정보항목 */}
+          <TableRow>
             <TableCell>법정대리인의 개인정보항목</TableCell>
-            <TableCell>
+            <TableCell colSpan={3}>
               <TextField
                 fullWidth
                 size="small"
                 placeholder="법정대리인의 개인정보항목"
                 name="sttyAgtPrvcMttr"
+                multiline
+                rows={5}
                 defaultValue={defaults.sttyAgtPrvcMttr ?? ""}
                 error={!!formErrors.sttyAgtPrvcMttr}
                 helperText={formErrors.sttyAgtPrvcMttr ?? ""}
@@ -271,7 +304,7 @@ const PrvcDetailTable = React.memo(
           {/* 주민등록번호 수집여부 / 주민등록번호 수집 법령근거 */}
           <TableRow>
             <TableCell>주민등록번호 수집여부</TableCell>
-            <TableCell>
+            <TableCell colSpan={3}>
               <RadioGroup
                 row
                 name="rrnoClctYn"
@@ -289,13 +322,17 @@ const PrvcDetailTable = React.memo(
                 />
               </RadioGroup>
             </TableCell>
+          </TableRow>
+          <TableRow>
             <TableCell>주민등록번호 수집 법령근거</TableCell>
-            <TableCell>
+            <TableCell colSpan={3}>
               <TextField
                 fullWidth
                 size="small"
                 placeholder="주민등록번호 수집 법령근거"
                 name="rrnoClctSttBssExpln"
+                multiline
+                rows={5}
                 defaultValue={defaults.rrnoClctSttBssExpln ?? ""}
                 error={!!formErrors.rrnoClctSttBssExpln}
                 helperText={formErrors.rrnoClctSttBssExpln ?? ""}
@@ -306,7 +343,7 @@ const PrvcDetailTable = React.memo(
           {/* 정보주체 동의여부 / 정보주체 동의 없이 수집 법령근거 */}
           <TableRow>
             <TableCell>정보주체 동의여부</TableCell>
-            <TableCell>
+            <TableCell colSpan={3}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -319,17 +356,21 @@ const PrvcDetailTable = React.memo(
                 label="동의"
               />
             </TableCell>
+          </TableRow>
+          <TableRow>
             <TableCell>정보주체 동의 없이 수집 법령근거</TableCell>
-            <TableCell>
+            <TableCell colSpan={3}>
               <TextField
                 fullWidth
                 size="small"
                 placeholder="정보주체 동의 없이 수집 법령근거"
                 name="infoMnbdDsagClctSttBssExpln"
+                multiline
+                rows={5}
                 defaultValue={defaults.infoMnbdDsagClctSttBssExpln ?? ""}
                 error={!!formErrors.infoMnbdDsagClctSttBssExpln}
                 helperText={formErrors.infoMnbdDsagClctSttBssExpln ?? ""}
-                disabled={!isInfoAgree} // 최초 렌더 기준
+                disabled={isInfoAgree} // 최초 렌더 기준
               />
             </TableCell>
           </TableRow>
@@ -384,6 +425,8 @@ const PrvcDetailTable = React.memo(
                 size="small"
                 placeholder="민감 정보 보유 법령근거"
                 name="sensInfoHldSttBssExpln"
+                multiline
+                rows={5}
                 defaultValue={defaults.sensInfoHldSttBssExpln ?? ""}
                 error={!!formErrors.sensInfoHldSttBssExpln}
                 helperText={formErrors.sensInfoHldSttBssExpln ?? ""}
@@ -441,6 +484,8 @@ const PrvcDetailTable = React.memo(
                 size="small"
                 placeholder="고유식별정보 보유 법령근거"
                 name="uiiHldSttBssExpln"
+                multiline
+                rows={5}
                 defaultValue={defaults.uiiHldSttBssExpln ?? ""}
                 error={!!formErrors.uiiHldSttBssExpln}
                 helperText={formErrors.uiiHldSttBssExpln ?? ""}
@@ -486,24 +531,30 @@ const PrvcDetailTable = React.memo(
           {/* 제3자 제공받는 자 / 제3자 제공 근거 */}
           <TableRow>
             <TableCell>제3자 제공받는 자</TableCell>
-            <TableCell>
+            <TableCell colSpan={3}>
               <TextField
                 fullWidth
                 size="small"
                 placeholder="제3자 제공받는 자"
                 name="tdptySplrcpNm"
+                multiline
+                rows={5}
                 defaultValue={defaults.tdptySplrcpNm ?? ""}
                 error={!!formErrors.tdptySplrcpNm}
                 helperText={formErrors.tdptySplrcpNm ?? ""}
               />
             </TableCell>
+          </TableRow>
+          <TableRow>
             <TableCell>제3자 제공 근거</TableCell>
-            <TableCell>
+            <TableCell colSpan={3}>
               <TextField
                 fullWidth
                 size="small"
                 placeholder="제3자 제공 근거"
                 name="tdptyPvsnBssExpln"
+                multiline
+                rows={5}
                 defaultValue={defaults.tdptyPvsnBssExpln ?? ""}
                 error={!!formErrors.tdptyPvsnBssExpln}
                 helperText={formErrors.tdptyPvsnBssExpln ?? ""}
@@ -514,24 +565,30 @@ const PrvcDetailTable = React.memo(
           {/* 제3자 제공사항 / 개인정보처리 위탁 업체명 */}
           <TableRow>
             <TableCell>제3자 제공사항</TableCell>
-            <TableCell>
+            <TableCell colSpan={3}>
               <TextField
                 fullWidth
                 size="small"
                 placeholder="제3자 제공사항"
                 name="tdptyPvsnMttr"
+                multiline
+                rows={5}
                 defaultValue={defaults.tdptyPvsnMttr ?? ""}
                 error={!!formErrors.tdptyPvsnMttr}
                 helperText={formErrors.tdptyPvsnMttr ?? ""}
               />
             </TableCell>
+          </TableRow>
+          <TableRow>
             <TableCell>개인정보처리 위탁 업체명</TableCell>
-            <TableCell>
+            <TableCell colSpan={3}>
               <TextField
                 fullWidth
                 size="small"
                 placeholder="개인정보처리 위탁 업체명"
                 name="prvcPrcsCnsgnBzentyNm"
+                multiline
+                rows={5}
                 defaultValue={defaults.prvcPrcsCnsgnBzentyNm ?? ""}
                 error={!!formErrors.prvcPrcsCnsgnBzentyNm}
                 helperText={formErrors.prvcPrcsCnsgnBzentyNm ?? ""}
@@ -584,7 +641,7 @@ const PrvcDetailTable = React.memo(
           {/* 목적 외 이용 제공 여부 / 목적 외 이용 제공 근거 */}
           <TableRow>
             <TableCell>목적 외 이용 제공 여부</TableCell>
-            <TableCell>
+            <TableCell colSpan={3}>
               <RadioGroup
                 row
                 name="prpsExclUtztnPvsnYn"
@@ -602,13 +659,17 @@ const PrvcDetailTable = React.memo(
                 />
               </RadioGroup>
             </TableCell>
+          </TableRow>
+          <TableRow>
             <TableCell>목적 외 이용 제공 근거</TableCell>
-            <TableCell>
+            <TableCell colSpan={3}>
               <TextField
                 fullWidth
                 size="small"
                 placeholder="목적 외 이용 제공 근거"
                 name="prpsExclUtztnPvsnBssExpln"
+                multiline
+                rows={5}
                 defaultValue={defaults.prpsExclUtztnPvsnBssExpln ?? ""}
                 error={!!formErrors.prpsExclUtztnPvsnBssExpln}
                 helperText={formErrors.prpsExclUtztnPvsnBssExpln ?? ""}
@@ -685,8 +746,8 @@ export default function DocClassificationFormPage() {
           const y = viewData.prvcFileHldPrst.hldPrdDfyrs ?? 1;
           setIsDirectInputYear(String(y) === "0");
 
-          setIsInfoAgree(viewData.prvcFileHldPrst.infoMnbdAgreYn !== "Y");
-
+          setIsInfoAgree(viewData.prvcFileHldPrst.infoMnbdAgreYn === "Y");
+          console.log(viewData.prvcFileHldPrst.hldPrdDfyrs);
           setHldPrdDfyrs(viewData.prvcFileHldPrst.hldPrdDfyrs ?? null);
           setHldPrdMmCnt(viewData.prvcFileHldPrst.hldPrdMmCnt ?? null);
         }
@@ -757,8 +818,8 @@ export default function DocClassificationFormPage() {
         clctSttBssExpln: (fd.get("clctSttBssExpln") as string) ?? "",
         useDeptNm: (fd.get("useDeptNm") as string) ?? "",
         prvcPrcsMthdExpln: (fd.get("prvcPrcsMthdExpln") as string) ?? "",
-        hldPrdDfyrs: (fd.get("hldPrdDfyrs") as unknown as number) ?? "",
-        hldPrdMmCnt: (fd.get("hldPrdMmCnt") as unknown as number) ?? "",
+        hldPrdDfyrs: (fd.get("hldPrdDfyrs") as unknown as number) ?? null,
+        hldPrdMmCnt: (fd.get("hldPrdMmCnt") as unknown as number) ?? null,
         infoMnbdPrvcMttr: (fd.get("infoMnbdPrvcMttr") as string) ?? "",
         sttyAgtPrvcMttr: (fd.get("sttyAgtPrvcMttr") as string) ?? "",
         rrnoClctYn: (fd.get("rrnoClctYn") as string) ?? "",
@@ -821,7 +882,6 @@ export default function DocClassificationFormPage() {
         useEn: (fd.get("useEn") as string) ?? defaults.useEn,
         prvcFileHldPrst: subDetail,
       };
-
       // 검증
       const { issues } = docClassificationvalidator(payload);
       if (issues && issues.length > 0) {
@@ -836,15 +896,21 @@ export default function DocClassificationFormPage() {
 
       setIsSubmitting(true);
 
-      return;
       try {
         const isEditMode = Boolean(docClsfNo);
 
         if (isEditMode) {
+          console.log(payload.prvcFileHldPrst?.hldPrdDfyrs);
+          console.log(hldPrdDfyrs);
+          console.log(payload.prvcFileHldPrst?.hldPrdMmCnt);
+          console.log(hldPrdMmCnt);
+
           if (
             payload.prvcInclYn === "Y" &&
-            (payload.prvcFileHldPrst?.hldPrdDfyrs !== hldPrdDfyrs ||
-              payload.prvcFileHldPrst?.hldPrdMmCnt !== hldPrdMmCnt)
+            (Number(payload.prvcFileHldPrst?.hldPrdDfyrs) !==
+              Number(hldPrdDfyrs) ||
+              Number(payload.prvcFileHldPrst?.hldPrdMmCnt) !==
+                Number(hldPrdMmCnt))
           ) {
             const confirmed = await dialogs.confirm(
               "보유기간 변경 시, 기존 개인정보파일에 대한 보유기간 수정에 대한 검토가 필요합니다. 해당화면으로 이동 하시겠습니다?",
@@ -857,6 +923,8 @@ export default function DocClassificationFormPage() {
 
             if (confirmed) {
               navigate(URL.HOLDING_INSTITUTION_LIST);
+              return;
+            } else {
               return;
             }
           } else {

@@ -9,16 +9,11 @@ export function formatDate(dateString: string, separator = ".") {
 
 // 빈 값 체크 함수
 // value: 검사할 값 (모든 타입)
-export function isEmpty<T>(value: T): boolean {
-  return (
-    value === null ||
-    value === undefined ||
-    value === "" ||
-    (Array.isArray(value) && value.length === 0) ||
-    (typeof value === "object" &&
-      value !== null &&
-      Object.keys(value).length === 0)
-  );
+export function isEmpty(value: unknown): boolean {
+  if (value === null || value === undefined) return true;
+  if (typeof value === "string") return value.trim() === "";
+  if (Array.isArray(value)) return value.length === 0;
+  return false; // 그 외는 비어있다고 안 본다
 }
 
 // 디바운스 함수

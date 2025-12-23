@@ -3,7 +3,7 @@ declare global {
   function formatDate(dateString: string, separator?: string): string;
 
   // 빈 값 체크 함수
-  function isEmpty<T>(value: T): boolean;
+  function isEmpty<T>(value: unknown): boolean;
 
   // 디바운스 함수
   function debounce<T extends (...args: any[]) => any>(

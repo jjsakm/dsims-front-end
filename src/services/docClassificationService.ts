@@ -4,6 +4,7 @@ import type {
   SearchValues,
 } from "@/types/docClassification";
 import axios from "axios";
+import { isEmpty } from "@/utils/globalFunc";
 
 export async function getDocClassificationList(
   values?: Partial<SearchValues>
@@ -82,6 +83,9 @@ export function docClassificationvalidator(
   }
 
   if (data.docClsfSeCd === "S" && isEmpty(data.docLclsfNo)) {
+    console.log(data.docLclsfNo);
+    console.log(isEmpty(data.docLclsfNo));
+
     issues = [...issues, { message: "필수 입니다.", path: ["docLclsfNo"] }];
   }
 
@@ -93,10 +97,15 @@ export function docClassificationvalidator(
     issues = [...issues, { message: "필수 입니다.", path: ["docSclsfNm"] }];
   }
 
+  console.log("validator issues >>>", issues);
+
   // ▼ 여기부터 하위(개인정보 상세) 필수 체크
   if (data.prvcInclYn === "Y" && data.prvcFileHldPrst) {
     const sub = data.prvcFileHldPrst;
     // 공통 필수: 예외를 뺀 모든 서브필드
+    if (isEmpty(sub.deptNm)) {
+      issues = [...issues, { message: "필수 입니다.", path: ["deptNm"] }];
+    }
     Object.keys(sub).forEach((field) => {
       if (
         field === "docClsfNo" ||
