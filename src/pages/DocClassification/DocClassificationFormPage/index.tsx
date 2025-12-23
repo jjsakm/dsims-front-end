@@ -38,6 +38,10 @@ import MuiSelect from "@/components/Elements/MuiSelect";
 import MuiCheckbox from "@/components/Elements/MuiCheckbox";
 import type { SelectItem } from "@/types/common";
 import { getDocClsfList, getLclsfList } from "@/services/bizCommon";
+import {
+  useDocClsfChildrenLive,
+  useLclsfListLive,
+} from "@/hooks/query/useDocClsfTree";
 
 /* ------------------------------------------------------------------ */
 /* 타입/초기값                                                         */
@@ -536,54 +540,28 @@ export default function DocClassificationFormPage() {
 
   const [docClsfSeCd, setdocClsfSeCd] = React.useState<string>("L");
 
-  const [lclsfList, setLclsfList] = React.useState<SelectItem[]>();
-  const [mclsfList, setMclsfList] = React.useState<SelectItem[]>();
-
   const formRef = React.useRef<HTMLFormElement | null>(null);
 
   /* ---------------- 데이터 로딩 ---------------- */
+  const { data: lclsfDocs } = useLclsfListLive();
+  const { data: mclsfDocs } = useDocClsfChildrenLive(defaults.docLclsfNo);
 
-  const getLclsfCodeList = React.useCallback(async () => {
-    setError(null);
-
-    try {
-      const list = await getLclsfList();
-
-      const resultList: SelectItem[] = list.map((vo: DocClsf) => {
-        return {
+  const lclsfList = lclsfDocs
+    ? [
+        ...lclsfDocs.map((vo) => ({
           label: vo.docClsfNm,
           value: vo.docClsfNo,
-        };
-      });
-      setLclsfList(resultList);
-    } catch (e) {
-      setError(e as Error);
-    }
-  }, []);
-
-  const getDocClsfCodeList = React.useCallback(
-    async (name: string, docClsfNo: string) => {
-      setError(null);
-
-      try {
-        const list = await getDocClsfList(docClsfNo);
-
-        const resultList: SelectItem[] = list.map((vo: DocClsf) => {
-          return {
-            label: vo.docClsfNm,
-            value: vo.docClsfNo,
-          };
-        });
-
-        if (name === "docLclsfNo") {
-          setMclsfList(resultList);
-        }
-      } catch (e) {
-        setError(e as Error);
-      }
-    },
-    []
-  );
+        })),
+      ]
+    : [];
+  const mclsfList = mclsfDocs
+    ? [
+        ...mclsfDocs.map((vo) => ({
+          label: vo.docClsfNm,
+          value: vo.docClsfNo,
+        })),
+      ]
+    : [];
 
   const loadData = React.useCallback(async () => {
     setError(null);
@@ -594,9 +572,9 @@ export default function DocClassificationFormPage() {
         setDefaults(viewData as Values);
         setdocClsfSeCd(viewData.docClsfSeCd);
 
-        if (viewData.docClsfSeCd === "S") {
-          getDocClsfCodeList("docLclsfNo", viewData.docLclsfNo);
-        }
+        // if (viewData.docClsfSeCd === "S") {
+        //   getDocClsfCodeList("docLclsfNo", viewData.docLclsfNo);
+        // }
       } else {
         setDefaults(INITIAL_FORM_VALUES);
       }
@@ -606,18 +584,15 @@ export default function DocClassificationFormPage() {
       setIsLoading(false);
     }
     setIsLoading(false);
-  }, [docClsfNo, getDocClsfCodeList]);
+  }, [docClsfNo]);
 
   React.useEffect(() => {
     loadData();
-    getLclsfCodeList();
-  }, [loadData]);
+  }, []);
 
   const handleChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value, type, checked } = e.target;
-
-      console.log(value);
 
       setDefaults((prev) => ({
         ...prev,
@@ -638,11 +613,6 @@ export default function DocClassificationFormPage() {
         case "docLclsfNo":
           next.docMclsfNo = "";
           next.docSclsfNo = "";
-          if (value !== "") {
-            getDocClsfCodeList(name, value);
-          } else {
-            setMclsfList([]);
-          }
           break;
         default:
           break;
@@ -779,7 +749,7 @@ export default function DocClassificationFormPage() {
         setIsSubmitting(false);
       }
     },
-    [defaults, docClsfNo, notifications, navigate]
+    [defaults, docClsfSeCd, docClsfNo, navigate, notifications]
   );
 
   const handleBack = React.useCallback(() => {
