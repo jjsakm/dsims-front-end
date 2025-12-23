@@ -26,9 +26,7 @@ import {
   docClassificationvalidator,
 } from "@/services/docClassificationService";
 import type {
-  DocClassification,
   DocClassDetailFormState,
-  DocClsf,
   DocClassDetail,
 } from "@/types/docClassification";
 import URL from "@/constants/url";
@@ -36,8 +34,6 @@ import PageContainer from "@/components/AgGridContainer/PageContainer";
 import PageStatus from "@/components/PageStatus";
 import MuiSelect from "@/components/Elements/MuiSelect";
 import MuiCheckbox from "@/components/Elements/MuiCheckbox";
-import type { SelectItem } from "@/types/common";
-import { getDocClsfList, getLclsfList } from "@/services/bizCommon";
 import {
   useDocClsfChildrenLive,
   useLclsfListLive,

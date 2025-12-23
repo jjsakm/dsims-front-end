@@ -158,44 +158,6 @@ export default function DocClassificationListPage() {
       ]
     : initSelectItem;
 
-  // const getDocClsfCodeList = React.useCallback(
-  //   async (name: string, docClsfNo: string) => {
-  //     setError(null);
-
-  //     try {
-  //       const list = await getDocClsfList(docClsfNo);
-
-  //       const resultList: SelectItem[] = list.map((vo: DocClsf) => {
-  //         return {
-  //           label: vo.docClsfNm,
-  //           value: vo.docClsfNo,
-  //         };
-  //       });
-
-  //       if (name === "docLclsfNo") {
-  //         setMclsfList([...initSelectItem, ...resultList]);
-  //       } else {
-  //         setSclsfList([...initSelectItem, ...resultList]);
-  //       }
-  //     } catch (e) {
-  //       setError(e as Error);
-  //     }
-  //   },
-  //   []
-  // );
-
-  // React.useEffect(() => {
-  //   if (topLevelDocs && topLevelDocs.length > 0) {
-  //     const resultList: SelectItem[] = topLevelDocs.map((vo: DocClsf) => ({
-  //       label: vo.docClsfNm,
-  //       value: vo.docClsfNo,
-  //     }));
-  //     setLclsfList([...initSelectItem, ...resultList]);
-  //   } else {
-  //     setLclsfList(initSelectItem); // 아직 데이터 없으면 기본값
-  //   }
-  // }, [topLevelDocs]);
-
   React.useEffect(() => {
     loadData();
   }, []);
