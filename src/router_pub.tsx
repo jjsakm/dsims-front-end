@@ -66,21 +66,25 @@ export const router_pub = createBrowserRouter([
     id: "digitalDoc_pub",
     path: URL.DIGITAL_DOC_LIST,
     Component: DigitalDocListPage,
+    handle: { breadcrumb: "문서고 목록" },
   },
   {
     id: "digitalDoc-detail_pub",
     path: URL.DIGITAL_DOC_DETAIL,
     Component: DigitalDocDetailPage,
+    handle: { breadcrumb: "문서고 상세" },
   },
   {
     id: "digitalDoc-create_pub",
     path: URL.DIGITAL_DOC_CREATE,
     Component: DigitalDocFormPage,
+    handle: { breadcrumb: "문서고 등록" },
   },
   {
     id: "digitalDoc-edit_pub",
     path: URL.DIGITAL_DOC_EDIT,
     Component: DigitalDocFormPage,
+    handle: { breadcrumb: "문서고 수정" },
   },
   // 전자문서 파기
   {
