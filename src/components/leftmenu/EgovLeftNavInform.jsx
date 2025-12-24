@@ -109,7 +109,7 @@ const MENU_ITEMS = [
       { label: "문서고 목록", to: "/pub/digitalDoc/list", isPublisher: true },
       {
         label: "문서고 상세",
-        to: "/pub/digitalDoc/:digitalDocId",
+        to: "/pub/digitalDoc/detail",
         isPublisher: true,
       },
       { label: "문서고 등록", to: "/pub/digitalDoc/create", isPublisher: true },
