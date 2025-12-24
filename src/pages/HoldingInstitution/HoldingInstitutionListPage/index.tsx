@@ -186,6 +186,26 @@ export default function HoldingInstitutionListPage() {
   const handleSearch = (data: SearchValues) => {
     // TODO: 검색 로직은 이후 AgGrid 연동 시 구현
     console.log(data);
+    const {
+      collectionStartDate,
+      collectionEndDate,
+      closeStartDate,
+      closeEndDate,
+    } = data;
+    const cStart = dayjs(collectionStartDate, "YYYYMMDD");
+    const cEnd = dayjs(collectionEndDate, "YYYYMMDD");
+    const clsStart = dayjs(closeStartDate, "YYYYMMDD");
+    const clsEnd = dayjs(closeEndDate, "YYYYMMDD");
+
+    if (cEnd.isBefore(cStart)) {
+      alert("수집일자 종료일은 시작일보다 빠를 수 없습니다.");
+      return;
+    }
+
+    if (clsEnd.isBefore(clsStart)) {
+      alert("종료일자 종료일은 시작일보다 빠를 수 없습니다.");
+      return;
+    }
   };
 
   if (isLoading || error) {
@@ -222,7 +242,7 @@ export default function HoldingInstitutionListPage() {
                       control={control}
                       render={({ field }) => (
                         <DatePickerKr
-                          label="수집일자"
+                          label=""
                           value={field.value}
                           onChange={field.onChange}
                         />
@@ -237,7 +257,7 @@ export default function HoldingInstitutionListPage() {
                       control={control}
                       render={({ field }) => (
                         <DatePickerKr
-                          label="수집일자"
+                          label="종료일자"
                           value={field.value}
                           onChange={field.onChange}
                         />
@@ -249,7 +269,7 @@ export default function HoldingInstitutionListPage() {
                       control={control}
                       render={({ field }) => (
                         <DatePickerKr
-                          label="수집일자"
+                          label=""
                           value={field.value}
                           onChange={field.onChange}
                         />

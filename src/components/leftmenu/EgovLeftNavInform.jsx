@@ -55,7 +55,7 @@ const MENU_ITEMS = [
     label: "문서고 조회",
     id: "docInquiry",
     children: [
-      { label: "문서고 등록", to: URL.DIGITAL_DOC_LIST },
+      { label: "문서고 등록", to: URL.DIGITAL_DOC_CREATE },
       { label: "문서고 조회", to: URL.DIGITAL_DOC_LIST },
     ],
   },
@@ -169,7 +169,8 @@ function EgovLeftNavInform() {
                 disableRipple
                 component={hasChildren ? "div" : NavLink}
                 to={hasChildren ? undefined : item.to}
-                onClick={hasChildren ? () => handleToggle(item.id) : undefined}>
+                onClick={hasChildren ? () => handleToggle(item.id) : undefined}
+              >
                 <ListItemText primary={item.label} />
                 {hasChildren &&
                   (openStates[item.id] ? <ExpandLess /> : <ExpandMore />)}
@@ -193,7 +194,8 @@ function EgovLeftNavInform() {
                           key={childIdx}
                           disableRipple
                           component={NavLink}
-                          to={child.to}>
+                          to={child.to}
+                        >
                           <ListItemText
                             primary={child.label}
                             sx={childListItemTextStyle}

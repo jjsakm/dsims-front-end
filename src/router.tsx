@@ -1,4 +1,4 @@
-import {createBrowserRouter, redirect} from "react-router";
+import { createBrowserRouter, redirect } from "react-router";
 import DashboardLayout from "./components/Layout/DashboardLayout";
 import DashboardPage from "./pages/Dashboard";
 import EgovNoticeListPage from "./pages/Notice/EgovNoticeListPage";
@@ -17,7 +17,7 @@ import NotFound from "./NotFound";
 import URL from "./constants/url";
 import EgovNoticeDetailPage from "./pages/Notice/EgovNoticeDetailPage";
 import EgovNoticeFormPage from "./pages/Notice/EgovNoticeFormPage";
-import {router_pub} from "@/router_pub.tsx";
+import { router_pub } from "@/router_pub.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -108,6 +108,7 @@ export const router = createBrowserRouter([
         id: "digitalDoc-create",
         path: URL.DIGITAL_DOC_CREATE,
         Component: DigitalDocFormPage,
+        handle: { breadcrumb: "문서고 등록" },
       },
       {
         id: "digitalDoc-edit",

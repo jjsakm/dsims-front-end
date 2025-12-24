@@ -19,10 +19,8 @@ export function DatePickerKr({ value, onChange, label, disabled }: Props) {
       label={label}
       format="YYYY-MM-DD"
       disabled={disabled}
-      value={dayjsValue as any}
-      onChange={(date: any) =>
-        onChange(date ? dayjs(date).format("YYYYMMDD") : "")
-      }
+      value={dayjsValue}
+      onChange={(date) => onChange(date ? dayjs(date).format("YYYYMMDD") : "")}
     />
   );
 }
