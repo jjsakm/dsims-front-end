@@ -43,7 +43,7 @@ export const HorizontalTableView = ({ rows, tableAriaLabel }) => {
                 <TableCell
                   sx={{
                     border: `1px solid ${theme.palette.divider}`,
-                    backgroundColor: theme.palette.grey[300],
+                    backgroundColor: theme.palette.grey[200],
                     fontWeight: "bold",
                     padding: theme.spacing(1),
                   }}

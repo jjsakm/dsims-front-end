@@ -59,7 +59,7 @@ export default function VerticalTable({
                     rowSpan={header.rowSpan}
                     sx={{
                       border: `1px solid ${theme.palette.divider}`,
-                      backgroundColor: theme.palette.grey[300],
+                      backgroundColor: theme.palette.grey[200],
                       fontWeight: "bold",
                       width: header.width,
                       padding: theme.spacing(1),
@@ -100,7 +100,9 @@ export default function VerticalTable({
                     padding: theme.spacing(1),
                   }}
                 >
-                  {Object.values(row).map(v => String(v)).join(" | ")}
+                  {Object.values(row)
+                    .map((v) => String(v))
+                    .join(" | ")}
                 </TableCell>
               )}
             </TableRow>
