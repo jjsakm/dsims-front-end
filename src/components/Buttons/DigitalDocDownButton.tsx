@@ -37,8 +37,7 @@ export default function DigitalDocDownButton() {
         variant="contained"
         size="small"
         color="secondary"
-        onClick={handleClickOpen}
-      >
+        onClick={handleClickOpen}>
         다운로드
       </Button>
       <Dialog open={open} onClose={handleClose}>
@@ -57,14 +56,13 @@ export default function DigitalDocDownButton() {
           />
         </DialogContent>
         <DialogActions>
+          <Button onClick={handleClose}>취소</Button>
           <Button
             type="submit"
             form="subscription-form"
-            onClick={handleDownload}
-          >
+            onClick={handleDownload}>
             다운로드
           </Button>
-          <Button onClick={handleClose}>취소</Button>
         </DialogActions>
       </Dialog>
     </React.Fragment>

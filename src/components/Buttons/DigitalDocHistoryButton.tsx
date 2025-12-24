@@ -1,25 +1,45 @@
 import * as React from "react";
+import { styled } from "@mui/material/styles";
 import {
   Box,
   Button,
   Dialog,
   DialogContent,
   DialogTitle,
+  Grid,
   IconButton,
   Stack,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import VerticalTable, {
+  type HistoryRow,
+  type HeaderItem,
+} from "@/components/Table/VerticalTable";
+import { HorizontalTableView } from "@/components/Table/HorizontalTable";
 
-interface HistoryRow {
-  id: number;
-  date: string;
-  actor: string;
-  action: string;
-  ip: string;
-  device: string;
-}
+const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
+  m: 0,
+  p: 2,
+  position: "relative",
+  fontWeight: 600,
+  color: theme.palette.text.primary,
+}));
 
-const historyRows: HistoryRow[] = [
+const CloseButton = styled(IconButton)(({ theme }) => ({
+  position: "absolute",
+  right: theme.spacing(1),
+  top: theme.spacing(1),
+}));
+
+const historyInfoSampleHeader: HeaderItem[] = [
+  { label: "번호", key: "id", width: "8%", align: "center" },
+  { label: "행위일자", key: "date", width: "15%", align: "center" },
+  { label: "행위자", key: "actor", width: "15%", align: "center" },
+  { label: "행위내용", key: "action", width: "27%", align: "center" },
+  { label: "IP", key: "ip", width: "20%", align: "center" },
+  { label: "장비", key: "device", width: "15%", align: "center" },
+];
+const historyInfoSample: HistoryRow[] = [
   {
     id: 1,
     date: "2025. 10. 27.",
@@ -44,29 +64,111 @@ const historyRows: HistoryRow[] = [
     ip: "111.111.\n111.111",
     device: "PC",
   },
+];
+
+const historyViewSampleHeader: HeaderItem[] = [
+  { label: "부서", key: "dept" },
+  { label: "이름", key: "name" },
+  { label: "행위내용", key: "action" },
+  { label: "행위자", key: "actor" },
+  { label: "행위일자", key: "date" },
+];
+const historyViewSample: HistoryRow[] = [
   {
-    id: 4,
-    date: "2025. 10. 01.",
+    id: 1,
+    dept: "피해구제팀",
+    name: "-",
+    action: "추가",
     actor: "홍길동",
-    action: "문서분류 수정",
-    ip: "111.111.\n111.111",
-    device: "PC",
+    date: "25.10.01",
   },
   {
-    id: 5,
-    date: "2025. 09. 30.",
+    id: 2,
+    dept: "정보화팀",
+    name: "홍길동",
+    action: "추가",
     actor: "홍길동",
-    action: "문서분류 수정",
-    ip: "111.111.\n111.111",
-    device: "PC",
+    date: "25.08.10",
+  },
+];
+const digitalDocSample = [
+  {
+    groups: [
+      {
+        label: "문서분류",
+        contentColSpan: 7,
+        content: "피해구제 > 접수서류 > 사망 신청 (전자문서)",
+      },
+    ],
   },
   {
-    id: 6,
-    date: "2025. 09. 26.",
-    actor: "홍길동",
-    action: "문서분류 등록",
-    ip: "111.111.\n111.111",
-    device: "PC",
+    groups: [
+      {
+        label: "문서번호",
+        contentColSpan: 3,
+        content: "KIDS-0001",
+      },
+      {
+        label: "기본권한",
+        contentColSpan: 3,
+        content: "피해구제팀 / 전체",
+      },
+    ],
+  },
+  {
+    groups: [
+      {
+        label: "문서제목",
+        contentColSpan: 7,
+        content: "피해구제 접수서류 사망신청서",
+      },
+    ],
+  },
+  {
+    groups: [
+      {
+        label: "수집일자",
+        contentColSpan: 3,
+        content: "2025-10-01 (5년)",
+      },
+      {
+        label: "종료일자",
+        contentColSpan: 3,
+        content: "2030-09-30",
+      },
+    ],
+  },
+  {
+    groups: [
+      {
+        label: "개인정보",
+        contentColSpan: 3,
+        content: "포함",
+      },
+      {
+        label: "반환여부",
+        contentColSpan: 3,
+        content: "미반환",
+      },
+    ],
+  },
+  {
+    groups: [
+      {
+        label: "비고",
+        contentColSpan: 7,
+        content: "피해구제 접수서류 비고입니다.",
+      },
+    ],
+  },
+  {
+    groups: [
+      {
+        label: "첨부파일",
+        contentColSpan: 7,
+        content: "피해구제 접수서류.pdf",
+      },
+    ],
   },
 ];
 
@@ -82,670 +184,50 @@ export default function DocDestructionHistoryButton() {
   };
 
   return (
-    <React.Fragment>
-      <Button variant="outlined" onClick={handleClickOpen}>
+    <>
+      <Button variant="outlined" size="small" onClick={handleClickOpen}>
         이력
       </Button>
       <Dialog maxWidth="xl" open={open} onClose={handleClose}>
-        <DialogTitle
-          sx={{
-            m: 0,
-            p: 2,
-            position: "relative",
-            fontWeight: 600,
-          }}
-        >
+        <StyledDialogTitle>
           이력
-          <IconButton
-            aria-label="close"
-            onClick={handleClose}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-            }}
-          >
+          <CloseButton aria-label="close" onClick={handleClose}>
             <CloseIcon />
-          </IconButton>
-        </DialogTitle>
+          </CloseButton>
+        </StyledDialogTitle>
         <DialogContent>
           <Box sx={{ minWidth: 600 }}>
-            <Stack direction="row" spacing={4} alignItems="flex-start">
-              {/* 이력 정보 */}
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  tableLayout: "fixed",
-                }}
-              >
-                <thead>
-                  <tr>
-                    <th
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        backgroundColor: "#e0e0e0",
-                        textAlign: "center",
-                      }}
-                    >
-                      번호
-                    </th>
-                    <th
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        backgroundColor: "#e0e0e0",
-                        textAlign: "center",
-                      }}
-                    >
-                      행위일자
-                    </th>
-                    <th
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        backgroundColor: "#e0e0e0",
-                        textAlign: "center",
-                      }}
-                    >
-                      행위자
-                    </th>
-                    <th
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        backgroundColor: "#e0e0e0",
-                        textAlign: "center",
-                      }}
-                    >
-                      행위내용
-                    </th>
-                    <th
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        backgroundColor: "#e0e0e0",
-                        textAlign: "center",
-                      }}
-                    >
-                      IP
-                    </th>
-                    <th
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        backgroundColor: "#e0e0e0",
-                        textAlign: "center",
-                      }}
-                    >
-                      장비
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {historyRows.map((row) => (
-                    <tr key={row.id}>
-                      <td
-                        style={{
-                          border: "1px solid #000",
-                          padding: "8px",
-                          textAlign: "center",
-                        }}
-                      >
-                        {row.id}
-                      </td>
-                      <td
-                        style={{
-                          border: "1px solid #000",
-                          padding: "8px",
-                          textAlign: "center",
-                        }}
-                      >
-                        {row.date}
-                      </td>
-                      <td
-                        style={{
-                          border: "1px solid #000",
-                          padding: "8px",
-                          textAlign: "center",
-                        }}
-                      >
-                        {row.actor}
-                      </td>
-                      <td
-                        style={{
-                          border: "1px solid #000",
-                          padding: "8px",
-                          textAlign: "center",
-                        }}
-                      >
-                        {row.action}
-                      </td>
-                      <td
-                        style={{
-                          border: "1px solid #000",
-                          padding: "8px",
-                          textAlign: "center",
-                          whiteSpace: "pre-line",
-                        }}
-                      >
-                        {row.ip}
-                      </td>
-                      <td
-                        style={{
-                          border: "1px solid #000",
-                          padding: "8px",
-                          textAlign: "center",
-                        }}
-                      >
-                        {row.device}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <Grid container spacing={3}>
+              <Stack direction="row" spacing={3} alignItems="flex-start">
+                <VerticalTable
+                  headers={[historyInfoSampleHeader]}
+                  rows={historyInfoSample}
+                />
+                <VerticalTable
+                  headers={[
+                    [
+                      {
+                        label: "공람 이력",
+                        key: "title",
+                        colSpan: 5,
+                        align: "center",
+                      },
+                    ],
+                    historyViewSampleHeader,
+                  ]}
+                  rows={historyViewSample}
+                />
+              </Stack>
 
-              {/* 공람 이력 */}
-              <table
-                style={{
-                  width: "420px",
-                  borderCollapse: "collapse",
-                  tableLayout: "fixed",
-                }}
-              >
-                <thead>
-                  <tr>
-                    <th
-                      colSpan={5}
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        backgroundColor: "#bdbdbd",
-                        textAlign: "center",
-                        fontWeight: 700,
-                        fontSize: "1.1rem",
-                      }}
-                    >
-                      공람 이력
-                    </th>
-                  </tr>
-                  <tr>
-                    <th
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        backgroundColor: "#e0e0e0",
-                        textAlign: "center",
-                      }}
-                    >
-                      부서
-                    </th>
-                    <th
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        backgroundColor: "#e0e0e0",
-                        textAlign: "center",
-                      }}
-                    >
-                      이름
-                    </th>
-                    <th
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        backgroundColor: "#e0e0e0",
-                        textAlign: "center",
-                      }}
-                    >
-                      행위내용
-                    </th>
-                    <th
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        backgroundColor: "#e0e0e0",
-                        textAlign: "center",
-                      }}
-                    >
-                      행위자
-                    </th>
-                    <th
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        backgroundColor: "#e0e0e0",
-                        textAlign: "center",
-                      }}
-                    >
-                      행위일자
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* row 1 */}
-                  <tr>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        textAlign: "center",
-                      }}
-                    >
-                      피해구제팀
-                    </td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        textAlign: "center",
-                      }}
-                    >
-                      -
-                    </td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        textAlign: "center",
-                      }}
-                    >
-                      추가
-                    </td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        textAlign: "center",
-                      }}
-                    >
-                      홍길동
-                    </td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        textAlign: "center",
-                      }}
-                    >
-                      25.10.01.
-                    </td>
-                  </tr>
-
-                  {/* row 2 */}
-                  <tr>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        textAlign: "center",
-                      }}
-                    >
-                      정보화팀
-                    </td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        textAlign: "center",
-                      }}
-                    >
-                      홍길동
-                    </td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        textAlign: "center",
-                      }}
-                    >
-                      추가
-                    </td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        textAlign: "center",
-                      }}
-                    >
-                      홍길동
-                    </td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "8px",
-                        textAlign: "center",
-                      }}
-                    >
-                      25.08.10.
-                    </td>
-                  </tr>
-
-                  {/* empty rows for layout */}
-                  <tr>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "16px",
-                        textAlign: "center",
-                      }}
-                    ></td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "16px",
-                        textAlign: "center",
-                      }}
-                    ></td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "16px",
-                        textAlign: "center",
-                      }}
-                    ></td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "16px",
-                        textAlign: "center",
-                      }}
-                    ></td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "16px",
-                        textAlign: "center",
-                      }}
-                    ></td>
-                  </tr>
-                  <tr>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "16px",
-                        textAlign: "center",
-                      }}
-                    ></td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "16px",
-                        textAlign: "center",
-                      }}
-                    ></td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "16px",
-                        textAlign: "center",
-                      }}
-                    ></td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "16px",
-                        textAlign: "center",
-                      }}
-                    ></td>
-                    <td
-                      style={{
-                        border: "1px solid #000",
-                        padding: "16px",
-                        textAlign: "center",
-                      }}
-                    ></td>
-                  </tr>
-                </tbody>
-              </table>
-            </Stack>
-
-            {/* 문서 정보 */}
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                marginTop: "24px",
-              }}
-            >
-              <tbody>
-                {/* 문서분류 / 기본권한 */}
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                      backgroundColor: "#e0e0e0",
-                      fontWeight: 600,
-                      textAlign: "center",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    문서분류
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                    }}
-                  >
-                    피해구제 &gt; 접수서류 &gt; 사망 신청 (전자문서)
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                      backgroundColor: "#e0e0e0",
-                      fontWeight: 600,
-                      textAlign: "center",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    기본권한
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                    }}
-                  >
-                    피해구제팀 / 전체
-                  </td>
-                </tr>
-
-                {/* 문서번호 */}
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                      backgroundColor: "#e0e0e0",
-                      fontWeight: 600,
-                      textAlign: "center",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    문서번호
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                    }}
-                    colSpan={3}
-                  >
-                    KIDS-0001
-                  </td>
-                </tr>
-
-                {/* 문서제목 */}
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                      backgroundColor: "#e0e0e0",
-                      fontWeight: 600,
-                      textAlign: "center",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    문서제목
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                    }}
-                    colSpan={3}
-                  >
-                    피해구제 접수서류 사망신청서
-                  </td>
-                </tr>
-
-                {/* 수집일자 / 종료일자 */}
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                      backgroundColor: "#e0e0e0",
-                      fontWeight: 600,
-                      textAlign: "center",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    수집일자
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                    }}
-                  >
-                    2025-10-01 (5년)
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                      backgroundColor: "#e0e0e0",
-                      fontWeight: 600,
-                      textAlign: "center",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    종료일자
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                    }}
-                  >
-                    2030-09-30
-                  </td>
-                </tr>
-
-                {/* 개인정보 / 반환여부 */}
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                      backgroundColor: "#e0e0e0",
-                      fontWeight: 600,
-                      textAlign: "center",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    개인정보
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                    }}
-                  >
-                    포함
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                      backgroundColor: "#e0e0e0",
-                      fontWeight: 600,
-                      textAlign: "center",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    반환여부
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                    }}
-                  >
-                    미반환
-                  </td>
-                </tr>
-
-                {/* 비고 */}
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                      backgroundColor: "#e0e0e0",
-                      fontWeight: 600,
-                      textAlign: "center",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    비고
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                    }}
-                    colSpan={3}
-                  >
-                    피해구제 접수서류 비고입니다.
-                  </td>
-                </tr>
-
-                {/* 첨부파일 */}
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                      backgroundColor: "#e0e0e0",
-                      fontWeight: 600,
-                      textAlign: "center",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    첨부파일
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #000",
-                      padding: "8px",
-                    }}
-                    colSpan={3}
-                  >
-                    피해구제 접수서류.pdf
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+              {/* 문서 정보 */}
+              <HorizontalTableView
+                tableAriaLabel="전자 문서"
+                rows={digitalDocSample}
+              />
+            </Grid>
           </Box>
         </DialogContent>
       </Dialog>
-    </React.Fragment>
+    </>
   );
 }
