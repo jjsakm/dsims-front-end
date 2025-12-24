@@ -243,6 +243,7 @@ export default function DigitalDocDetailPage() {
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
+          {/* 문서분류/반환여부 테이블 */}
           <HorizontalTableCreate
             rows={sampleData2}
             tableAriaLabel="문서분류/반환여부 수정"

@@ -8,6 +8,7 @@ import {
   TableCell,
   Paper,
   useTheme,
+  Typography,
 } from "@mui/material";
 
 export interface HistoryRow {
@@ -30,7 +31,6 @@ export interface HeaderItem {
   colSpan?: number;
   rowSpan?: number;
   render?: (value: unknown, row: HistoryRow) => React.ReactNode;
-
 }
 
 interface VerticalTableProps {
@@ -38,14 +38,14 @@ interface VerticalTableProps {
   headers?: HeaderItem[][];
 }
 
-export default function VerticalTable({
-  rows,
-  headers,
-}: VerticalTableProps) {
+export default function VerticalTable({ rows, headers }: VerticalTableProps) {
   const theme = useTheme();
 
   return (
-    <TableContainer component={Paper} sx={{ maxWidth: 900, margin: "auto" }}>
+    <TableContainer
+      component={Paper}
+      sx={{ maxWidth: 900, margin: "auto", borderRadius: "0" }}
+    >
       <Table aria-label="custom data table" sx={{ borderCollapse: "collapse" }}>
         {headers && headers.length > 0 && (
           <TableHead>
@@ -65,7 +65,13 @@ export default function VerticalTable({
                       padding: theme.spacing(1),
                     }}
                   >
-                    {header.label}
+                    <Typography
+                      sx={{
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {header.label}
+                    </Typography>
                   </TableCell>
                 ))}
               </TableRow>
