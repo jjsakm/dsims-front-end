@@ -4,7 +4,7 @@ import type {
   SearchValues,
 } from "@/types/docClassification";
 import axios from "axios";
-import { isEmpty } from "@/utils/globalFunc";
+// import { isEmpty } from "@/utils/globalFunc";
 
 export async function getDocClassificationList(
   values?: Partial<SearchValues>

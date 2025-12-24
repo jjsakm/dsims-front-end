@@ -43,6 +43,6 @@ export function uniqueArray<T>(arr: T[]): T[] {
 
 (globalThis as any).formatDate = formatDate;
 (globalThis as any).isEmpty = isEmpty;
-(globalThis as any).isEmpty = debounce;
-(globalThis as any).isEmpty = deepClone;
-(globalThis as any).isEmpty = uniqueArray;
+(globalThis as any).debounce = debounce;
+(globalThis as any).deepClone = deepClone;
+(globalThis as any).uniqueArray = uniqueArray;
