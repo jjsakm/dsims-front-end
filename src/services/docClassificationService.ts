@@ -1,5 +1,6 @@
 import type {
   DocClassDetail,
+  DocClassHistory,
   DocClassification,
   SearchValues,
 } from "@/types/docClassification";
@@ -59,6 +60,16 @@ export async function deleteDocClassificationData(docClsfNo: string) {
   if (!res) {
     throw new Error("data not found");
   }
+}
+
+export async function getDocClassificationHistoryList(
+  docClsfNo: string
+): Promise<DocClassHistory[]> {
+  const res = await axios.get(
+    `/api/documentclassification/${docClsfNo}/history`
+  );
+
+  return res.data.result.list;
 }
 
 type ValidationResult = {

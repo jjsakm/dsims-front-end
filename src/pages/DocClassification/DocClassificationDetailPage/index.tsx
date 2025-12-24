@@ -118,7 +118,9 @@ export default function DocClassificationDetailPage() {
               <Button variant="outlined" onClick={handleBack}>
                 목록
               </Button>
-              <DocClassificationHistoryButton />
+              <DocClassificationHistoryButton
+                docClsfNo={detailData?.docClsfNo ?? ""}
+              />
             </Stack>
             <Stack direction="row" gap={2}>
               <Button variant="contained" onClick={handleViewDataEdit}>

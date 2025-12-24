@@ -10,8 +10,13 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import type { DocClassHistory } from "@/types/docClassification";
 import PageStatus from "../PageStatus";
+import { getDocClassificationHistoryList } from "@/services/docClassificationService";
 
-export default function DocClassificationHistoryButton() {
+type Props = {
+  docClsfNo: string;
+};
+
+export default function DocClassificationHistoryButton({ docClsfNo }: Props) {
   const [open, setOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
@@ -22,7 +27,9 @@ export default function DocClassificationHistoryButton() {
     setIsLoading(true);
 
     try {
-      console.log(111);
+      const res = await getDocClassificationHistoryList(docClsfNo ?? "");
+
+      setRowsData(res);
     } catch (listDataError) {
       setError(listDataError as Error);
     } finally {
@@ -148,7 +155,7 @@ export default function DocClassificationHistoryButton() {
               </thead>
               <tbody>
                 {rowData.map((row) => (
-                  <tr key={row.docClsfNm}>
+                  <tr key={row.docClsfNo}>
                     <td
                       style={{
                         border: "1px solid #000",
@@ -156,7 +163,7 @@ export default function DocClassificationHistoryButton() {
                         textAlign: "center",
                       }}
                     >
-                      {row.docClsfNm}
+                      {row.docClsfNo}
                     </td>
                     <td
                       style={{
@@ -165,7 +172,7 @@ export default function DocClassificationHistoryButton() {
                         textAlign: "center",
                       }}
                     >
-                      {row.docClsfNm}
+                      {formatDate(row.regYmd)}
                     </td>
                     <td
                       style={{
@@ -174,7 +181,7 @@ export default function DocClassificationHistoryButton() {
                         textAlign: "center",
                       }}
                     >
-                      {row.docClsfNm}
+                      {row.rgtrId}
                     </td>
                     <td
                       style={{
@@ -183,7 +190,7 @@ export default function DocClassificationHistoryButton() {
                         textAlign: "center",
                       }}
                     >
-                      {row.docClsfNm}
+                      {row.actCn}
                     </td>
                     <td
                       style={{
@@ -193,7 +200,7 @@ export default function DocClassificationHistoryButton() {
                         whiteSpace: "pre-line",
                       }}
                     >
-                      {row.docClsfNm}
+                      {row.acsrIpAddr}
                     </td>
                     <td
                       style={{
@@ -202,7 +209,7 @@ export default function DocClassificationHistoryButton() {
                         textAlign: "center",
                       }}
                     >
-                      {row.docClsfNm}
+                      {row.eqpmntNm}
                     </td>
                   </tr>
                 ))}
