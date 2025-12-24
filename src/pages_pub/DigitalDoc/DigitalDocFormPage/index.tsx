@@ -24,9 +24,9 @@ import {
 import MuiSelect from "@/components/Elements/MuiSelect";
 import { useInputStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
 import {
-  InfoTableCreate,
-  type InfoTableRow,
-} from "@/components/Table/InfoTable";
+  HorizontalTableCreate,
+  type HorizontalTableRow,
+} from "@/components/Table/HorizontalTable";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
@@ -192,7 +192,7 @@ export default function DigitalDocFormPage() {
 
   const pageTitle = docId ? "수정" : "등록";
 
-  const sampleData: InfoTableRow[] = [
+  const sampleData: HorizontalTableRow[] = [
     {
       groups: [
         {
@@ -389,7 +389,8 @@ export default function DigitalDocFormPage() {
                 row
                 name="uploadType"
                 value={formValues.uploadType ?? ""}
-                onChange={handleRadioFieldChange}>
+                onChange={handleRadioFieldChange}
+              >
                 <FormControlLabel
                   value="document"
                   control={<Radio size="small" />}
@@ -419,7 +420,8 @@ export default function DigitalDocFormPage() {
               <Button
                 variant="contained"
                 size="small"
-                onClick={handleFileButtonClick}>
+                onClick={handleFileButtonClick}
+              >
                 파일
               </Button>
             </Stack>
@@ -431,7 +433,7 @@ export default function DigitalDocFormPage() {
 
   return (
     <Box component="form" onSubmit={handleSubmit} noValidate autoComplete="off">
-      <InfoTableCreate
+      <HorizontalTableCreate
         rows={sampleData}
         tableAriaLabel="전자문서 등록 폼 테이블"
       />
