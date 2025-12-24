@@ -11,7 +11,12 @@ import "./utils/globalFunc";
 
 import "ag-grid-community/styles/ag-theme-alpine.css";
 
+import dayjs from "dayjs";
+import "dayjs/locale/ko";
+
 const queryClient = new QueryClient();
+
+dayjs.locale("ko"); // 전역 로케일을 한국으로 설정
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
