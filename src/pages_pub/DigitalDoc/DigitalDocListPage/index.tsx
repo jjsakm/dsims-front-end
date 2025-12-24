@@ -1,71 +1,124 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import { useNavigate } from "react-router";
-import AgGridContainer from "@/components/AgGridContainer/AgGridContainer";
-import {FormGroup, Grid, TextField} from "@mui/material";
+import { FormGroup, Grid, TextField } from "@mui/material";
 import MuiSelect from "@/components/Elements/MuiSelect";
-import type {ColDef} from "ag-grid-community";
-import {listDefs} from "./col-def";
-import type {DigitalDoc, DigitalDocSearchState} from "@/types/digitalDoc";
-import {getDigitalDocList} from "@/services/digitalDocService";
-import {useSearchStateHandlers} from "@/hooks/InputStateHandlers/useInputStateHandlers";
-import PageStatus from "@/components/PageStatus";
+import type { DigitalDocSearchState } from "@/types/digitalDoc";
+import { useSearchStateHandlers } from "@/hooks/InputStateHandlers/useInputStateHandlers";
 import SearchFilterContainer from "@/components/Container/SearchFilterContainer";
+import VerticalTable, {
+  type HeaderItem,
+  type HistoryRow,
+} from "@/components/Table/VerticalTable";
 
 export default function DigitalDocListPage() {
-  const navigate = useNavigate();
-
-  const [columnDefs] = React.useState<ColDef<any>[]>(listDefs);
-
   const { values, handleTextFieldChange, handleSelectFieldChange } =
     useSearchStateHandlers<DigitalDocSearchState["values"]>();
-
-  const [rowData, setRowsData] = React.useState<{
-    rows: DigitalDoc[];
-    rowCount: number;
-  }>({
-    rows: [],
-    rowCount: 0,
-  });
-
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState<Error | null>(null);
-
-  const loadData = React.useCallback(async () => {
-    setError(null);
-    setIsLoading(true);
-
-    try {
-      const listData = await getDigitalDocList();
-
-      setRowsData({
-        rows: listData.items,
-        rowCount: listData.itemCount,
-      });
-    } catch (listDataError) {
-      setError(listDataError as Error);
-    }
-
-    setIsLoading(false);
-  }, []);
-
-  React.useEffect(() => {
-    loadData();
-  }, [loadData]);
 
   const handleSearch = () => {
     // TODO: 검색 로직은 이후 구현
     console.log(values);
   };
 
-  const handleRowClick = (row: DigitalDoc) => {
-    navigate(`/digitalDoc/${row.id}`);
-  };
+  const header: HeaderItem[] = [
+    { label: "번호", key: "id", width: "8%" },
+    { label: "문서분류", key: "docClassification" },
+    { label: "문서번호", key: "docNumber" },
+    { label: "문서제목", key: "docTitle" },
+    { label: "개인정보", key: "personalInfo" },
+    { label: "수집일자(보존연한)", key: "collectDate" },
+    { label: "종료일자", key: "endDate" },
+    { label: "종류", key: "category" },
+    { label: "등록자(부서)", key: "registrarDept" },
+    { label: "등록일자", key: "regDate" },
+  ];
 
-  if (isLoading || error) {
-    return <PageStatus isLoading={isLoading} error={error} />;
-  }
+  const content: HistoryRow[] = [
+    {
+      id: 1,
+      docClassification: "피해구제 > ",
+      docNumber: "KIDS-001",
+      docTitle: "진료기록",
+      personalInfo: "포함",
+      collectDate: "25.09.01(반영구)",
+      endDate: "99.12.31",
+      category: "문서",
+      registrarDept: "홍길동(정보화팀)",
+      regDate: "25.09.21",
+    },
+    {
+      id: 2,
+      docClassification: "개발 > 시스템 설계",
+      docNumber: "SYS-005",
+      docTitle: "신규 서비스 아키텍처 설계 문서",
+      personalInfo: "미포함",
+      collectDate: "25.10.15(영구)",
+      endDate: "미정",
+      category: "설계서",
+      registrarDept: "이순신(개발1팀)",
+      regDate: "25.10.20",
+    },
+    {
+      id: 3,
+      docClassification: "인사 > 급여",
+      docNumber: "HR-012",
+      docTitle: "2025년 3분기 급여 정산 보고서",
+      personalInfo: "포함(민감)",
+      collectDate: "25.09.30(5년)",
+      endDate: "30.09.30",
+      category: "보고서",
+      registrarDept: "유관순(인사팀)",
+      regDate: "25.10.05",
+    },
+    {
+      id: 4,
+      docClassification: "영업 > 계약",
+      docNumber: "SALE-023",
+      docTitle: "A사 신규 서비스 공급 계약서",
+      personalInfo: "포함",
+      collectDate: "25.11.01(10년)",
+      endDate: "35.11.01",
+      category: "계약서",
+      registrarDept: "강감찬(영업3팀)",
+      regDate: "25.11.05",
+    },
+    {
+      id: 5,
+      docClassification: "재무 > 세금",
+      docNumber: "TAX-007",
+      docTitle: "2024년 법인세 신고 자료",
+      personalInfo: "미포함",
+      collectDate: "25.02.10(7년)",
+      endDate: "32.02.10",
+      category: "신고서",
+      registrarDept: "세종대왕(재무팀)",
+      regDate: "25.02.15",
+    },
+    {
+      id: 6,
+      docClassification: "홍보 > 이벤트",
+      docNumber: "PR-003",
+      docTitle: "크리스마스 프로모션 기획안",
+      personalInfo: "미포함",
+      collectDate: "25.11.20(1년)",
+      endDate: "26.11.20",
+      category: "기획안",
+      registrarDept: "신사임당(홍보팀)",
+      regDate: "25.11.22",
+    },
+    {
+      id: 7,
+      docClassification: "법무 > 규정",
+      docNumber: "LAW-001",
+      docTitle: "개인정보보호정책 개정",
+      personalInfo: "포함",
+      collectDate: "25.01.01(영구)",
+      endDate: "미정",
+      category: "규정",
+      registrarDept: "김유신(법무팀)",
+      regDate: "25.01.05",
+    },
+  ];
 
   return (
     <Box>
@@ -145,12 +198,7 @@ export default function DigitalDocListPage() {
       </SearchFilterContainer>
 
       <Box>
-        <AgGridContainer
-          isLoading={isLoading}
-          colDefs={columnDefs}
-          rowData={rowData.rows}
-          onRowClick={handleRowClick}
-        />
+        <VerticalTable headers={[header]} rows={content}></VerticalTable>
       </Box>
     </Box>
   );
