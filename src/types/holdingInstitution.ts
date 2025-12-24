@@ -7,9 +7,9 @@ export interface SearchValues {
   collectionEndDate: string;
   closeStartDate: string;
   closeEndDate: string;
-  largeCategory: string;
-  midCategory: string;
-  smallCategory: string;
+  docLclsfNo: string;
+  docMclsfNo: string;
+  docSclsfNo: string;
   retentionPeriod: string;
   agreeYn: boolean;
   useYn: "" | "Y" | "N";

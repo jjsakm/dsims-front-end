@@ -1,6 +1,6 @@
 import type { ColDef } from "ag-grid-community";
 
-export const listDefs: ColDef<any>[] = [
+export const listDefs: ColDef[] = [
   {
     headerName: "번호",
     field: "id",

@@ -39,7 +39,6 @@ import {
   useDocClsfChildrenLive,
   useLclsfListLive,
 } from "@/hooks/query/useDocClsfTree";
-import { continuousColorLegendClasses } from "@mui/x-charts";
 
 /* ------------------------------------------------------------------ */
 /* 타입/초기값                                                         */

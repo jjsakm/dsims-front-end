@@ -1,25 +1,49 @@
 import * as React from "react";
 import PageContainer from "@/components/AgGridContainer/PageContainer.tsx";
 import AgGridContainer from "@/components/AgGridContainer/AgGridContainer";
-import {Box, Button, FormGroup, Grid, Stack, TextField, Typography,} from "@mui/material";
+import {
+  Box,
+  Button,
+  FormGroup,
+  Grid,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import MuiSelect from "@/components/Elements/MuiSelect";
 import MuiCheckbox from "@/components/Elements/MuiCheckbox";
-import type {ColDef} from "ag-grid-community";
-import {listDefs} from "./col-def";
-import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
-import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import type { ColDef } from "ag-grid-community";
+import { listDefs } from "./col-def";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import {getHoldingInstitutionList} from "@/services/holdingInstitutionService";
-import {useDialogs} from "@/hooks/useDialogs/useDialogs";
-import type {HoldingInstitution, HoldingInstitutionSearchState,} from "@/types/holdingInstitution";
-import {useSearchStateHandlers} from "@/hooks/InputStateHandlers/useInputStateHandlers";
+import { getHoldingInstitutionList } from "@/services/holdingInstitutionService";
+import { useDialogs } from "@/hooks/useDialogs/useDialogs";
+import type {
+  HoldingInstitution,
+  SearchValues,
+} from "@/types/holdingInstitution";
 import PageStatus from "@/components/PageStatus";
 import SearchFilterContainer from "@/components/Container/SearchFilterContainer";
+import { useForm, useWatch, Controller } from "react-hook-form";
+import type { SelectItem } from "@/types/common";
+import {
+  useDocClsfChildrenLive,
+  useLclsfListLive,
+} from "@/hooks/query/useDocClsfTree";
+import { DatePickerKr } from "@/components/Common/DatePickerKr";
 
-export default function DocDestructionDetailPage() {
+const initSelectItem: SelectItem[] = [
+  {
+    label: "전체",
+    value: "",
+  },
+];
+
+export default function HoldingInstitutionListPage() {
   const dialogs = useDialogs();
 
-  const [columnDefs] = React.useState<ColDef<any>[]>(listDefs);
+  const [columnDefs] = React.useState<ColDef[]>(listDefs);
 
   const [rowData, setRowsData] = React.useState<{
     rows: HoldingInstitution[];
@@ -36,13 +60,59 @@ export default function DocDestructionDetailPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
 
-  const {
-    values,
-    handleTextFieldChange,
-    handleSelectFieldChange,
-    handleCheckboxFieldChange,
-    handleDateFieldChange,
-  } = useSearchStateHandlers<HoldingInstitutionSearchState["values"]>();
+  const { control, handleSubmit, setValue } = useForm<SearchValues>({
+    defaultValues: {
+      collectionStartDate: dayjs().format("YYYYMMDD"),
+      collectionEndDate: dayjs().format("YYYYMMDD"),
+      closeStartDate: dayjs().format("YYYYMMDD"),
+      closeEndDate: dayjs().format("YYYYMMDD"),
+      docLclsfNo: "",
+      docMclsfNo: "",
+      docSclsfNo: "",
+      retentionPeriod: "",
+      docNumber: "",
+      docTitle: "",
+      agreeYn: false,
+    },
+  });
+
+  const docLclsfNo = useWatch({ control, name: "docLclsfNo" });
+  const docMclsfNo = useWatch({ control, name: "docMclsfNo" });
+
+  // react-query 적용 소스 start
+  const { data: lclsfDocs } = useLclsfListLive();
+  const { data: mclsfDocs } = useDocClsfChildrenLive(docLclsfNo);
+  const { data: sclsfDocs } = useDocClsfChildrenLive(docMclsfNo);
+
+  const lclsfList = lclsfDocs
+    ? [
+        ...initSelectItem,
+        ...lclsfDocs.map((vo) => ({
+          label: vo.docClsfNm,
+          value: vo.docClsfNo,
+        })),
+      ]
+    : initSelectItem;
+  const mclsfList = mclsfDocs
+    ? [
+        ...initSelectItem,
+        ...mclsfDocs.map((vo) => ({
+          label: vo.docClsfNm,
+          value: vo.docClsfNo,
+        })),
+      ]
+    : initSelectItem;
+  const sclsfList = sclsfDocs
+    ? [
+        ...initSelectItem,
+        ...sclsfDocs.map((vo) => ({
+          label: vo.docClsfNm,
+          value: vo.docClsfNo,
+        })),
+      ]
+    : initSelectItem;
+
+  // react-query 적용 소스 end
 
   const handleSelectionChange = React.useCallback(
     (rows: HoldingInstitution[]) => {
@@ -113,9 +183,9 @@ export default function DocDestructionDetailPage() {
     loadData();
   }, [loadData]);
 
-  const handleSearch = () => {
+  const handleSearch = (data: SearchValues) => {
     // TODO: 검색 로직은 이후 AgGrid 연동 시 구현
-    console.log(values);
+    console.log(data);
   };
 
   if (isLoading || error) {
@@ -124,155 +194,199 @@ export default function DocDestructionDetailPage() {
 
   return (
     <PageContainer>
-      {/* <!-- 검색조건 --> */}
       <SearchFilterContainer>
         <FormGroup>
-          <Grid container mt={2} spacing={2} width="100%">
-            {/* 1행 */}
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <DatePicker
-                    value={
-                      values.collectionStartDate
-                        ? dayjs(values.collectionStartDate)
-                        : null
-                    }
-                    onChange={handleDateFieldChange("collectionStartDate")}
-                    name="collectionStartDate"
-                    label="수집일자"
+          <form onSubmit={handleSubmit(handleSearch)}>
+            <Grid container mt={2} spacing={2} width="100%">
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+                adapterLocale="ko" // 한국어
+              >
+                {/* 1행 */}
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Controller
+                      name="collectionStartDate"
+                      control={control}
+                      render={({ field }) => (
+                        <DatePickerKr
+                          label="수집일자"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                    <Typography>-</Typography>
+                    <Controller
+                      name="collectionEndDate"
+                      control={control}
+                      render={({ field }) => (
+                        <DatePickerKr
+                          label="수집일자"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                  </Stack>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Controller
+                      name="closeStartDate"
+                      control={control}
+                      render={({ field }) => (
+                        <DatePickerKr
+                          label="수집일자"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                    <Typography>-</Typography>
+                    <Controller
+                      name="closeEndDate"
+                      control={control}
+                      render={({ field }) => (
+                        <DatePickerKr
+                          label="수집일자"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                  </Stack>
+                </Grid>
+                {/* 2행 */}
+                <Grid size={{ xs: 12, sm: 3 }}>
+                  <Controller
+                    name="docLclsfNo"
+                    control={control}
+                    render={({ field }) => (
+                      <MuiSelect
+                        id="docLclsfNo"
+                        label="대분류"
+                        items={lclsfList}
+                        value={field.value}
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          setValue("docMclsfNo", "");
+                          setValue("docSclsfNo", "");
+                        }}
+                      />
+                    )}
                   />
-                  <Typography>-</Typography>
-                  <DatePicker
-                    value={
-                      values.collectionStartDate
-                        ? dayjs(values.collectionStartDate)
-                        : null
-                    }
-                    onChange={handleDateFieldChange("collectionStartDate")}
-                    name="collectionStartDate"
+                </Grid>
+                {/* ... 나머지 Select, TextField, Checkbox도 동일하게 Controller로 감싸기 */}
+                <Grid size={{ xs: 12, sm: 3 }}>
+                  <Controller
+                    name="docMclsfNo"
+                    control={control}
+                    render={({ field }) => (
+                      <MuiSelect
+                        id="docMclsfNo"
+                        label="중분류"
+                        items={mclsfList}
+                        value={field.value}
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          setValue("docSclsfNo", "");
+                        }}
+                      />
+                    )}
                   />
-                </Stack>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 3 }}>
+                  <Controller
+                    name="docSclsfNo"
+                    control={control}
+                    render={({ field }) => (
+                      <MuiSelect
+                        id="docSclsfNo"
+                        label="소분류"
+                        items={sclsfList}
+                        value={field.value}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 3 }}>
+                  <Controller
+                    name="retentionPeriod"
+                    control={control}
+                    render={({ field }) => (
+                      <MuiSelect
+                        id="retentionPeriod"
+                        label="보유기간"
+                        items={[
+                          { value: "", label: "전체" },
+                          { value: "1", label: "1년" },
+                          { value: "3", label: "3년" },
+                          { value: "5", label: "5년" },
+                          { value: "10", label: "10년" },
+                          { value: "30", label: "30년" },
+                          { value: "90", label: "준영구" },
+                          { value: "99", label: "영구" },
+                          { value: "0", label: "직접입력" },
+                        ]}
+                        value={field.value}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
+                    )}
+                  />
+                </Grid>
+                {/* 3행 */}
+                <Grid size={{ xs: 12, sm: 4 }}>
+                  <Controller
+                    name="docNumber"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        fullWidth
+                        placeholder="문서번호"
+                        label="문서번호"
+                        {...field}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller
+                    name="docTitle"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        fullWidth
+                        placeholder="문서제목"
+                        label="문서제목"
+                        {...field}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 2 }}>
+                  <Controller
+                    name="agreeYn"
+                    control={control}
+                    render={({ field }) => (
+                      <MuiCheckbox
+                        id="agreeYn"
+                        label="정보주체 동의여부"
+                        checked={field.value}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                      />
+                    )}
+                  />
+                </Grid>
               </LocalizationProvider>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <DatePicker
-                    value={
-                      values.closeStartDate
-                        ? dayjs(values.closeStartDate)
-                        : null
-                    }
-                    onChange={handleDateFieldChange("closeStartDate")}
-                    name="closeStartDate"
-                    label="종료일자"
-                  />
-                  <Typography>-</Typography>
-                  <DatePicker
-                    value={
-                      values.closeStartDate
-                        ? dayjs(values.closeStartDate)
-                        : null
-                    }
-                    onChange={handleDateFieldChange("closeStartDate")}
-                    name="closeStartDate"
-                  />
-                </Stack>
-              </LocalizationProvider>
-            </Grid>
-            {/* 2행 */}
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <MuiSelect
-                id="largeCategory"
-                label="대분류"
-                items={[
-                  { value: "00", label: "전체" },
-                  { value: "01", label: "피해구제" },
-                ]}
-                value={values.largeCategory ?? "00"}
-                onChange={handleSelectFieldChange}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <MuiSelect
-                id="midCategory"
-                label="중분류"
-                items={[
-                  { value: "00", label: "전체" },
-                  { value: "01", label: "접수서류" },
-                  { value: "02", label: "신청자 제출서류" },
-                  { value: "03", label: "직원보완자료" },
-                ]}
-                value={values.midCategory ?? "00"}
-                onChange={handleSelectFieldChange}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <MuiSelect
-                id="smallCategory"
-                label="소분류"
-                items={[
-                  { value: "00", label: "전체" },
-                  { value: "01", label: "사망 신청" },
-                  { value: "02", label: "미성년자 신청" },
-                  { value: "03", label: "이전문서" },
-                  { value: "04", label: "의무기록" },
-                ]}
-                value={values.smallCategory ?? "00"}
-                onChange={handleSelectFieldChange}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <MuiSelect
-                id="retentionPeriod"
-                label="보유기간"
-                items={[
-                  { value: "00", label: "전체" },
-                  { value: "01", label: "사망 신청" },
-                  { value: "02", label: "미성년자 신청" },
-                  { value: "03", label: "이전문서" },
-                  { value: "04", label: "의무기록" },
-                ]}
-                value={values.retentionPeriod ?? "00"}
-                onChange={handleSelectFieldChange}
-              />
-            </Grid>
-            {/* 3행 */}
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <TextField
-                fullWidth
-                name="docNumber"
-                placeholder="문서번호"
-                label="문서번호"
-                value={values.docNumber ?? ""}
-                onChange={handleTextFieldChange}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                fullWidth
-                name="docTitle"
-                placeholder="문서제목"
-                label="문서제목"
-                value={values.docTitle ?? ""}
-                onChange={handleTextFieldChange}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 2 }}>
-              <MuiCheckbox
-                id="agreeYn"
-                label="정보주체 동의여부"
-                checked={values.agreeYn ?? false}
-                onChange={handleCheckboxFieldChange}
-              />
-            </Grid>
-          </Grid>
-          <Box display="flex" justifyContent="flex-end">
-            <Button variant="contained" onClick={handleSearch}>
-              검색
-            </Button>
-          </Box>
+            <Box display="flex" justifyContent="flex-end">
+              <Button variant="contained" type="submit">
+                검색
+              </Button>
+            </Box>
+          </form>
         </FormGroup>
       </SearchFilterContainer>
 
