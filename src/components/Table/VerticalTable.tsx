@@ -11,16 +11,30 @@ import {
   Typography,
 } from "@mui/material";
 
+// 문서고 전자문서 이력조회 테이블
 export interface HistoryRow {
   id?: number | string;
-  date: string;
-  actor: string;
-  action: string;
+  date?: string;
+  actor?: string;
+  action?: string;
   ip?: string;
   device?: string;
   dept?: string;
   name?: string;
-  // [key: string]: unknown;
+  [key: string]: unknown;
+}
+// 문서고 전자문서 리스트 테이블
+export interface IDocumentMetaInfo {
+  docClassification?: string;
+  docNumber?: string;
+  docTitle?: string;
+  personalInfo?: string;
+  collectDate?: string;
+  endDate?: string;
+  category?: string;
+  registrarDept?: string;
+  regDate?: string;
+  [key: string]: unknown;
 }
 
 export interface HeaderItem {
@@ -44,7 +58,7 @@ export default function VerticalTable({ rows, headers }: VerticalTableProps) {
   return (
     <TableContainer
       component={Paper}
-      sx={{ maxWidth: 900, margin: "auto", borderRadius: "0" }}
+      sx={{ width: "100%", margin: "auto", borderRadius: "0" }}
     >
       <Table aria-label="custom data table" sx={{ borderCollapse: "collapse" }}>
         {headers && headers.length > 0 && (

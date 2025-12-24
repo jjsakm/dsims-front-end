@@ -21,14 +21,14 @@ export interface ApprovalRowData {
 }
 
 export interface ApprovalHistoryTableProps {
-  approvalRows: ApprovalRowData[]; // 현재 공람 이력 데이터
-  onDeleteApprovalRow: (id: string) => void; // 공람자 삭제 핸들러
-  onAddApprovalRow: () => void; // 공람자 추가 핸들러
-  newDept: string; // 새로 추가할 공람자의 부서 상태
-  onNewDeptChange: (dept: string) => void; // 새로 추가할 공람자 부서 변경 핸들러
-  newName: string; // 새로 추가할 공람자의 이름 상태
-  onNewNameChange: (name: string) => void; // 새로 추가할 공람자 이름 변경 핸들러
-  tableAriaLabel?: string; // 접근성을 위한 aria-label (기본값 제공)
+  approvalRows: ApprovalRowData[];
+  onDeleteApprovalRow: (id: string) => void;
+  onAddApprovalRow: () => void;
+  newDept: string;
+  onNewDeptChange: (dept: string) => void;
+  newName: string;
+  onNewNameChange: (name: string) => void;
+  tableAriaLabel?: string;
 }
 
 export const ApprovalHistoryTable: React.FC<ApprovalHistoryTableProps> = ({

@@ -69,6 +69,7 @@ export const HorizontalTableView = ({ rows, tableAriaLabel }) => {
 };
 
 export const HorizontalTableCreate = ({ rows, tableAriaLabel }) => {
+  const theme = useTheme();
   return (
     <Table size="small" width="100%" aria-label={tableAriaLabel}>
       <TableBody>
@@ -76,7 +77,16 @@ export const HorizontalTableCreate = ({ rows, tableAriaLabel }) => {
           <TableRow key={ridx}>
             {row.groups.map((group, gidx) => (
               <React.Fragment key={`${ridx}-${gidx}`}>
-                <TableCell>{group.label}</TableCell>
+                <TableCell
+                  sx={{
+                    border: `1px solid ${theme.palette.divider}`,
+                    backgroundColor: theme.palette.grey[200],
+                    fontWeight: "bold",
+                    padding: theme.spacing(1),
+                  }}
+                >
+                  {group.label}
+                </TableCell>
                 <TableCell colSpan={group.contentColSpan ?? 3}>
                   {group.renderInput ? (
                     group.renderInput()
