@@ -1,4 +1,4 @@
-// DatePickerKr.tsx
+// DatePickerFt.tsx
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 
@@ -11,7 +11,7 @@ type Props = {
   // 필요하면 여기서 직접 추가 (size, variant 등)
 };
 
-export function DatePickerKr({ value, onChange, label, disabled }: Props) {
+export function DatePickerFt({ value, onChange, label, disabled }: Props) {
   const dayjsValue = value ? dayjs(value, "YYYYMMDD") : null;
 
   return (

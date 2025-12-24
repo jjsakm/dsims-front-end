@@ -31,7 +31,7 @@ import {
   useDocClsfChildrenLive,
   useLclsfListLive,
 } from "@/hooks/query/useDocClsfTree";
-import { DatePickerKr } from "@/components/Common/DatePickerKr";
+import { DatePickerFt } from "@/components/Common/DatePickerFt";
 
 const initSelectItem: SelectItem[] = [
   {
@@ -229,7 +229,7 @@ export default function HoldingInstitutionListPage() {
                       name="collectionStartDate"
                       control={control}
                       render={({ field }) => (
-                        <DatePickerKr
+                        <DatePickerFt
                           label="수집일자"
                           value={field.value}
                           onChange={field.onChange}
@@ -241,7 +241,7 @@ export default function HoldingInstitutionListPage() {
                       name="collectionEndDate"
                       control={control}
                       render={({ field }) => (
-                        <DatePickerKr
+                        <DatePickerFt
                           label=""
                           value={field.value}
                           onChange={field.onChange}
@@ -256,7 +256,7 @@ export default function HoldingInstitutionListPage() {
                       name="closeStartDate"
                       control={control}
                       render={({ field }) => (
-                        <DatePickerKr
+                        <DatePickerFt
                           label="종료일자"
                           value={field.value}
                           onChange={field.onChange}
@@ -268,7 +268,7 @@ export default function HoldingInstitutionListPage() {
                       name="closeEndDate"
                       control={control}
                       render={({ field }) => (
-                        <DatePickerKr
+                        <DatePickerFt
                           label=""
                           value={field.value}
                           onChange={field.onChange}
