@@ -25,7 +25,7 @@ import type {
 } from "@/types/holdingInstitution";
 import PageStatus from "@/components/PageStatus";
 import SearchFilterContainer from "@/components/Container/SearchFilterContainer";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, useWatch, Controller } from "react-hook-form";
 import type { SelectItem } from "@/types/common";
 import {
   useDocClsfChildrenLive,
@@ -42,7 +42,7 @@ const initSelectItem: SelectItem[] = [
 export default function HoldingInstitutionListPage() {
   const dialogs = useDialogs();
 
-  const [columnDefs] = React.useState<ColDef<any>[]>(listDefs);
+  const [columnDefs] = React.useState<ColDef[]>(listDefs);
 
   const [rowData, setRowsData] = React.useState<{
     rows: HoldingInstitution[];
@@ -59,7 +59,7 @@ export default function HoldingInstitutionListPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
 
-  const { control, handleSubmit, watch, setValue } = useForm<SearchValues>({
+  const { control, handleSubmit, setValue } = useForm<SearchValues>({
     defaultValues: {
       collectionStartDate: dayjs().format("YYYYMMDD"),
       collectionEndDate: dayjs().format("YYYYMMDD"),
@@ -75,8 +75,8 @@ export default function HoldingInstitutionListPage() {
     },
   });
 
-  const docLclsfNo = watch("docLclsfNo"); // 대분류
-  const docMclsfNo = watch("docMclsfNo"); // 중분류
+  const docLclsfNo = useWatch({ control, name: "docLclsfNo" });
+  const docMclsfNo = useWatch({ control, name: "docMclsfNo" });
 
   // react-query 적용 소스
   const { data: lclsfDocs } = useLclsfListLive();
