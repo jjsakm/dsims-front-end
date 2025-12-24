@@ -4,6 +4,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Paper,
   Stack,
   TextField,
   RadioGroup,
@@ -12,6 +13,8 @@ import {
   Checkbox,
   FormGroup,
   useTheme,
+  Typography,
+  TableContainer,
 } from "@mui/material";
 
 export interface CellGroup {
@@ -33,59 +36,76 @@ export interface HorizontalTableProps {
 
 export const HorizontalTableView = ({ rows, tableAriaLabel }) => {
   const theme = useTheme();
+
+  const styleGroup = {
+    container: { width: "100%" },
+    label: {
+      border: `1px solid ${theme.palette.divider}`,
+      backgroundColor: theme.palette.grey[100],
+      padding: theme.spacing(1),
+    },
+    text: {
+      fontWeight: "700",
+    },
+  };
+
   return (
-    <Table size="small" width="100%" aria-label={tableAriaLabel}>
-      <TableBody>
-        {rows.map((row, ridx) => (
-          <TableRow key={ridx}>
-            {row.groups.map((group, gidx) => (
-              <React.Fragment key={`${ridx}-${gidx}`}>
-                <TableCell
-                  sx={{
-                    border: `1px solid ${theme.palette.divider}`,
-                    backgroundColor: theme.palette.grey[200],
-                    fontWeight: "bold",
-                    padding: theme.spacing(1),
-                  }}
-                >
-                  {group.label}
-                </TableCell>
-                <TableCell colSpan={group.contentColSpan ?? 3}>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    {typeof group.content === "string"
-                      ? group.content
-                      : Array.isArray(group.content)
-                      ? group.content.join(", ")
-                      : group.content}
-                  </Stack>
-                </TableCell>
-              </React.Fragment>
-            ))}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <TableContainer
+      component={Paper}
+      sx={{ width: "100%", margin: "auto", borderRadius: "0" }}
+    >
+      <Table size="small" aria-label={tableAriaLabel} sx={styleGroup.container}>
+        <TableBody>
+          {rows.map((row, ridx) => (
+            <TableRow key={ridx}>
+              {row.groups.map((group, gidx) => (
+                <React.Fragment key={`${ridx}-${gidx}`}>
+                  <TableCell sx={styleGroup.label}>
+                    <Typography sx={styleGroup.text}>{group.label}</Typography>
+                  </TableCell>
+                  <TableCell colSpan={group.contentColSpan ?? 3}>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      {typeof group.content === "string"
+                        ? group.content
+                        : Array.isArray(group.content)
+                        ? group.content.join(", ")
+                        : group.content}
+                    </Stack>
+                  </TableCell>
+                </React.Fragment>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 
 export const HorizontalTableCreate = ({ rows, tableAriaLabel }) => {
   const theme = useTheme();
+
+  const styleGroup = {
+    container: { width: "100%" },
+    label: {
+      border: `1px solid ${theme.palette.divider}`,
+      backgroundColor: theme.palette.grey[100],
+      padding: theme.spacing(1),
+    },
+    text: {
+      fontWeight: "700",
+    },
+  };
+
   return (
-    <Table size="small" width="100%" aria-label={tableAriaLabel}>
+    <Table size="small" aria-label={tableAriaLabel} sx={styleGroup.container}>
       <TableBody>
         {rows.map((row, ridx) => (
           <TableRow key={ridx}>
             {row.groups.map((group, gidx) => (
               <React.Fragment key={`${ridx}-${gidx}`}>
-                <TableCell
-                  sx={{
-                    border: `1px solid ${theme.palette.divider}`,
-                    backgroundColor: theme.palette.grey[200],
-                    fontWeight: "bold",
-                    padding: theme.spacing(1),
-                  }}
-                >
-                  {group.label}
+                <TableCell sx={styleGroup.label}>
+                  <Typography sx={styleGroup.text}>{group.label}</Typography>
                 </TableCell>
                 <TableCell colSpan={group.contentColSpan ?? 3}>
                   {group.renderInput ? (

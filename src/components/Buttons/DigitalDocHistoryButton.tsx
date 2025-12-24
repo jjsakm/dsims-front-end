@@ -188,7 +188,16 @@ export default function DocDestructionHistoryButton() {
       <Button variant="outlined" size="small" onClick={handleClickOpen}>
         이력
       </Button>
-      <Dialog maxWidth="xl" open={open} onClose={handleClose}>
+      <Dialog
+        maxWidth="xl"
+        open={open}
+        onClose={handleClose}
+        PaperProps={{
+          sx: {
+            backgroundColor: "#fff",
+          },
+        }}
+      >
         <StyledDialogTitle>
           이력
           <CloseButton aria-label="close" onClick={handleClose}>

@@ -2,10 +2,12 @@
 
 import React from "react";
 import {
+  TableContainer,
   Table,
   TableBody,
   TableRow,
   TableCell,
+  Paper,
   Button,
   Select,
   MenuItem,
@@ -42,11 +44,12 @@ export const ApprovalHistoryTable: React.FC<ApprovalHistoryTableProps> = ({
   tableAriaLabel = "공람 이력 테이블",
 }) => {
   const theme = useTheme();
-  const style = {
-    container: { width: "100%" },
+
+  const styleGroup = {
+    container: { width: "100%", margin: "auto", borderRadius: "0" },
     label: {
       border: `1px solid ${theme.palette.divider}`,
-      backgroundColor: theme.palette.grey[200],
+      backgroundColor: theme.palette.grey[100],
       padding: theme.spacing(1),
     },
     text: {
@@ -55,27 +58,27 @@ export const ApprovalHistoryTable: React.FC<ApprovalHistoryTableProps> = ({
   };
 
   return (
-    <Box sx={style.container}>
+    <TableContainer component={Paper} sx={styleGroup.container}>
       <Table aria-label={tableAriaLabel} size="small">
         <TableBody>
           <TableRow>
             <TableCell
               rowSpan={approvalRows.length + 2}
               align="center"
-              sx={style.label}
+              sx={styleGroup.label}
             >
-              <Typography sx={style.text}>공람</Typography>
+              <Typography sx={styleGroup.text}>공람</Typography>
             </TableCell>
 
             {/* 나머지 헤더 셀 */}
-            <TableCell align="center" sx={style.label}>
-              <Typography sx={style.text}>부서</Typography>
+            <TableCell align="center" sx={styleGroup.label}>
+              <Typography sx={styleGroup.text}>부서</Typography>
             </TableCell>
-            <TableCell align="center" sx={style.label}>
-              <Typography sx={style.text}>이름</Typography>
+            <TableCell align="center" sx={styleGroup.label}>
+              <Typography sx={styleGroup.text}>이름</Typography>
             </TableCell>
-            <TableCell align="center" sx={style.label}>
-              <Typography sx={style.text}>삭제</Typography>
+            <TableCell align="center" sx={styleGroup.label}>
+              <Typography sx={styleGroup.text}>삭제</Typography>
             </TableCell>
           </TableRow>
 
@@ -149,6 +152,6 @@ export const ApprovalHistoryTable: React.FC<ApprovalHistoryTableProps> = ({
           </TableRow>
         </TableBody>
       </Table>
-    </Box>
+    </TableContainer>
   );
 };

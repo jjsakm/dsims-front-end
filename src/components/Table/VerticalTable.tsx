@@ -55,11 +55,26 @@ interface VerticalTableProps {
 export default function VerticalTable({ rows, headers }: VerticalTableProps) {
   const theme = useTheme();
 
+
+  const styleGroup = {
+    container: { width: "100%", margin: "auto", borderRadius: "0" },
+    label: {
+      border: `1px solid ${theme.palette.divider}`,
+      backgroundColor: theme.palette.grey[100],
+      padding: theme.spacing(1),
+      width: "header.width",
+    },
+    text: {
+      fontWeight: "700",
+    },
+    content: {
+      border: `1px solid ${theme.palette.divider}`,
+      padding: theme.spacing(1),
+    },
+  };
+
   return (
-    <TableContainer
-      component={Paper}
-      sx={{ width: "100%", margin: "auto", borderRadius: "0" }}
-    >
+    <TableContainer component={Paper} sx={styleGroup.container}>
       <Table aria-label="custom data table" sx={{ borderCollapse: "collapse" }}>
         {headers && headers.length > 0 && (
           <TableHead>
@@ -71,21 +86,9 @@ export default function VerticalTable({ rows, headers }: VerticalTableProps) {
                     align={header.align || "center"}
                     colSpan={header.colSpan}
                     rowSpan={header.rowSpan}
-                    sx={{
-                      border: `1px solid ${theme.palette.divider}`,
-                      backgroundColor: theme.palette.grey[200],
-                      fontWeight: "bold",
-                      width: header.width,
-                      padding: theme.spacing(1),
-                    }}
+                    sx={styleGroup.label}
                   >
-                    <Typography
-                      sx={{
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {header.label}
-                    </Typography>
+                    <Typography sx={styleGroup.text}>{header.label}</Typography>
                   </TableCell>
                 ))}
               </TableRow>
@@ -100,10 +103,7 @@ export default function VerticalTable({ rows, headers }: VerticalTableProps) {
                   <TableCell
                     key={`${row.id}-${header.key}`}
                     align={header.align || "center"}
-                    sx={{
-                      border: `1px solid ${theme.palette.divider}`,
-                      padding: theme.spacing(1),
-                    }}
+                    sx={styleGroup.content}
                   >
                     {header.render
                       ? header.render(row[header.key], row)
@@ -111,15 +111,7 @@ export default function VerticalTable({ rows, headers }: VerticalTableProps) {
                   </TableCell>
                 ))
               ) : (
-                // ✨ headers가 없는 경우, 행 전체를 하나의 셀로 렌더링하는 등의 대체 로직을 넣을 수도 있습니다. ✨
-                // 예시: 모든 값을 문자열로 합쳐 하나의 셀에 표시
-                <TableCell
-                  colSpan={100}
-                  sx={{
-                    border: `1px solid ${theme.palette.divider}`,
-                    padding: theme.spacing(1),
-                  }}
-                >
+                <TableCell colSpan={100} sx={styleGroup.content}>
                   {Object.values(row)
                     .map((v) => String(v))
                     .join(" | ")}
