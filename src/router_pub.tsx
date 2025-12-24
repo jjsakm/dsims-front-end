@@ -3,9 +3,11 @@ import DocClassificationListPage from "./pages_pub/DocClassification/DocClassifi
 import ManagementDetaiilPage from "./pages_pub/DocClassification/DocClassificationDetailPage";
 import DocClassificationFormPage from "./pages_pub/DocClassification/DocClassificationFormPage";
 import HoldingInstitutionListPage from "./pages_pub/HoldingInstitution/HoldingInstitutionListPage";
+
 import DigitalDocListPage from "./pages_pub/DigitalDoc/DigitalDocListPage";
 import DigitalDocDetailPage from "./pages_pub/DigitalDoc/DigitalDocDetailPage";
 import DigitalDocFormPage from "./pages_pub/DigitalDoc/DigitalDocFormPage";
+
 import DocDestructionListPage from "./pages_pub/DocDestruction/DocDestructionListPage";
 import DocDestructionReqListPage from "./pages_pub/DocDestruction/DocDestructionReqListPage";
 import DocDestructionAppvListPage from "./pages_pub/DocDestruction/DocDestructionAppvListPage";
@@ -18,10 +20,11 @@ const URL = {
   DOC_CLASSIFICATION_CREATE: "docClassification/create",
   DOC_CLASSIFICATION_MODIFY: "docClassification/:docClassificationId/modify",
   HOLDING_INSTITUTION_LIST: "holdingInstitution/list",
+
   DIGITAL_DOC_LIST: "digitalDoc/list",
-  DIGITAL_DOC_DETAIL: "digitalDoc/:digitalDocId",
+  DIGITAL_DOC_DETAIL: "digitalDoc/detail",
   DIGITAL_DOC_CREATE: "digitalDoc/create",
-  DIGITAL_DOC_EDIT: "digitalDoc/:digitalDocId/edit",
+
   DOC_DESTRUCTION_REQ_LIST: "docDestruction/reqList",
   DOC_DESTRUCTION_APPV_LIST: "docDestruction/appvList",
   DOC_DESTRUCTION_LIST: "docDestruction/list",
