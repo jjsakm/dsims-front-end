@@ -14,7 +14,7 @@ import MuiSelect from "@/components/Elements/MuiSelect";
 import MuiCheckbox from "@/components/Elements/MuiCheckbox";
 import type { ColDef } from "ag-grid-community";
 import { listDefs } from "./col-def";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { getHoldingInstitutionList } from "@/services/holdingInstitutionService";
@@ -31,6 +31,7 @@ import {
   useDocClsfChildrenLive,
   useLclsfListLive,
 } from "@/hooks/query/useDocClsfTree";
+import { DatePickerKr } from "@/components/Common/DatePickerKr";
 
 const initSelectItem: SelectItem[] = [
   {
@@ -78,7 +79,7 @@ export default function HoldingInstitutionListPage() {
   const docLclsfNo = useWatch({ control, name: "docLclsfNo" });
   const docMclsfNo = useWatch({ control, name: "docMclsfNo" });
 
-  // react-query 적용 소스
+  // react-query 적용 소스 start
   const { data: lclsfDocs } = useLclsfListLive();
   const { data: mclsfDocs } = useDocClsfChildrenLive(docLclsfNo);
   const { data: sclsfDocs } = useDocClsfChildrenLive(docMclsfNo);
@@ -110,6 +111,8 @@ export default function HoldingInstitutionListPage() {
         })),
       ]
     : initSelectItem;
+
+  // react-query 적용 소스 end
 
   const handleSelectionChange = React.useCallback(
     (rows: HoldingInstitution[]) => {
@@ -195,27 +198,21 @@ export default function HoldingInstitutionListPage() {
         <FormGroup>
           <form onSubmit={handleSubmit(handleSearch)}>
             <Grid container mt={2} spacing={2} width="100%">
-              {/* 1행 */}
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <LocalizationProvider
-                  dateAdapter={AdapterDayjs}
-                  adapterLocale="ko" // 한국어
-                >
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+                adapterLocale="ko" // 한국어
+              >
+                {/* 1행 */}
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <Stack direction="row" spacing={2} alignItems="center">
                     <Controller
                       name="collectionStartDate"
                       control={control}
                       render={({ field }) => (
-                        <DatePicker
+                        <DatePickerKr
                           label="수집일자"
-                          format="YYYY-MM-DD" // 화면에 보이는 형식
-                          {...field}
-                          value={field.value ? dayjs(field.value) : null}
-                          onChange={(date) =>
-                            field.onChange(
-                              date ? dayjs(date).format("YYYYMMDD") : ""
-                            )
-                          }
+                          value={field.value}
+                          onChange={field.onChange}
                         />
                       )}
                     />
@@ -224,42 +221,25 @@ export default function HoldingInstitutionListPage() {
                       name="collectionEndDate"
                       control={control}
                       render={({ field }) => (
-                        <DatePicker
-                          label=""
-                          format="YYYY-MM-DD" // 화면에 보이는 형식
-                          {...field}
-                          value={field.value ? dayjs(field.value) : null}
-                          onChange={(date) =>
-                            field.onChange(
-                              date ? dayjs(date).format("YYYYMMDD") : ""
-                            )
-                          }
+                        <DatePickerKr
+                          label="수집일자"
+                          value={field.value}
+                          onChange={field.onChange}
                         />
                       )}
                     />
                   </Stack>
-                </LocalizationProvider>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <LocalizationProvider
-                  dateAdapter={AdapterDayjs}
-                  adapterLocale="ko" // 한국어
-                >
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <Stack direction="row" spacing={2} alignItems="center">
                     <Controller
                       name="closeStartDate"
                       control={control}
                       render={({ field }) => (
-                        <DatePicker
-                          label="종료일자"
-                          format="YYYY-MM-DD" // 화면에 보이는 형식
-                          {...field}
-                          value={field.value ? dayjs(field.value) : null}
-                          onChange={(date) =>
-                            field.onChange(
-                              date ? dayjs(date).format("YYYYMMDD") : ""
-                            )
-                          }
+                        <DatePickerKr
+                          label="수집일자"
+                          value={field.value}
+                          onChange={field.onChange}
                         />
                       )}
                     />
@@ -268,144 +248,138 @@ export default function HoldingInstitutionListPage() {
                       name="closeEndDate"
                       control={control}
                       render={({ field }) => (
-                        <DatePicker
-                          label=""
-                          format="YYYY-MM-DD" // 화면에 보이는 형식
-                          {...field}
-                          value={field.value ? dayjs(field.value) : null}
-                          onChange={(date) =>
-                            field.onChange(
-                              date ? dayjs(date).format("YYYYMMDD") : ""
-                            )
-                          }
+                        <DatePickerKr
+                          label="수집일자"
+                          value={field.value}
+                          onChange={field.onChange}
                         />
                       )}
                     />
                   </Stack>
-                </LocalizationProvider>
-              </Grid>
-              {/* 2행 */}
-              <Grid size={{ xs: 12, sm: 3 }}>
-                <Controller
-                  name="docLclsfNo"
-                  control={control}
-                  render={({ field }) => (
-                    <MuiSelect
-                      id="docLclsfNo"
-                      label="대분류"
-                      items={lclsfList}
-                      value={field.value}
-                      onChange={(e) => {
-                        field.onChange(e.target.value);
-                        setValue("docMclsfNo", "");
-                        setValue("docSclsfNo", "");
-                      }}
-                    />
-                  )}
-                />
-              </Grid>
-              {/* ... 나머지 Select, TextField, Checkbox도 동일하게 Controller로 감싸기 */}
-              <Grid size={{ xs: 12, sm: 3 }}>
-                <Controller
-                  name="docMclsfNo"
-                  control={control}
-                  render={({ field }) => (
-                    <MuiSelect
-                      id="docMclsfNo"
-                      label="중분류"
-                      items={mclsfList}
-                      value={field.value}
-                      onChange={(e) => {
-                        field.onChange(e.target.value);
-                        setValue("docSclsfNo", "");
-                      }}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 3 }}>
-                <Controller
-                  name="docSclsfNo"
-                  control={control}
-                  render={({ field }) => (
-                    <MuiSelect
-                      id="docSclsfNo"
-                      label="소분류"
-                      items={sclsfList}
-                      value={field.value}
-                      onChange={(e) => field.onChange(e.target.value)}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 3 }}>
-                <Controller
-                  name="retentionPeriod"
-                  control={control}
-                  render={({ field }) => (
-                    <MuiSelect
-                      id="retentionPeriod"
-                      label="보유기간"
-                      items={[
-                        { value: "", label: "전체" },
-                        { value: "1", label: "1년" },
-                        { value: "3", label: "3년" },
-                        { value: "5", label: "5년" },
-                        { value: "10", label: "10년" },
-                        { value: "30", label: "30년" },
-                        { value: "90", label: "준영구" },
-                        { value: "99", label: "영구" },
-                        { value: "0", label: "직접입력" },
-                      ]}
-                      value={field.value}
-                      onChange={(e) => field.onChange(e.target.value)}
-                    />
-                  )}
-                />
-              </Grid>
-              {/* 3행 */}
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <Controller
-                  name="docNumber"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      fullWidth
-                      placeholder="문서번호"
-                      label="문서번호"
-                      {...field}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <Controller
-                  name="docTitle"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      fullWidth
-                      placeholder="문서제목"
-                      label="문서제목"
-                      {...field}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 2 }}>
-                <Controller
-                  name="agreeYn"
-                  control={control}
-                  render={({ field }) => (
-                    <MuiCheckbox
-                      id="agreeYn"
-                      label="정보주체 동의여부"
-                      checked={field.value}
-                      onChange={(e) => field.onChange(e.target.checked)}
-                    />
-                  )}
-                />
-              </Grid>
+                </Grid>
+                {/* 2행 */}
+                <Grid size={{ xs: 12, sm: 3 }}>
+                  <Controller
+                    name="docLclsfNo"
+                    control={control}
+                    render={({ field }) => (
+                      <MuiSelect
+                        id="docLclsfNo"
+                        label="대분류"
+                        items={lclsfList}
+                        value={field.value}
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          setValue("docMclsfNo", "");
+                          setValue("docSclsfNo", "");
+                        }}
+                      />
+                    )}
+                  />
+                </Grid>
+                {/* ... 나머지 Select, TextField, Checkbox도 동일하게 Controller로 감싸기 */}
+                <Grid size={{ xs: 12, sm: 3 }}>
+                  <Controller
+                    name="docMclsfNo"
+                    control={control}
+                    render={({ field }) => (
+                      <MuiSelect
+                        id="docMclsfNo"
+                        label="중분류"
+                        items={mclsfList}
+                        value={field.value}
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          setValue("docSclsfNo", "");
+                        }}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 3 }}>
+                  <Controller
+                    name="docSclsfNo"
+                    control={control}
+                    render={({ field }) => (
+                      <MuiSelect
+                        id="docSclsfNo"
+                        label="소분류"
+                        items={sclsfList}
+                        value={field.value}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 3 }}>
+                  <Controller
+                    name="retentionPeriod"
+                    control={control}
+                    render={({ field }) => (
+                      <MuiSelect
+                        id="retentionPeriod"
+                        label="보유기간"
+                        items={[
+                          { value: "", label: "전체" },
+                          { value: "1", label: "1년" },
+                          { value: "3", label: "3년" },
+                          { value: "5", label: "5년" },
+                          { value: "10", label: "10년" },
+                          { value: "30", label: "30년" },
+                          { value: "90", label: "준영구" },
+                          { value: "99", label: "영구" },
+                          { value: "0", label: "직접입력" },
+                        ]}
+                        value={field.value}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
+                    )}
+                  />
+                </Grid>
+                {/* 3행 */}
+                <Grid size={{ xs: 12, sm: 4 }}>
+                  <Controller
+                    name="docNumber"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        fullWidth
+                        placeholder="문서번호"
+                        label="문서번호"
+                        {...field}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller
+                    name="docTitle"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        fullWidth
+                        placeholder="문서제목"
+                        label="문서제목"
+                        {...field}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 2 }}>
+                  <Controller
+                    name="agreeYn"
+                    control={control}
+                    render={({ field }) => (
+                      <MuiCheckbox
+                        id="agreeYn"
+                        label="정보주체 동의여부"
+                        checked={field.value}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                      />
+                    )}
+                  />
+                </Grid>
+              </LocalizationProvider>
             </Grid>
             <Box display="flex" justifyContent="flex-end">
               <Button variant="contained" type="submit">
